@@ -24,12 +24,36 @@ Fill in this folder with the appropriate paths.
 ```
 {
   "plantnet_data": [path to downloaded Pl@nt300-K data],
-  "inaturalist_data": [path to downloaded Pl@nt300-K data. This should contain the files `train2018.json`, `val2018.json`, and sub-directory `train_val2018`],
+  "inaturalist_data": [path to downloaded Pl@nt300-K data. This should contain the files
+                    `train2018.json`, `val2018.json`, and sub-directory `train_val2018`],
   "scores_and_labels": [path to folder where model weights and softmax scores will be saved],
-  "conformal_results":   [path to folder where conformal results from running `get_results.py` will be saved], 
+  "conformal_results":   [path to folder where conformal results from running
+                        `get_results.py` will be saved], 
   "figs": [path to folder where you want figures to be saved]
 }
 ```
+
+## Reproducing paper plots
+
+To generate the plots from the paper:
+
+**Step 0:** For each of the four datasets (`plantnet`, `plantnet-trunc`, `inaturalist`, and `inaturalist-trunc`), obtain the `val` and `test` softmax scores and labels, as well as the `train` labels and put them in the folder specified by `"scores_and_labels"` in `folders.json`. This can be done by either
+(a) Following the instructions in `train_models/README.md` to train the classifiers yourself
+(b) Downloading the softmax scores we have precomputed, which are available at [TODO]
+
+**Step 1:** Run `scripts/run_get_results.sh` by running  
+
+```
+sh scripts/run_get_results.sh
+```
+or, if you are using a Slurm system, by running
+```
+sbatch scripts/run_get_results.sh
+```
+
+This will apply various conformal prediction procedures to each dataset and save evaluation metrics to the `"conformal_results"` folder specified in `folders.json`.
+
+**Step 2:** After saving these metrics, run the Jupyter notebooks in `notebooks/`. This will generate the figures and save them to the `"figs"` folder specified in `folders.json`.
 
 ## Acknowledgements 
 
