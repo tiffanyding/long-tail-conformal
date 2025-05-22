@@ -1,0 +1,10 @@
+train_models/TEST_CACHE
+scratch.ipynb
+folders_TRUE.json
+
+
+*.ipynb_checkpoints/
+*__pycache__/
+
+*.out
+

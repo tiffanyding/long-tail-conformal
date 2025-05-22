@@ -1,0 +1,7 @@
+{
+  "plantnet_data": "/home-warm/plantnet/plantnet_300K/images",
+  "inaturalist_data": "/home-warm/plantnet/inaturalist/",
+  "scores_and_labels":   "TEST_CACHE",
+  "conformal_results":   "/home-warm/plantnet/conformal_cache/metrics", 
+  "figs": "figs"
+}
