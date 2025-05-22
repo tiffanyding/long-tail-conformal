@@ -21,6 +21,7 @@ This adds a kernel called `ltc-env` to your list of Jupyter kernels.
 
 Fill in this folder with the appropriate paths.
 
+```
 {
   "plantnet_data": [path to downloaded Pl@nt300-K data],
   "inaturalist_data": [path to downloaded Pl@nt300-K data. This should contain the files `train2018.json`, `val2018.json`, and sub-directory `train_val2018`],
@@ -28,6 +29,7 @@ Fill in this folder with the appropriate paths.
   "conformal_results":   [path to folder where conformal results from running `get_results.py` will be saved], 
   "figs": [path to folder where you want figures to be saved]
 }
+```
 
 ## Acknowledgements 
 

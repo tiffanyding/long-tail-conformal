@@ -2,7 +2,7 @@ train_models/TEST_CACHE
 scratch.ipynb
 folders_TRUE.json
 
-
+notebooks/figs/
 *.ipynb_checkpoints/
 *__pycache__/
 
