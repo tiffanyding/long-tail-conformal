@@ -17,6 +17,10 @@ ipython3 kernel install --user --name=ltc-env
 ```
 This adds a kernel called `ltc-env` to your list of Jupyter kernels. 
 
+## Getting started
+
+TODO: provide code/example notebook for running Standard with PAS, Fuzzy CP, and Interp-Q.
+
 ## folders.json
 
 Fill in this folder with the appropriate paths.
@@ -37,9 +41,9 @@ Fill in this folder with the appropriate paths.
 
 To generate the plots from the paper:
 
-**Step 0:** For each of the four datasets (`plantnet`, `plantnet-trunc`, `inaturalist`, and `inaturalist-trunc`), obtain the `val` and `test` softmax scores and labels, as well as the `train` labels and put them in the folder specified by `"scores_and_labels"` in `folders.json`. This can be done by either
-(a) Following the instructions in `train_models/README.md` to train the classifiers yourself
-(b) Downloading the softmax scores we have precomputed, which are available at [TODO]
+**Step 0:** For each of the four datasets (`plantnet`, `plantnet-trunc`, `inaturalist`, and `inaturalist-trunc`), obtain the `val` and `test` softmax scores and labels, as well as the `train` labels and put them in the folder specified by `"scores_and_labels"` in `folders.json`. There are two options for doing this
+- Option A: Follow the instructions in `train_models/README.md` to train the classifiers yourself
+- Option B: Download the softmax scores we have precomputed, which are available at [TODO]
 
 **Step 1:** Run `scripts/run_get_results.sh` by running  
 
