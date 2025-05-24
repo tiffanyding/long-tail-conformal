@@ -2,7 +2,6 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle
-# import torch
 
 import pdb
 
@@ -12,11 +11,10 @@ from scipy.sparse import lil_matrix
 from scipy.stats import multivariate_normal, rv_discrete
 
 # # For clustered conformal
-from utils.clustering_utils import embed_all_classes
+# from utils.clustering_utils import embed_all_classes
 from sklearn.cluster import KMeans
 from sklearn.model_selection import train_test_split
 
-# from np_quantile_utils import quantile
 
 #========================================
 #  Misc.
@@ -175,21 +173,6 @@ def get_conformal_scores(softmax_scores, score, train_labels_path=None, weights=
 
     return scores 
 
-# def get_conformal_scores_dict(softmax_scores):
-#     '''
-#     Given softmax scores (n, num_classes), return dict of softmax, APS, and RAPS softmax score matrices
-#         {'softmax': ...,
-#          'APS': ...,
-#          'RAPS': ...}
-#     '''
-#     # RAPS hyperparameters (currently using ImageNet defaults)
-#     lmbda = .01 
-#     kreg = 5
-#     conformal_scores = {'softmax': 1 - softmax_scores,
-#                       'APS': get_APS_scores_all(softmax_scores, randomize=True, seed=0),
-#                       'RAPS': get_RAPS_scores_all(softmax_scores, lmbda, kreg, randomize=True, seed=0)}
-
-#     return conformal_scores
 
 #========================================
 #   General conformal utils
@@ -453,6 +436,45 @@ def classwise_conformal(totalcal_scores_all, totalcal_labels, val_scores_all, va
 #========================================
 #   Clustered conformal prediction
 #========================================
+
+def quantile_embedding(samples, q=[0.5, 0.6, 0.7, 0.8, 0.9]):
+    '''
+    Computes the q-quantiles of samples and returns the vector of quantiles
+    '''
+    return np.quantile(samples, q)
+
+def embed_all_classes(scores_all, labels, q=[0.5, 0.6, 0.7, 0.8, 0.9], return_cts=False):
+    '''
+    Input:
+        - scores_all: num_instances x num_classes array where 
+            scores_all[i,j] = score of class j for instance i
+          Alternatively, num_instances-length array where scores_all[i] = score of true class for instance i
+        - labels: num_instances-length array of true class labels
+        - q: quantiles to include in embedding
+        - return_cts: if True, return an array containing the counts for each class 
+        
+    Output: 
+        - embeddings: num_classes x len(q) array where ith row is the embeddings of class i
+        - (Optional) cts: num_classes-length array where cts[i] = # of times class i 
+        appears in labels 
+    '''
+    num_classes = len(np.unique(labels))
+    
+    embeddings = np.zeros((num_classes, len(q)))
+    cts = np.zeros((num_classes,))
+    
+    for i in range(num_classes):
+        if len(scores_all.shape) == 2:
+            class_i_scores = scores_all[labels==i,i]
+        else:
+            class_i_scores = scores_all[labels==i] 
+        cts[i] = class_i_scores.shape[0]
+        embeddings[i,:] = quantile_embedding(class_i_scores, q=q)
+    
+    if return_cts:
+        return embeddings, cts
+    else:
+        return embeddings
 
 def compute_cluster_specific_qhats(cluster_assignments, cal_scores_all, cal_true_labels, alpha, 
                                    null_qhat='standard', exact_coverage=False):
@@ -798,8 +820,6 @@ def fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, val_scores_all=None,
         
         proj_arr = np.random.rand(num_classes).astype(np.float64)
 
-        # # TEMP, FOR TESTING
-        # proj_arr = np.linspace(0,1, num_classes)
     elif projection == 'quantile': # Project each class to an estimate of its 1-alpha score quantile
         # We use linear interpolation. e.g., the 0.9 quantile of [1, 2] is 1.9
         # For classes with 0 examples, we arbitrarily choose to map it to the 
@@ -886,29 +906,7 @@ def fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, val_scores_all=None,
             # Compute weighted quantile (note that due to numerical imprecision,
             # it is better to let np.quantile do the normalization of weights within the function)
             S_all = np.concatenate((cal_scores, [np.inf]))
-            # New: Use np.quantile with weights
             weighted_quantile = np.quantile(S_all, q=1 - alpha, weights=weights, method="inverted_cdf")
-
-            # Original
-
-            # # Normalize weights to sum to 1 
-            # weights = weights / np.sum(weights)
-            
-            # sorted_indices = np.argsort(S_all)
-            # S_all = S_all[sorted_indices]
-            # weights = weights[sorted_indices] # reorder weights to align with sorted_S_cal
-            # cumulative_sum = np.cumsum(weights)
-            # ind = np.argmax(cumulative_sum > (1 - alpha))
-            # ind = np.argmax(cumulative_sum >= (1 - alpha)) # CHANGED TO >= !
-            # weighted_quantile = S_all[ind]
-            
-            # cdf = np.cumsum(weights)
-            # ind = np.searchsorted(cdf, 1-alpha, side='left')
-            # weighted_quantile = S_all[ind]
-            
-            # Another attempt
-            # weighted_quantile = quantile(S_all, 1-alpha, weights=weights)
-
             
             class_qhats[k] = weighted_quantile
 
@@ -942,9 +940,6 @@ def fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, val_scores_all=None,
     # Pre-process: replace infinite qhats with a finite value (e.g., the max score)
     if reconformalize is not None:
         class_qhats = np.minimum(np.max(cal_scores_all), class_qhats)
-        # Actually, I don't think this is needed to get a lower bound on coverage
-        # Update: I still think it is useful to do, otherwise when we reconformalize we
-        # will excessively drag down coverage for classes with finite qhats
 
         if reconformalize_data is not None: # use heldout data
             holdout_scores_all, holdout_labels = reconformalize_data
@@ -957,23 +952,11 @@ def fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, val_scores_all=None,
         if reconformalize == 'additive':
             S = reconf_scores - np.array([class_qhats[y] for y in reconf_labels])
             conformal_offset = get_conformal_quantile(S, alpha)
-            # Always apply
-            class_qhats += conformal_offset
-            # Only apply if it improves coverage
-            # if conformal_offset > 0:
-            #     print(f'Applying additive offset of {conformal_offset:.5f} to class_qhats to ensure marginal coverage') 
-            #     class_qhats += conformal_offset
-            # else:
-            #     print(f'Ignoring additive offset of {conformal_offset:.5f} because this decreases marginal coverage')
-            
+            class_qhats += conformal_offset   
         elif reconformalize == 'multiplicative':
             S = reconf_scores / np.array([class_qhats[y] for y in reconf_labels])
             conformal_offset = get_conformal_quantile(S, alpha)     
-            if conformal_offset > 1:
-                print(f'Applying multiplicative scaling of {conformal_offset:.5f} to class_qhats to ensure marginal coverage') 
-                class_qhats *= conformal_offset
-            else:
-                print(f'Ignoring multiplicative scaling of {conformal_offset:.5f} because this decreases marginal coverage')
+            class_qhats *= conformal_offset
         elif reconformalize == 'alpha': 
             # Find the alpha' such that taking the 1-alpha' quantile of the class-weighted score distribution
             # yields 1-alpha marginal coverage
@@ -983,14 +966,8 @@ def fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, val_scores_all=None,
             S = np.array([F[y].cdf(reconf_scores[i]) for i,y in enumerate(reconf_labels)]) # CHECK
             alpha_hat = 1-get_conformal_quantile(S, alpha) 
             class_qhats = np.array([F[y].ppf(1-alpha_hat) for y in range(num_classes)])
-            # if alpha_hat < alpha:
-            #     print('Applying alpha reconformalization with alpha_hat =', alpha_hat)
-            #     # pdb.set_trace()
-            #     class_qhats = np.array([F[y].ppf(1-alpha_hat) for y in range(num_classes)])
-            # else:
-            #     print(f'Ignoring alpha reconformalization using alpha_hat={alpha_hat} because this decreases marginal coverage')
         else:
-            raise ValueError('Invalid "reconformalize" option. Options are "additive" and "multiplicative"')
+            raise ValueError('Invalid "reconformalize" option. Options are "additive", "multiplicative", and "alpha"')
         
     # 4) [Optional] If val_scores_all is not None, construct prediction sets for it
     if val_scores_all is not None:
@@ -1022,7 +999,6 @@ def get_exact_coverage_conformal_params(scores, alpha, default_qhat=np.inf):
     n = len(scores)
     
     if n == 0:
-        # return np.inf, np.inf, 1 # CHANGED
         return np.inf, 0, .1
     
     val_a = np.ceil((n+1)*(1-alpha)) / n
@@ -1309,7 +1285,6 @@ def compute_class_false_positive_ct(true_labels, set_preds):
 
     # v2: Fast
    
-    
     num_samples = len(true_labels)
     num_classes = max(true_labels) + 1
     

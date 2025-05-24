@@ -19,7 +19,7 @@ This adds a kernel called `ltc-env` to your list of Jupyter kernels.
 
 ## Getting started
 
-TODO: provide code/example notebook for running Standard with PAS, Fuzzy CP, and Interp-Q.
+If you want to run our methods on your own dataset, check out `example.ipynb`! This notebook provides stand-alone implementations of all of proposed methods (Standard CP with PAS, Fuzzy CP, and Interp-Q). 
 
 ## folders.json
 
