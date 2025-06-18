@@ -2,9 +2,15 @@ import json
 # from pathlib import Path
 
 # Read once
-cfg_path = "../folders.json"
-with open(cfg_path) as f:
-    cfg = json.load(f)
+try:
+    with open("folders.json") as f:
+        cfg = json.load(f)
+except FileNotFoundError:
+    try:
+        with open(os.path.join("..", "folders.json")) as f:
+            cfg = json.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError("Could not find 'folders.json' in the current or parent directory.")
 
 def get_plantnet_folder():
     return cfg['plantnet_data']

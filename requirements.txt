@@ -11,6 +11,5 @@ statsmodels
 tqdm
 
 # GPU‐enabled PyTorch
-pytorch:pytorch
-pytorch::cudatoolkit=12.4      # If needed, replace with the CUDA version on your decide (check by running `nvcc --version`)
+conda-forge::pytorch-gpu
 pytorch::torchvision          
