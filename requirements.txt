@@ -8,16 +8,9 @@ numpy>=2.0.0
 scikit-learn
 seaborn
 statsmodels
-#tensorflow
-#torch
-#torchvision
+tqdm
 
 # GPU‐enabled PyTorch
 pytorch:pytorch
 pytorch::cudatoolkit=12.4      # If needed, replace with the CUDA version on your decide (check by running `nvcc --version`)
 pytorch::torchvision          
-
-#pytorch:pytorch=2.1.2
-
-# conda-forge::timm # (Only used in plantnet_utils.py, which I think is no longer needed)
-tqdm
