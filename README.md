@@ -30,7 +30,7 @@ Fill in this folder with the appropriate paths.
   "plantnet_data": [path to downloaded Pl@nt300-K data],
   "inaturalist_data": [path to downloaded Pl@nt300-K data. This should contain the files
                     `train2018.json`, `val2018.json`, and sub-directory `train_val2018`],
-  "scores_and_labels": [path to folder where model weights and softmax scores will be saved],
+  "scores_and_labels": [path to folder where model weights and softmax scores are saved],
   "conformal_results":   [path to folder where conformal results from running
                         `get_results.py` will be saved], 
   "figs": [path to folder where you want figures to be saved]
@@ -43,7 +43,7 @@ To generate the plots from the paper:
 
 **Step 0:** For each of the four datasets (`plantnet`, `plantnet-trunc`, `inaturalist`, and `inaturalist-trunc`), obtain the `val` and `test` softmax scores and labels, as well as the `train` labels and put them in the folder specified by `"scores_and_labels"` in `folders.json`. There are two options for doing this
 - Option A: Follow the instructions in `train_models/README.md` to train the classifiers yourself
-- Option B: Download the softmax scores we have precomputed, which are available at [TODO]
+- Option B: Download the softmax scores we have precomputed by running `sh scripts/download_softmax_and_labels.sh`. This downloads the val and test softmax scores and labels to `data/`
 
 **Step 1:** Run `scripts/run_get_results.sh` by running  
 
