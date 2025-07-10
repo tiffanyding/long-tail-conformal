@@ -1,5 +1,4 @@
-This is the code release for "Conformal Prediction for Long-Tailed Classification"
-
+This is the code release for [Conformal Prediction for Long-Tailed Classification](https://arxiv.org/abs/2507.06867).
 
 ## Setting up virtual environment
 
@@ -21,7 +20,9 @@ This adds a kernel called `ltc-env` to your list of Jupyter kernels.
 
 If you want to run our methods on your own dataset, check out `example.ipynb`! This notebook provides stand-alone implementations of all of proposed methods (Standard CP with PAS, Fuzzy CP, and Interp-Q). 
 
-## folders.json
+## Running our code
+
+### folders.json
 
 Fill in this folder with the appropriate paths.
 
@@ -37,7 +38,7 @@ Fill in this folder with the appropriate paths.
 }
 ```
 
-## Reproducing paper plots
+### Reproducing paper plots
 
 To generate the plots from the paper:
 
@@ -63,3 +64,15 @@ This will apply various conformal prediction procedures to each dataset and save
 
 The code for implementing existing conformal procedures draws upon https://github.com/tiffanyding/class-conditional-conformal.
 The code for processing datasets is based on https://github.com/macaodha/inat_comp_2018/blob/master/inat2018_loader.py.
+
+## Citation
+
+To cite this work: 
+```
+@article{ding2025conformal,
+  title={Conformal Prediction for Long-Tailed Classification},
+  author={Ding, Tiffany and Fermanian, Jean-Baptiste and Salmon, Joseph},
+  journal={arXiv preprint arXiv:2507.06867},
+  year={2025}
+}
+```
