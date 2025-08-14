@@ -8,10 +8,6 @@ The dataset is available at https://zenodo.org/records/5645731#.Yuehg3ZBxPY
 
 Download and untar the 2018 train-val data from https://github.com/visipedia/inat_comp/tree/master/2018#Data by running
 
-Run the following to
-1. Download and untar the 2018 train-val data
-2. Download and untar the train and val annotations
-
 ```
 wget https://ml-inat-competition-datasets.s3.amazonaws.com/2018/train_val2018.tar.gz
 tar -xzvf train_val2018.tar.gz
