@@ -19,8 +19,11 @@ To train on full iNaturalist:
 To train on truncated PlantNet-300k:
 
         python run_train.py inaturalist --trunc
-'''
 
+To train a model using focal loss, simply add `--loss focal'. For example, to train on PlantNet using the focal loss, run
+
+        python run_train.py plantnet --loss focal
+'''
 
 if __name__ == "__main__":
     st = time.time()
@@ -30,13 +33,19 @@ if __name__ == "__main__":
                         help='Name of the dataset to train model on')
     
     parser.add_argument('--trunc', dest='trunc', action='store_true', # whether to truncate the dataset
-                    help='Set the flag value to True.')
+                    help='Use this flag to truncate dataset')
     parser.set_defaults(trunc=False)
+    parser.add_argument('--use_last_epoch', dest='use_last_epoch', action='store_true', # whether to truncate the dataset
+                    help='Use this flag to generate softmax scores using the last epoch model (rather than select based on validation accuracy)')
+    parser.set_defaults(use_last_epoch=False)
 
     parser.add_argument('--frac_val', type=float, default=0.1,
                         help='Fraction of data to reserve for validation')
     parser.add_argument('--num_epochs', type=int, default=20,
                     help='Number of epochs to train for')
+    parser.add_argument('--loss', type=str, default='cross_entropy',
+                    help='Loss function: Options are "cross_entropy" or "focal" (designed for imbalanced data)')
+    
 
     args = parser.parse_args()
 
@@ -44,6 +53,11 @@ if __name__ == "__main__":
         dset_name = args.dataset + '-trunc'
     else:
         dset_name = args.dataset
+
+    if args.use_last_epoch:
+        filename = f'last-epoch-{dset_name}-model'
+    else:
+        filename = f'best-{dset_name}-model'
 
     config = {
         'batch_size' : 32, 
@@ -54,8 +68,10 @@ if __name__ == "__main__":
         'num_workers' : 4,
         'dataset_name' : args.dataset,
         'truncate': args.trunc,
+        'loss': args.loss,
         'feature_extract': False, # Whether to only tune the final layer
-        'model_filename' : f'best-{dset_name}-model',
+        'use_last_epoch': args.use_last_epoch,
+        'model_filename' : filename
     }
     
     

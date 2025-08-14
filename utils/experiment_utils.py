@@ -1,13 +1,15 @@
 import json
+import os
 # from pathlib import Path
 
 # Read once
+folder_path = "folders.json" 
 try:
-    with open("folders.json") as f:
+    with open(folder_path) as f:
         cfg = json.load(f)
 except FileNotFoundError:
     try:
-        with open(os.path.join("..", "folders.json")) as f:
+        with open(os.path.join("..", folder_path)) as f:
             cfg = json.load(f)
     except FileNotFoundError:
         raise FileNotFoundError("Could not find 'folders.json' in the current or parent directory.")

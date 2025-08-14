@@ -59,3 +59,12 @@ To train on truncated PlantNet-300k:
 ```
 
 The `run_train.py` script will train a ResNet-50 for 20 epochs by default (this can be changed using the `--num-epochs` flag) and then save the weights from the epoch with the highest validation accuracy. Upon completing training, it will compute the softmax scores for the validation and test sets. This is saved to the `"scores_and_labels"` folder specified in `folders.json`. The train, validation, and test labels are also saved to this folder.
+
+## Training using focal loss
+
+To train a model using focal loss, simply add `--loss focal'. For example, to train on PlantNet using the focal loss, run
+
+```
+        python run_train.py plantnet --loss focal
+```
+

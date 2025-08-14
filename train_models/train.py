@@ -462,7 +462,21 @@ def train_model(model, train_loader, val_loader, config):
 
     # The above prints show which layers are being optimized
 
-    criterion = nn.CrossEntropyLoss()
+    if config['loss'] == 'cross_entropy':
+        criterion = nn.CrossEntropyLoss()
+    elif config['loss'] == 'focal':
+        # From https://github.com/AdeelH/pytorch-multi-class-focal-loss
+        criterion = torch.hub.load(
+        	'adeelh/pytorch-multi-class-focal-loss',
+        	model='FocalLoss',
+        	alpha=None, # defaults to 1 
+        	gamma=2,
+        	reduction='mean',
+        	force_reload=False
+        )
+        print('Training model with focal loss')
+    else:
+        raise ValueError("Invalid loss. Options are 'cross_entropy' and 'focal'")
 
     optimizer = optim.Adam(params_to_update, lr=config['lr'])
 
@@ -524,13 +538,11 @@ def train_model(model, train_loader, val_loader, config):
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
                 
-                # Save model weights
-                if save_every_epoch: 
-                    print(f'Saving epoch {epoch} model')
-                    torch.save(best_model_wts, cache_folder + config['model_filename'] + '.pth')
-                    with open(cache_folder + config['model_filename'] + '-config.pkl', 'wb') as f:
-                        pickle.dump(config, f)
-        
+            # Save model weights every epoch (overwriting previous saves)
+            if config['use_last_epoch']: 
+                print(f'Saving epoch {epoch} model')
+                torch.save(model.state_dict(), cache_folder + config['model_filename'] + '.pth')
+    
             if phase == 'val':
                 val_acc_history.append(epoch_acc.item())
 
@@ -540,12 +552,14 @@ def train_model(model, train_loader, val_loader, config):
     print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Best val Acc: {:4f}'.format(best_acc))
 
-    # load best model weights
-    model.load_state_dict(best_model_wts)
-
-    # Save best model weights
-    torch.save(best_model_wts, cache_folder + config['model_filename'] + '.pth')
+    # Save best model by validation accuracy
+    if not config['use_last_epoch']: 
+        # load best model weights
+        model.load_state_dict(best_model_wts)
     
+        # Save best model weights
+        torch.save(best_model_wts, cache_folder + config['model_filename'] + '.pth')
+        
     with open(cache_folder + config['model_filename'] + '-config.pkl', 'wb') as f:
         pickle.dump(config, f)
 
@@ -588,8 +602,18 @@ def get_val_test_softmax_and_labels(config):
     np.save(cache_folder + config['model_filename'] + '_test_softmax.npy', test_softmax)
     np.save(cache_folder + config['model_filename'] + '_test_labels.npy', test_labels)
     
-    print('Saved val and test softmax+labels to' + cache_folder + config['model_filename'] 
+    print('Saved val and test softmax+labels to ' + cache_folder + config['model_filename'] 
           + '{_val_softmax, _val_labels, _test_softmax, _test_labels}.npy')
+
+    # Also save train_labels to use later
+    _, _, _, train_labels, _, _ = get_datasets(config['dataset_name'], truncate=False, return_labels=True)
+    if config['truncate']:
+        dset_name = config['dataset_name'] + '-trunc'
+    else:
+        dset_name =  config['dataset_name']
+    np.save(cache_folder + dset_name + '_train_labels.npy', train_labels)
+    print('Saved train labels to' + cache_folder + dset_name + '_train_labels.npy' )
+
 
     # Sanity check
     val_preds = np.argmax(val_softmax, axis=1)
@@ -617,8 +641,13 @@ def postprocess_config(config):
 def get_model(config):
     # Read in folder from folders.json
     global cache_folder
-    cache_folder = get_inputs_folder()
+    cache_folder = '../' + get_inputs_folder() # ADDED ../
     cache_folder = cache_folder if cache_folder.endswith('/') else cache_folder + '/'
+    # For focal loss, put results in a sub-directoary
+    if config['loss'] == 'focal':
+        cache_folder += 'focal_loss'
+        os.makedirs(cache_folder, exist_ok=True)
+        
     
     model = resnet50(weights="IMAGENET1K_V2")
     model.fc = nn.Linear(model.fc.in_features, config['num_classes'])

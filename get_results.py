@@ -59,17 +59,23 @@ def save(res, path):
     print(f'Saved res', path)
 
 
-def get_results(dataset, alphas, methods, score='softmax', results_folder='results'):
+def get_results(dataset, alphas, methods, score='softmax', 
+                results_folder='results', model_type='best'):
+    '''
+    model_type: 'best' or 'last_epoch'
+    '''
     print(f'Results will be computed for: \n{dataset=}\n{alphas=}\n{methods=}')
     os.makedirs(results_folder, exist_ok=True)
 
     # ------- Get data --------
     # folder = '/home-warm/plantnet/conformal_cache/train_models'
     folder = get_inputs_folder()
-    val_softmax = np.load(f'{folder}/best-{dataset}-model_val_softmax.npy')
-    val_labels = np.load(f'{folder}/best-{dataset}-model_val_labels.npy')
-    test_softmax = np.load(f'{folder}/best-{dataset}-model_test_softmax.npy')
-    test_labels = np.load(f'{folder}/best-{dataset}-model_test_labels.npy')
+    model_type = model_type.replace('_', '-')
+    print(f'Loading {model_type} model softmax scores and labels from', folder)
+    val_softmax = np.load(f'{folder}/{model_type}-{dataset}-model_val_softmax.npy')
+    val_labels = np.load(f'{folder}/{model_type}-{dataset}-model_val_labels.npy')
+    test_softmax = np.load(f'{folder}/{model_type}-{dataset}-model_test_softmax.npy')
+    test_labels = np.load(f'{folder}/{model_type}-{dataset}-model_test_labels.npy')
     print('Loaded pre-computed softmax scores')
     
     num_classes = val_softmax.shape[1]
@@ -330,15 +336,19 @@ if __name__ == "__main__":
     parser.add_argument('--methods', type=str, nargs='+',
                         default=[
                           'standard', 'classwise', 'classwise-exact', 'clustered',
-                          'fuzzy-rarity', 'fuzzy-RErarity', 'cvx'
+                          'fuzzy-rarity', 'fuzzy-RErarity', 'cvx', 'prevalence-adjusted'
                         ],
                         help='Which methods to run')
+    parser.add_argument('--model_type', type=str, choices=['best', 'last_epoch'], default='best',
+                        help='Whether to use weights from model with best val accuracy,' +
+                               'or the weights from the last epoch')
 
     args = parser.parse_args()
 
     score = args.score
     alphas  = args.alphas
     methods = args.methods
+    model_type = args.model_type
 
 
     # alphas = [0.3, 0.2, 0.1, 0.05, 0.03, 0.02, 0.01]
@@ -355,7 +365,10 @@ if __name__ == "__main__":
     # score = 'PAS'
 
     results_folder = get_outputs_folder()
-    get_results(args.dataset, alphas, methods, score, results_folder=results_folder)
+    if model_type == 'last_epoch':
+        results_folder = os.path.join(results_folder, 'last_epoch')
+    print('Results will be saved to', results_folder)
+    get_results(args.dataset, alphas, methods, score, results_folder=results_folder, model_type=model_type)
 
     print(f'Time taken: {(time.time() - st) / 60:.2f} minutes')
     
