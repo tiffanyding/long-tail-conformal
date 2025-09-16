@@ -60,7 +60,7 @@ def save(res, path):
 
 
 def get_results(dataset, alphas, methods, score='softmax', 
-                results_folder='results', model_type='best'):
+                results_folder='results', model_type='best', loss='cross_entropy'):
     '''
     model_type: 'best' or 'last_epoch'
     '''
@@ -70,10 +70,17 @@ def get_results(dataset, alphas, methods, score='softmax',
     # ------- Get data --------
     # folder = '/home-warm/plantnet/conformal_cache/train_models'
     folder = get_inputs_folder()
+    if loss != 'cross_entropy':
+        folder = os.path.join(folder, loss)
     model_type = model_type.replace('_', '-')
     print(f'Loading {model_type} model softmax scores and labels from', folder)
-    val_softmax = np.load(f'{folder}/{model_type}-{dataset}-model_val_softmax.npy')
-    val_labels = np.load(f'{folder}/{model_type}-{dataset}-model_val_labels.npy')
+    if model_type == 'proper-cal':
+        split = 'cal'
+    else:
+        split = 'val'
+        
+    val_softmax = np.load(f'{folder}/{model_type}-{dataset}-model_{split}_softmax.npy')
+    val_labels = np.load(f'{folder}/{model_type}-{dataset}-model_{split}_labels.npy')
     test_softmax = np.load(f'{folder}/{model_type}-{dataset}-model_test_softmax.npy')
     test_labels = np.load(f'{folder}/{model_type}-{dataset}-model_test_labels.npy')
     print('Loaded pre-computed softmax scores')
@@ -287,7 +294,8 @@ def get_results(dataset, alphas, methods, score='softmax',
                     
         # # ------- Run Convex Combination Methods --------
         if ('cvx' in methods) or ('monotonic-cvx' in methods):
-            weights = 1 - np.array([0, .001, .01, .025, .05, .1, .15, .2, .4, .6, .8, 1])
+            # weights = 1 - np.array([0, .001, .01, .025, .05, .1, .15, .2, .4, .6, .8, 1])
+            weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1]
             with open(f'{results_prefix}_standard.pkl', 'rb') as f:
                 standard_res = pickle.load(f)
                 standard_qhat = standard_res['qhat']
@@ -339,9 +347,13 @@ if __name__ == "__main__":
                           'fuzzy-rarity', 'fuzzy-RErarity', 'cvx', 'prevalence-adjusted'
                         ],
                         help='Which methods to run')
-    parser.add_argument('--model_type', type=str, choices=['best', 'last_epoch'], default='best',
-                        help='Whether to use weights from model with best val accuracy,' +
-                               'or the weights from the last epoch')
+    parser.add_argument('--model_type', type=str, choices=['best', 'last_epoch', 'proper_cal'], default='best',
+                        help='Whether to use weights from model with best val accuracy (where val is then reused as cal)' +
+                               'OR the weights from the last epoc' +
+                               'OR the best val-acc weights (where val is separate from cal)' )
+    parser.add_argument('--loss', type=str, default='cross_entropy',
+                    help='Loss function: Options are "cross_entropy" or "focal" (designed for imbalanced data)')
+    
 
     args = parser.parse_args()
 
@@ -349,6 +361,7 @@ if __name__ == "__main__":
     alphas  = args.alphas
     methods = args.methods
     model_type = args.model_type
+    loss = args.loss
 
 
     # alphas = [0.3, 0.2, 0.1, 0.05, 0.03, 0.02, 0.01]
@@ -365,10 +378,15 @@ if __name__ == "__main__":
     # score = 'PAS'
 
     results_folder = get_outputs_folder()
-    if model_type == 'last_epoch':
-        results_folder = os.path.join(results_folder, 'last_epoch')
+    if loss != 'cross_entropy':
+        results_folder = os.path.join(results_folder, loss)
+    
+    if (model_type == 'last_epoch') or (model_type == 'proper_cal'):
+        results_folder = os.path.join(results_folder, model_type)
+    
     print('Results will be saved to', results_folder)
-    get_results(args.dataset, alphas, methods, score, results_folder=results_folder, model_type=model_type)
+    get_results(args.dataset, alphas, methods, score, results_folder=results_folder, 
+                model_type=model_type, loss=loss)
 
     print(f'Time taken: {(time.time() - st) / 60:.2f} minutes')
     

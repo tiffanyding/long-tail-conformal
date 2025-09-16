@@ -400,7 +400,7 @@ def get_datasets(dataset_name, truncate=False, root=None, return_labels=False, s
             train_labels = np.array(train_dataset.labels)
             test_labels  = np.array(test_dataset.labels)
                         
-            print(f" train: {len(train_dataset)}, val: {len(val_dataset)}, test: {len(test_dataset)}")
+            # print(f" train: {len(train_dataset)}, val: {len(val_dataset)}, test: {len(test_dataset)}")
                 
     else:
         raise ValueError("Valid dataset_name values are 'plantnet' and 'inaturalist'")
@@ -412,18 +412,54 @@ def get_datasets(dataset_name, truncate=False, root=None, return_labels=False, s
 
 def get_dataloaders(config, root=None):
 
-    train_dataset, val_dataset, test_dataset = get_datasets(config['dataset_name'], truncate=config['truncate'], root=root)
-        
+    train_dataset, val_dataset, test_dataset = get_datasets(config['dataset_name'], 
+                                                            truncate=config['truncate'], root=root)
+
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=config['batch_size'], 
-                                               shuffle=True, num_workers=config['num_workers'])
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=config['batch_size'], 
-                                             shuffle=True, num_workers=config['num_workers'])
+                                           shuffle=True, num_workers=config['num_workers'])
+
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=config['batch_size'], 
-                                              shuffle=True, num_workers=config['num_workers'])
+                                          shuffle=True, num_workers=config['num_workers'])
 
-    return train_loader, val_loader, test_loader
+    if config['proper_cal']: # Do 4-way datasplit by selecting a random 30% of val to become a proper validation set 
+                          # Note: Randomization is NOT within each class
+        np.random.seed(0) # For reproducibility
+        frac_val = 0.3 # (Fraction of calibration set to use as proper val)
+        num_val_samples = int(np.floor(frac_val * len(val_dataset)))
+        indices = np.arange(len(val_dataset))
+        np.random.shuffle(indices)
+        proper_val_indices = indices[:num_val_samples]
+        proper_cal_indices = indices[num_val_samples:]
+        
+        # Create new datasets using the indices
+        proper_val_dataset = Subset(val_dataset, proper_val_indices)
+        proper_cal_dataset = Subset(val_dataset, proper_cal_indices)
 
-# ------------------------------------------------
+        val_loader = torch.utils.data.DataLoader(proper_val_dataset, batch_size=config['batch_size'], 
+                                                 shuffle=True, num_workers=config['num_workers'])
+        cal_loader = torch.utils.data.DataLoader(proper_cal_dataset, batch_size=config['batch_size'], 
+                                                 shuffle=True, num_workers=config['num_workers'])
+
+        print(f"Train size: {len(train_dataset)} | "
+          f"Val size: {len(proper_val_dataset)} | "
+          f"Cal size: {len(proper_cal_dataset)} | "
+          f"Test size: {len(test_dataset)}")
+    
+        return train_loader, val_loader, cal_loader, test_loader
+        
+
+    else:
+
+        val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=config['batch_size'], 
+                                                 shuffle=True, num_workers=config['num_workers'])
+
+        print(f"Train size: {len(train_dataset)} | "
+          f"Val size: {len(val_dataset)} | "
+          f"Test size: {len(test_dataset)}")
+    
+        return train_loader, val_loader, test_loader
+    
+    # ------------------------------------------------
 #                  Model training
 # ------------------------------------------------
 
@@ -590,38 +626,54 @@ def get_softmax_and_labels(dataloader, model, config):
 
 def get_val_test_softmax_and_labels(config):
     model = get_model(config)
-    train_loader, val_loader, test_loader = get_dataloaders(config)
 
-    print('Computing val softmax scores...')
-    val_softmax, val_labels = get_softmax_and_labels(val_loader, model, config)
+    if config['proper_cal']:
+        train_loader, val_loader, cal_loader, test_loader = get_dataloaders(config)
+        print('Computing cal softmax scores...')
+        cal_softmax, cal_labels = get_softmax_and_labels(cal_loader, model, config)
+        np.save(cache_folder + config['model_filename'] + '_cal_softmax.npy', cal_softmax)
+        np.save(cache_folder + config['model_filename'] + '_cal_labels.npy', cal_labels)
+    else:
+        train_loader, val_loader, test_loader = get_dataloaders(config)
+        print('Computing val softmax scores...')
+        val_softmax, val_labels = get_softmax_and_labels(val_loader, model, config)
+        np.save(cache_folder + config['model_filename'] + '_val_softmax.npy', val_softmax)
+        np.save(cache_folder + config['model_filename'] + '_val_labels.npy', val_labels)
+
+    
     print('Computing test softmax scores...')
     test_softmax, test_labels = get_softmax_and_labels(test_loader, model, config)
-
-    np.save(cache_folder + config['model_filename'] + '_val_softmax.npy', val_softmax)
-    np.save(cache_folder + config['model_filename'] + '_val_labels.npy', val_labels)
     np.save(cache_folder + config['model_filename'] + '_test_softmax.npy', test_softmax)
     np.save(cache_folder + config['model_filename'] + '_test_labels.npy', test_labels)
     
-    print('Saved val and test softmax+labels to ' + cache_folder + config['model_filename'] 
-          + '{_val_softmax, _val_labels, _test_softmax, _test_labels}.npy')
+    print('Saved val/cal and test softmax+labels to ' + cache_folder + config['model_filename'] 
+          + '[...].npy')
 
     # Also save train_labels to use later
-    _, _, _, train_labels, _, _ = get_datasets(config['dataset_name'], truncate=False, return_labels=True)
+    _, _, _, train_labels, _, _ = get_datasets(config['dataset_name'], 
+                                               truncate=config['truncate'], return_labels=True)
     if config['truncate']:
         dset_name = config['dataset_name'] + '-trunc'
     else:
         dset_name =  config['dataset_name']
     np.save(cache_folder + dset_name + '_train_labels.npy', train_labels)
-    print('Saved train labels to' + cache_folder + dset_name + '_train_labels.npy' )
+    print('Saved train labels to ' + cache_folder + dset_name + '_train_labels.npy' )
 
 
-    # Sanity check
-    val_preds = np.argmax(val_softmax, axis=1)
+    # Sanity check accuracies
+    if config['proper_cal']:
+        cal_preds = np.argmax(cal_softmax, axis=1)
+        print('Cal accuracy:', np.mean(cal_preds == cal_labels))
+    else:
+        val_preds = np.argmax(val_softmax, axis=1)
+        print('Val accuracy:', np.mean(val_preds == val_labels))
     test_preds = np.argmax(test_softmax, axis=1)
-    print('Val accuracy:', np.mean(val_preds == val_labels))
     print('Test accuracy:', np.mean(test_preds == test_labels), 
           '(Note that when using --trunc, we do not expect test and val accuracies to match.)')  
 
+    if config['proper_cal']:
+        return cal_softmax, cal_labels, test_softmax, test_labels
+    
     return val_softmax, val_labels, test_softmax, test_labels
     
 
@@ -641,12 +693,12 @@ def postprocess_config(config):
 def get_model(config):
     # Read in folder from folders.json
     global cache_folder
-    cache_folder = '../' + get_inputs_folder() # ADDED ../
+    cache_folder = get_inputs_folder()
     cache_folder = cache_folder if cache_folder.endswith('/') else cache_folder + '/'
     # For focal loss, put results in a sub-directoary
     if config['loss'] == 'focal':
-        cache_folder += 'focal_loss'
-        os.makedirs(cache_folder, exist_ok=True)
+        cache_folder += 'focal_loss'   
+    os.makedirs(cache_folder, exist_ok=True)
         
     
     model = resnet50(weights="IMAGENET1K_V2")
@@ -660,14 +712,16 @@ def get_model(config):
             loaded_config = pickle.load(f)
             
         for setting in ['num_classes', 'batch_size', 'num_epochs', 
-                        'frac_val', 'lr', 'dataset_name', 'truncate']:
+                        'use_last_epoch', 'proper_cal',
+                        'lr', 'dataset_name', 'truncate']:
             assert config[setting] == loaded_config[setting] # If the configs aren't equal, retrain
 
     except Exception:
         print(traceback.format_exc()) # Print error for debugging purposes
         os.makedirs(cache_folder, exist_ok=True)
         model = model.to(config['device'])
-        train_loader, val_loader, test_loader = get_dataloaders(config)
+        dataloaders = get_dataloaders(config)
+        train_loader, val_loader = dataloaders[0], dataloaders[1]
         model, val_acc_history = train_model(model, train_loader, val_loader, config) 
     return model
 
