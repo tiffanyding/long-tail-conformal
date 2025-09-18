@@ -24,10 +24,6 @@ To train a model using focal loss, simply add `--loss focal'. For example, to tr
 
         python run_train.py plantnet --loss focal
 
-To split the validation set into a proper validation and proper calibration set, add `--proper_cal'. 
-For example, to do this for Plantnet, run
-
-        python run_train.py plantnet --proper_cal
 '''
 
 if __name__ == "__main__":
@@ -45,11 +41,16 @@ if __name__ == "__main__":
                     help='Use this flag to generate softmax scores using the last epoch model (rather than select based on validation accuracy)')
     parser.set_defaults(use_last_epoch=False)
 
-    parser.add_argument('--proper_cal', dest='proper_cal', action='store_true', # whether to truncate the dataset
-                    help='Use this flag to do a 4-way data split where 30% of the conformal calibration dataset is set aside' +
-                       'to use as a proper validation. The remaining 70% is untouched. Without this flag, the data for' +
-                       'model validation and conformal calibration is the same')
-    parser.set_defaults(proper_cal=False)
+    # parser.add_argument('--proper_cal', dest='proper_cal', action='store_true', # whether to truncate the dataset
+    #                 help='Use this flag to do a 4-way data split where 30% of the conformal calibration dataset is set aside' +
+    #                    'to use as a proper validation. The remaining 70% is untouched. Without this flag, the data for' +
+    #                    'model validation and conformal calibration is the same')
+    # parser.set_defaults(proper_cal=False)
+
+    parser.add_argument('--double_dip', dest='double_dip', action='store_true', 
+                    help='Use this to reuse the model validation set for conformal calibration.'
+                       'Note that this theoretically violates exchangeability.')
+    parser.set_defaults(double_dip=False)
     
     parser.add_argument('--num_epochs', type=int, default=20,
                     help='Number of epochs to train for')
@@ -69,8 +70,8 @@ if __name__ == "__main__":
 
     if args.use_last_epoch:
         filename = f'last-epoch-{dset_name}-model'
-    elif args.proper_cal:
-        filename = f'proper-cal-{dset_name}-model'
+    elif args.double_dip:
+        filename = f'double-dip-{dset_name}-model'
     else:
         filename = f'best-{dset_name}-model'
 
@@ -85,7 +86,7 @@ if __name__ == "__main__":
         'loss': args.loss,
         'feature_extract': False, # Whether to only tune the final layer
         'use_last_epoch': args.use_last_epoch,
-        'proper_cal': args.proper_cal,
+        'proper_cal': not args.double_dip, # Use proper calibration set by default
         'model_filename' : filename
     }
     
@@ -93,6 +94,6 @@ if __name__ == "__main__":
     config = postprocess_config(config)
     
     # get_model(config) # train model only
-    get_val_test_softmax_and_labels(config) # train model and apply to val/cal and test datasets
+    get_cal_test_softmax_and_labels(config) # train model and apply to calibration and test datasets
 
     print(f'Time taken: {(time.time() - st) / 60:.2f} minutes')

@@ -422,6 +422,7 @@ def get_dataloaders(config, root=None):
                                           shuffle=True, num_workers=config['num_workers'])
 
     if config['proper_cal']: # Do 4-way datasplit by selecting a random 30% of val to become a proper validation set 
+                             # The rest will be used as the conformal calibration set
                           # Note: Randomization is NOT within each class
         np.random.seed(0) # For reproducibility
         frac_val = 0.3 # (Fraction of calibration set to use as proper val)
@@ -624,7 +625,7 @@ def get_softmax_and_labels(dataloader, model, config):
     return softmax_arr, labels_arr
 
 
-def get_val_test_softmax_and_labels(config):
+def get_cal_test_softmax_and_labels(config):
     model = get_model(config)
 
     if config['proper_cal']:

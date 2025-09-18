@@ -74,10 +74,7 @@ def get_results(dataset, alphas, methods, score='softmax',
         folder = os.path.join(folder, loss)
     model_type = model_type.replace('_', '-')
     print(f'Loading {model_type} model softmax scores and labels from', folder)
-    if model_type == 'proper-cal':
-        split = 'cal'
-    else:
-        split = 'val'
+    split = 'cal'
         
     val_softmax = np.load(f'{folder}/{model_type}-{dataset}-model_{split}_softmax.npy')
     val_labels = np.load(f'{folder}/{model_type}-{dataset}-model_{split}_labels.npy')
@@ -381,7 +378,7 @@ if __name__ == "__main__":
     if loss != 'cross_entropy':
         results_folder = os.path.join(results_folder, loss)
     
-    if (model_type == 'last_epoch') or (model_type == 'proper_cal'):
+    if (model_type == 'last_epoch'):
         results_folder = os.path.join(results_folder, model_type)
     
     print('Results will be saved to', results_folder)

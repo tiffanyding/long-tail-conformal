@@ -1,7 +1,7 @@
 {
   "plantnet_data": "/home-warm/plantnet/plantnet_300K/images",
-  "inaturalist_data": "/home-warm/plantnet/inaturalist/",
+  "inaturalist_data": "/home-warm/plantnet/inaturalist",
   "scores_and_labels":   "/home/tding/code/clean/long-tail-conformal/train_models/data",
-  "conformal_results":   "/home-warm/plantnet/conformal_cache/metrics/", 
-  "figs": "figs"
+  "conformal_results":   "/home-warm/plantnet/conformal_cache/metrics", 
+  "figs": "/home/tding/code/clean/long-tail-conformal/figs"
 }
