@@ -190,8 +190,8 @@ def create_combined_decision_acc_plot():
             
             # Add legend only for plantnet-trunc Standard (row=0, col=0)
             if row == 0 and col == 0:
-                legend = ax.legend(loc='lower left', fontsize=8, title='Expert proportion')
-                legend.get_title().set_fontsize(9)
+                legend = fig.legend(loc='center right', bbox_to_anchor=(1.08, 0.5), fontsize=10, title='Expert proportion', ncol=1)
+                legend.get_title().set_fontsize(11)
     
     plt.tight_layout()
     
