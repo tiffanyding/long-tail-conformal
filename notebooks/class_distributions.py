@@ -147,3 +147,5 @@ axes[3].legend(handles, labels, loc='lower center', ncol=1, handlelength=3,
 plt.tight_layout(pad=1.2, w_pad=0.3, rect=[0, 0.05, 1, 1])
 plt.savefig(f'{fig_folder}/all_class_distributions.pdf', bbox_inches='tight')
 plt.show()
+
+# %%

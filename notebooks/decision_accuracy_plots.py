@@ -121,13 +121,16 @@ def create_combined_decision_acc_plot():
     fig, axes = plt.subplots(2, 4, figsize=(18, 5))
     
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
-    methods = ['classwise', 'standard', 'clustered', 'fuzzy-RErarity-0.0001']
+    methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']
+    # methods = ['classwise', 'standard', 'clustered', 'fuzzy-RErarity-0.0001']
+
     colors = ['tab:green', 'tab:green', 'tab:green', 'tab:green']
     
     method_to_name = {'standard': 'Standard', 
                       'classwise': 'Classwise', 
                       'clustered': 'Clustered',
                       'fuzzy-RErarity-0.0001': 'Fuzzy',
+                      'prevalence-adjusted': 'PAS'}
                       }
     
     for row, dataset_name in enumerate(datasets):
@@ -206,4 +209,99 @@ def create_combined_decision_acc_plot():
 
 # Create the combined plot
 create_combined_decision_acc_plot()
+
+# %%
+def create_methods_comparison_plot():
+    """
+    Create a 2x5 subplot where:
+    - Rows: datasets (plantnet-trunc, inaturalist-trunc)  
+    - Columns: fixed gamma levels (0%, 25%, 50%, 75%, 100%)
+    - Each subplot shows 4 methods as solid lines with different colors
+    """
+    # Create 2x5 subplot layout
+    fig, axes = plt.subplots(2, 5, figsize=(20, 8))
+    
+    datasets = ['plantnet-trunc', 'inaturalist-trunc']
+    methods = ['standard', 'classwise', 'clustered', 
+            #    'fuzzy-RErarity-0.0001', 
+               'prevalence-adjusted']
+    method_colors = ['tab:red', 'tab:blue', 'tab:green', 'tab:purple']
+    gamma_levels = [0, 0.25, 0.5, 0.75, 1.0]  # 0%, 25%, 50%, 75%, 100%
+    
+    method_to_name = {'standard': 'Standard', 
+                      'classwise': 'Classwise',
+                      'clustered': 'Clustered', 
+                      'fuzzy-RErarity-0.0001': 'Fuzzy',
+                      'prevalence-adjusted': 'PAS'}
+    
+    for row, dataset_name in enumerate(datasets):
+        # Load test labels for this dataset
+        test_labels_path = f'/home-warm/plantnet/conformal_cache/train_models/best-{dataset_name}-model_test_labels.npy'
+        test_labels = np.load(test_labels_path)
+        num_classes = np.max(test_labels) + 1
+        
+        # Load results for this dataset
+        res = {}
+        for method in methods:
+            res[method] = load_metrics(dataset_name, 0.1, method)
+        
+        # Add class-conditional decision accuracies
+        for method in methods:
+            dec_acc = compute_class_cond_decision_accuracy_for_method(res, method, test_labels)
+            res[method]['class-cond-decision-accuracy'] = dec_acc
+        
+        # Sort classes by class cond acc of Standard CP
+        idx = np.argsort(res['standard']['coverage_metrics']['raw_class_coverages'])[::-1]
+        
+        for col, gamma in enumerate(gamma_levels):
+            ax = axes[row, col]
+            
+            # Plot each method for this gamma level
+            for method, color in zip(methods, method_colors):
+                # Get the lines for the specific method
+                up_line = res[method]['class-cond-decision-accuracy'][idx]
+                lower_line = res[method]['coverage_metrics']['raw_class_coverages'][idx]
+                
+                # Compute the line for this gamma level
+                if gamma == 0:
+                    line_data = up_line  # Pure random
+                elif gamma == 1:
+                    line_data = lower_line  # Pure expert
+                else:
+                    line_data = (1-gamma) * up_line + gamma * lower_line
+                
+                ax.plot(line_data, color=color, linewidth=2.0, 
+                       label=method_to_name[method], solid_capstyle='round')
+            
+            ax.set_xlim(0, num_classes-1)
+            
+            # Set titles and labels
+            if row == 0:
+                ax.set_title(f'$\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
+            if col == 0:
+                ax.set_ylabel('Decision accuracy')
+            if row == 1:
+                ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of Stand. CP)')
+            
+            # Add dataset name on the left
+            if col == 0:
+                ax.text(-0.15, 0.5, dataset_names[dataset_name], 
+                       transform=ax.transAxes, rotation=90, 
+                       verticalalignment='center', fontsize=14)
+            
+            # Add legend only to top-right subplot
+            if row == 0 and col == 4:
+                ax.legend(loc='upper right', fontsize=10)
+    
+    plt.tight_layout()
+    
+    # Save the combined plot
+    fig_path = f'{fig_folder}/methods_comparison_2x5.pdf'
+    plt.savefig(fig_path, bbox_inches='tight')
+    print('Saved methods comparison plot to', fig_path)
+    
+    return fig, axes
+
+# Create the methods comparison plot
+create_methods_comparison_plot()
 # %%
