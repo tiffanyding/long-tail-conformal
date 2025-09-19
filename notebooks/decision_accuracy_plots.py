@@ -118,15 +118,17 @@ for res in all_res.values():
 # %%
 def create_combined_decision_acc_plot():
     # Create 2x3 subplot layout
-    fig, axes = plt.subplots(2, 3, figsize=(15, 5))
+    fig, axes = plt.subplots(2, 4, figsize=(18, 5))
     
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
-    methods = ['classwise', 'standard', 'fuzzy-RErarity-0.0001']
-    colors = ['tab:green', 'tab:green', 'tab:green']
+    methods = ['classwise', 'standard', 'clustered', 'fuzzy-RErarity-0.0001']
+    colors = ['tab:green', 'tab:green', 'tab:green', 'tab:green']
     
     method_to_name = {'standard': 'Standard', 
                       'classwise': 'Classwise', 
-                      'fuzzy-RErarity-0.0001': 'Fuzzy'}
+                      'clustered': 'Clustered',
+                      'fuzzy-RErarity-0.0001': 'Fuzzy',
+                      }
     
     for row, dataset_name in enumerate(datasets):
         # Load test labels for this dataset
