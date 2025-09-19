@@ -121,7 +121,7 @@ def create_combined_decision_acc_plot():
     fig, axes = plt.subplots(2, 3, figsize=(15, 5))
     
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
-    methods = ['standard', 'classwise', 'fuzzy-RErarity-0.0001']
+    methods = ['classwise', 'standard', 'fuzzy-RErarity-0.0001']
     colors = ['tab:green', 'tab:green', 'tab:green']
     
     method_to_name = {'standard': 'Standard', 
