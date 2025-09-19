@@ -116,86 +116,92 @@ for res in all_res.values():
         res[method]['class-cond-decision-accuracy'] = dec_acc
 
 # %%
-def make_decision_acc_plot(res, method, base_color):
-
-    # Sort classes by class cond acc of Standard CP
-    idx = np.argsort(res['standard']['coverage_metrics']['raw_class_coverages'])[::-1]
+def create_combined_decision_acc_plot():
+    # Create 2x3 subplot layout
+    fig, axes = plt.subplots(2, 3, figsize=(15, 5))
     
-    fig, ax = plt.subplots(figsize=(6,2))
+    datasets = ['plantnet-trunc', 'inaturalist-trunc']
+    methods = ['standard', 'classwise', 'fuzzy-RErarity-0.0001']
+    colors = ['tab:green', 'tab:green', 'tab:green']
     
     method_to_name = {'standard': 'Standard', 
                       'classwise': 'Classwise', 
-                      'fuzzy-RErarity-0.0001': 'Fuzzy',
-                      'prevalence-adjusted': 'Stand. w. PAS',
-                      'cvx-cw_weight=0.99': 'Interp-Q'}
+                      'fuzzy-RErarity-0.0001': 'Fuzzy'}
     
-    # Get the lines for the specific method
-    up_line = res[method]['class-cond-decision-accuracy'][idx]
-    lower_line = res[method]['coverage_metrics']['raw_class_coverages'][idx] 
+    for row, dataset_name in enumerate(datasets):
+        # Load test labels for this dataset
+        test_labels_path = f'/home-warm/plantnet/conformal_cache/train_models/best-{dataset_name}-model_test_labels.npy'
+        test_labels = np.load(test_labels_path)
+        num_classes = np.max(test_labels) + 1
+        
+        # Load results for this dataset
+        res = {}
+        for method in methods:
+            res[method] = load_metrics(dataset_name, 0.1, method)
+        
+        # Add class-conditional decision accuracies
+        for method in methods:
+            dec_acc = compute_class_cond_decision_accuracy_for_method(res, method, test_labels)
+            res[method]['class-cond-decision-accuracy'] = dec_acc
+        
+        # Sort classes by class cond acc of Standard CP
+        idx = np.argsort(res['standard']['coverage_metrics']['raw_class_coverages'])[::-1]
+        
+        for col, (method, base_color) in enumerate(zip(methods, colors)):
+            ax = axes[row, col]
+            
+            # Get the lines for the specific method
+            up_line = res[method]['class-cond-decision-accuracy'][idx]
+            lower_line = res[method]['coverage_metrics']['raw_class_coverages'][idx] 
+            
+            # Define the five lines and their corresponding labels
+            lines_data = [
+                (lower_line, '$\\gamma_{\\mathrm{exp.}}=100\\%$'),
+                (0.25*up_line + 0.75*lower_line, '$\\gamma_{\\mathrm{exp.}}=75\\%$'),
+                (0.5*up_line + 0.5*lower_line, '$\\gamma_{\\mathrm{exp.}}=50\\%$'),
+                (0.75*up_line + 0.25*lower_line, '$\\gamma_{\\mathrm{exp.}}=25\\%$'),
+                (up_line, '$\\gamma_{\\mathrm{exp.}}=0\\%$'),
+            ]
+            
+            # Create colormap based on the base color - using green for all
+            colormap = plt.cm.Greens
+            
+            # Generate colors from the colormap
+            colors_grad = [colormap(0.8 - 0.15*i) for i in range(5)]
+            
+            # Plot each line with gradient colors
+            for i, (line_data, label) in enumerate(lines_data):
+                zorder = 5 - i
+                ax.plot(line_data, color=colors_grad[i], 
+                        linewidth=2.0,
+                        zorder=zorder,
+                        label=label)
+            
+            ax.set_xlim(0, num_classes-1)
+            ax.set_title(f'{dataset_names[dataset_name]} - {method_to_name[method]}')
+            
+            # Set y-label only for first column
+            if col == 0:
+                ax.set_ylabel('Decision accuracy')
+            
+            # Set x-label only for second row
+            if row == 1:
+                ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of Stand. CP)')
+            
+            # Add legend only for plantnet-trunc Standard (row=0, col=0)
+            if row == 0 and col == 0:
+                legend = ax.legend(loc='lower left', fontsize=8, title='Expert proportion')
+                legend.get_title().set_fontsize(9)
     
-    # Define the five lines and their corresponding labels
-    lines_data = [
-        (lower_line, '$\\gamma_{\\mathrm{exp.}}=100\\%$'),
-        (0.25*up_line + 0.75*lower_line, '$\\gamma_{\\mathrm{exp.}}=75\\%$'),
-        (0.5*up_line + 0.5*lower_line, '$\\gamma_{\\mathrm{exp.}}=50\\%$'),
-        (0.75*up_line + 0.25*lower_line, '$\\gamma_{\\mathrm{exp.}}=25\\%$'),
-        (up_line, '$\\gamma_{\\mathrm{exp.}}=0\\%$'),
-    ]
+    plt.tight_layout()
     
-    # Create colormap based on the base color
-    if base_color == 'tab:blue':
-        colormap = plt.cm.Blues
-    elif base_color == 'tab:red':
-        colormap = plt.cm.Reds
-    elif base_color == 'tab:green':
-        colormap = plt.cm.Greens
-    elif base_color == 'tab:purple':
-        colormap = plt.cm.Purples
-    else:
-        colormap = plt.cm.viridis  # fallback
-    
-    # Generate colors from the colormap (from dark to light for reverse order)
-    colors = [colormap(0.8 - 0.15*i) for i in range(5)]
-    
-    # Plot each line with gradient colors
-    for i, (line_data, label) in enumerate(lines_data):
-        # Set zorder so higher percentages are on top (reverse order of i)
-        zorder = 5 - i
-        ax.plot(line_data, color=colors[i], 
-                linewidth=2.0,
-                zorder=zorder,
-                label=label)
-    
-    ax.set_xlim(0, num_classes-1)
-    ax.set_ylabel('Decision accuracy')
-    ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of Stand. CP)')
-    ax.set_title(f'{dataset_names[dataset]} - {method_to_name[method]}')
-    
-    fig_path = f'{fig_folder}/{dataset}/{dataset}_{score}_{method}_decision-acc.pdf'
-    
-    # Save 
+    # Save the combined plot
+    fig_path = f'{fig_folder}/combined_decision_acc_2x3.pdf'
     plt.savefig(fig_path, bbox_inches='tight')
-    print('Saved plot to', fig_path)
-    legend = ax.legend(loc='lower left', fontsize=8, title='Expert proportion')
-    legend.get_title().set_fontsize(9)
-    new_path = fig_path.replace('.pdf', '_WITH_LEGEND.pdf')
-    plt.savefig(new_path, bbox_inches='tight')
-    print('Saved plot to', new_path)
+    print('Saved combined plot to', fig_path)
+    print(fig_path)
+    return fig, axes
 
-# Plot for alpha = 0.1
-res = all_res['alpha=0.1']
-
-# Create separate plots for each method
-methods_to_plot = [
-    ('standard', 'tab:blue'),
-    ('classwise', 'tab:red'), 
-    ('fuzzy-RErarity-0.0001', 'tab:green'),
-    ('prevalence-adjusted', 'tab:purple')
-]
-
-
-
-
-for method, color in methods_to_plot:
-    make_decision_acc_plot(res, method, color)
+# Create the combined plot
+create_combined_decision_acc_plot()
 # %%
