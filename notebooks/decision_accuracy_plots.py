@@ -7,6 +7,8 @@ import pickle
 
 from utils.conformal_utils import *
 from utils.experiment_utils import get_inputs_folder, get_outputs_folder, get_figs_folder
+from scipy.ndimage import uniform_filter
+
 
 plt.rcParams.update({
     'font.size': 16,        # base font size
@@ -131,7 +133,6 @@ def create_combined_decision_acc_plot():
                       'clustered': 'Clustered',
                       'fuzzy-RErarity-0.0001': 'Fuzzy',
                       'prevalence-adjusted': 'PAS'}
-                      }
     
     for row, dataset_name in enumerate(datasets):
         # Load test labels for this dataset
@@ -156,17 +157,20 @@ def create_combined_decision_acc_plot():
             ax = axes[row, col]
             
             # Get the lines for the specific method
-            up_line = res[method]['class-cond-decision-accuracy'][idx]
-            lower_line = res[method]['coverage_metrics']['raw_class_coverages'][idx] 
+            up_line_raw = res[method]['class-cond-decision-accuracy'][idx]
+            lower_line_raw = res[method]['coverage_metrics']['raw_class_coverages'][idx] 
             
-            # Define the five lines and their corresponding labels
-            lines_data = [
-                (lower_line, '$\\gamma_{\\mathrm{exp.}}=100\\%$'),
-                (0.25*up_line + 0.75*lower_line, '$\\gamma_{\\mathrm{exp.}}=75\\%$'),
-                (0.5*up_line + 0.5*lower_line, '$\\gamma_{\\mathrm{exp.}}=50\\%$'),
-                (0.75*up_line + 0.25*lower_line, '$\\gamma_{\\mathrm{exp.}}=25\\%$'),
-                (up_line, '$\\gamma_{\\mathrm{exp.}}=0\\%$'),
-            ]
+            # Apply moving mean filter with order 3
+            # up_line = uniform_filter(up_line_raw, size=5, mode='nearest')
+            # lower_line = uniform_filter(lower_line_raw, size=5, mode='nearest')
+            
+            # Define gamma levels and their corresponding labels
+            gamma_levels = [1.0, 0.75, 0.5, 0.25, 0.0]  # 100%, 75%, 50%, 25%, 0%
+            gamma_labels = ['$\\gamma_{\\mathrm{exp.}}=100\\%$', 
+                           '$\\gamma_{\\mathrm{exp.}}=75\\%$',
+                           '$\\gamma_{\\mathrm{exp.}}=50\\%$', 
+                           '$\\gamma_{\\mathrm{exp.}}=25\\%$',
+                           '$\\gamma_{\\mathrm{exp.}}=0\\%$']
             
             # Create colormap based on the base color - using green for all
             colormap = plt.cm.Greens
@@ -175,7 +179,10 @@ def create_combined_decision_acc_plot():
             colors_grad = [colormap(0.8 - 0.15*i) for i in range(5)]
             
             # Plot each line with gradient colors
-            for i, (line_data, label) in enumerate(lines_data):
+            for i, (gamma, label) in enumerate(zip(gamma_levels, gamma_labels)):
+                # Compute the line for this gamma level
+                line_data = uniform_filter((1-gamma) * up_line_raw + gamma * lower_line_raw, size=20, mode='nearest')
+                
                 zorder = 5 - i
                 ax.plot(line_data, color=colors_grad[i], 
                         linewidth=2.0,
@@ -263,12 +270,8 @@ def create_methods_comparison_plot():
                 lower_line = res[method]['coverage_metrics']['raw_class_coverages'][idx]
                 
                 # Compute the line for this gamma level
-                if gamma == 0:
-                    line_data = up_line  # Pure random
-                elif gamma == 1:
-                    line_data = lower_line  # Pure expert
-                else:
-                    line_data = (1-gamma) * up_line + gamma * lower_line
+
+                line_data = uniform_filter((1-gamma) * up_line + gamma * lower_line, size=20, mode='nearest')
                 
                 ax.plot(line_data, color=color, linewidth=2.0, 
                        label=method_to_name[method], solid_capstyle='round')
