@@ -121,12 +121,12 @@ def make_decision_acc_plot(res, method, base_color):
     # Sort classes by class cond acc of Standard CP
     idx = np.argsort(res['standard']['coverage_metrics']['raw_class_coverages'])[::-1]
     
-    fig, ax = plt.subplots(figsize=(5,2.5))
+    fig, ax = plt.subplots(figsize=(6,2))
     
     method_to_name = {'standard': 'Standard', 
                       'classwise': 'Classwise', 
                       'fuzzy-RErarity-0.0001': 'Fuzzy',
-                      'prevalence-adjusted': 'Standard with PAS',
+                      'prevalence-adjusted': 'Stand. w. PAS',
                       'cvx-cw_weight=0.99': 'Interp-Q'}
     
     # Get the lines for the specific method
@@ -168,7 +168,7 @@ def make_decision_acc_plot(res, method, base_color):
     
     ax.set_xlim(0, num_classes-1)
     ax.set_ylabel('Decision accuracy')
-    ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of Standard CP)')
+    ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of Stand. CP)')
     ax.set_title(f'{dataset_names[dataset]} - {method_to_name[method]}')
     
     fig_path = f'{fig_folder}/{dataset}/{dataset}_{score}_{method}_decision-acc.pdf'
@@ -176,8 +176,8 @@ def make_decision_acc_plot(res, method, base_color):
     # Save 
     plt.savefig(fig_path, bbox_inches='tight')
     print('Saved plot to', fig_path)
-    legend = ax.legend(loc='upper left', bbox_to_anchor=(1,1.05), fontsize=11, title='Expert proportion')
-    legend.get_title().set_fontsize(12)
+    legend = ax.legend(loc='lower left', fontsize=8, title='Expert proportion')
+    legend.get_title().set_fontsize(9)
     new_path = fig_path.replace('.pdf', '_WITH_LEGEND.pdf')
     plt.savefig(new_path, bbox_inches='tight')
     print('Saved plot to', new_path)
