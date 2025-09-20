@@ -150,11 +150,11 @@ def create_combined_decision_acc_plot():
             dec_acc = compute_class_cond_decision_accuracy_for_method(res, method, test_labels)
             res[method]['class-cond-decision-accuracy'] = dec_acc
         
-        # Sort classes by class cond acc of Standard CP
-        idx = np.argsort(res['standard']['coverage_metrics']['raw_class_coverages'])[::-1]
-        
         for col, (method, base_color) in enumerate(zip(methods, colors)):
             ax = axes[row, col]
+            
+            # Sort classes by class cond acc of this specific method
+            idx = np.argsort(res[method]['coverage_metrics']['raw_class_coverages'])[::-1]
             
             # Get the lines for the specific method
             up_line_raw = res[method]['class-cond-decision-accuracy'][idx]
@@ -198,7 +198,7 @@ def create_combined_decision_acc_plot():
             
             # Set x-label only for second row
             if row == 1:
-                ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of Stand. CP)')
+                ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of each method)')
             
             # Add legend only for plantnet-trunc Standard (row=0, col=0)
             if row == 0 and col == 0:
@@ -257,21 +257,22 @@ def create_methods_comparison_plot():
             dec_acc = compute_class_cond_decision_accuracy_for_method(res, method, test_labels)
             res[method]['class-cond-decision-accuracy'] = dec_acc
         
-        # Sort classes by class cond acc of Standard CP
-        idx = np.argsort(res['standard']['coverage_metrics']['raw_class_coverages'])[::-1]
-        
         for col, gamma in enumerate(gamma_levels):
             ax = axes[row, col]
             
             # Plot each method for this gamma level
             for method, color in zip(methods, method_colors):
+                # Sort classes by class cond acc of this specific method
+                idx = np.argsort(res[method]['coverage_metrics']['raw_class_coverages'])[::-1]
+                
                 # Get the lines for the specific method
                 up_line = res[method]['class-cond-decision-accuracy'][idx]
                 lower_line = res[method]['coverage_metrics']['raw_class_coverages'][idx]
                 
                 # Compute the line for this gamma level
 
-                line_data = uniform_filter((1-gamma) * up_line + gamma * lower_line, size=20, mode='nearest')
+                line_data = (1-gamma) * up_line + gamma * lower_line
+                # line_data = uniform_filter((1-gamma) * up_line + gamma * lower_line, size=20, mode='nearest')
                 
                 ax.plot(line_data, color=color, linewidth=2.0, 
                        label=method_to_name[method], solid_capstyle='round')
