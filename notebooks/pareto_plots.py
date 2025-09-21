@@ -440,7 +440,7 @@ methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] + \
 
 for dataset in dataset_names.keys():
 # for dataset in ['plantnet-trunc']:
-    generate_all_pareto_plots(dataset, score, alphas, methods, show_inset=True)
+    generate_all_pareto_plots(dataset, score, alphas, methods, show_inset=False)
 
 # %%
 # x = np.load("/home/tding/code/clean/long-tail-conformal/train_models/data/plantnet-trunc_train_labels.npy")
@@ -534,7 +534,7 @@ for dataset in dataset_names.keys():
     print(f'Saved cleaned csv of metrics for alpha={selected_alpha} to {pth}')
 
 
-# %%
+remove the inset plots for all methods# %%
 df
 
 # %% [markdown]
