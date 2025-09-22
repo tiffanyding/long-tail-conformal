@@ -10,6 +10,7 @@ import pandas as pd
 import pickle
 
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
+from matplotlib.ticker import LogFormatter
 
 from utils.conformal_utils import *
 from utils.experiment_utils import get_inputs_folder, get_outputs_folder, get_figs_folder
@@ -239,6 +240,17 @@ def plot_set_size_vs_cov_metric(
 
     # --- style main axis ---
     ax.set_yscale('log')
+    
+    # Set custom y-axis tick labels to show numeric values instead of powers of 10
+    class CustomLogFormatter(LogFormatter):
+        def __call__(self, x, pos=None):
+            # Return the numeric value instead of scientific notation
+            if x >= 1:
+                return f'{int(x):,}'
+            else:
+                return f'{x:.3f}'
+    
+    ax.yaxis.set_major_formatter(CustomLogFormatter())
     ax.spines[['right', 'top']].set_visible(False)
 
     # --- inset ---
