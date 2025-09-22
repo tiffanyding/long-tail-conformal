@@ -292,7 +292,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset):
                     'MacroCov',
                     'MarginalCov']
                  
-    fig, axes = plt.subplots(1, len(metric_names), figsize=(13, 2.2), sharey=True)
+    fig, axes = plt.subplots(1, len(metric_names), figsize=(16, 2.2), sharey=True)
     for i in range(len(metric_names)):
         ax = axes[i]
         if i == 3:
@@ -380,11 +380,22 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset):
                             linewidth=1.5)
         ax.set_xlabel(metric_names[i])
         ax.set_ylim(bottom=0)
-        
+    
     # Add labels and save plot
     axes[0].set_ylabel('Average set size')
-    plt.legend(ncols=len(alphas), loc='upper left', bbox_to_anchor=(-3.85,-0.35), fontsize=12)
-    plt.tight_layout()
+
+    # Get handles and labels from the first axis
+    handles, labels = axes[0].get_legend_handles_labels()
+    plt.tight_layout(rect=[0, 0.12, 1, 1])  # leave space at bottom for legend
+    fig.legend(
+        handles, labels,
+        loc='lower center',
+        bbox_to_anchor=(0.5, -0.5),  # 0.01 is just below the axes area
+        ncol=len(alphas),
+        fontsize=12,
+        frameon=True
+    )
+    plt.subplots_adjust(bottom=0.22)  # adjust as needed for space
     plt.suptitle(dataset_names.get(dataset, dataset), y=1.02)
 
     os.makedirs(f'{fig_folder}/weighted_macro_coverage', exist_ok=True)
