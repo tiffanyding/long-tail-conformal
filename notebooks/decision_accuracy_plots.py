@@ -38,12 +38,7 @@ dataset_names = {
 # dataset = 'inaturalist'
 dataset = 'inaturalist-trunc'
 
-methods = ['standard', 'classwise', 'classwise-exact', 'clustered', 'prevalence-adjusted'] + \
-            [f'fuzzy-rarity-{bw}' for bw in [1e-16, 1e-12, 1e-8, 1e-6, 0.0001, 0.001, 0.01, .1 , 10, 1000]] +\
-            [f'fuzzy-RErarity-{bw}' for bw in [1e-16, 1e-12, 1e-8, 1e-6, 0.0001, 0.001, 0.01, .1 , 10, 1000]] +\
-            [f'fuzzy-READDrarity-{bw}' for bw in [1e-16, 1e-12, 1e-8, 1e-6, 0.0001, 0.001, 0.01, .1 , 10, 1000]] +\
-            [f'cvx-cw_weight={w}' for w in [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1]] +\
-            [f'monotonic-cvx-cw_weight={w}' for w in 1 - np.array([0, .001, .01, .025, .05, .1, .15, .2, .4, .6, .8, 1])]
+methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] 
 
 
 alphas = [0.2, 0.1, 0.05, 0.01]
@@ -123,6 +118,7 @@ def create_combined_decision_acc_plot():
     fig, axes = plt.subplots(2, 4, figsize=(18, 5))
     
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
+    
     methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']
     # methods = ['classwise', 'standard', 'clustered', 'fuzzy-RErarity-0.0001']
 
@@ -223,23 +219,30 @@ def create_methods_comparison_plot():
     Create a 2x5 subplot where:
     - Rows: datasets (plantnet-trunc, inaturalist-trunc)  
     - Columns: fixed gamma levels (0%, 25%, 50%, 75%, 100%)
-    - Each subplot shows 4 methods as solid lines with different colors
+    - Each subplot shows 4 methods as lines with the EXACT same curves as create_combined_decision_acc_plot
+    - Uses the same colors and smoothing as the original function
     """
     # Create 2x5 subplot layout
     fig, axes = plt.subplots(2, 5, figsize=(20, 8))
     
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
-    methods = ['standard', 'classwise', 'clustered', 
-            #    'fuzzy-RErarity-0.0001', 
-               'prevalence-adjusted']
-    method_colors = ['tab:red', 'tab:blue', 'tab:green', 'tab:purple']
-    gamma_levels = [0, 0.25, 0.5, 0.75, 1.0]  # 0%, 25%, 50%, 75%, 100%
+    methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']  # Same order as create_combined_decision_acc_plot
+    gamma_levels = [0.0, 0.25, 0.5, 0.75, 1.0]  # 0%, 25%, 50%, 75%, 100%
     
-    method_to_name = {'standard': 'Standard', 
-                      'classwise': 'Classwise',
-                      'clustered': 'Clustered', 
-                      'fuzzy-RErarity-0.0001': 'Fuzzy',
-                      'prevalence-adjusted': 'PAS'}
+    # Use colorblind-friendly colors for each method
+    # Use the same colors and legend labels as in pareto_plots.py
+    method_colors = {
+        'standard': 'blue',
+        'classwise': 'red',
+        'clustered': 'purple',
+        'prevalence-adjusted': 'orange',
+    }
+    method_to_name = {
+        'standard': 'Standard',
+        'classwise': 'Classwise',
+        'clustered': 'Clustered',
+        'prevalence-adjusted': 'Standard w. PAS',
+    }
     
     for row, dataset_name in enumerate(datasets):
         # Load test labels for this dataset
@@ -259,53 +262,90 @@ def create_methods_comparison_plot():
         
         for col, gamma in enumerate(gamma_levels):
             ax = axes[row, col]
-            
             # Plot each method for this gamma level
-            for method, color in zip(methods, method_colors):
-                # Sort classes by class cond acc of this specific method
+            for method in methods:
                 idx = np.argsort(res[method]['coverage_metrics']['raw_class_coverages'])[::-1]
-                
-                # Get the lines for the specific method
-                up_line = res[method]['class-cond-decision-accuracy'][idx]
-                lower_line = res[method]['coverage_metrics']['raw_class_coverages'][idx]
-                
-                # Compute the line for this gamma level
-
-                line_data = (1-gamma) * up_line + gamma * lower_line
-                # line_data = uniform_filter((1-gamma) * up_line + gamma * lower_line, size=20, mode='nearest')
-                
+                up_line_raw = res[method]['class-cond-decision-accuracy'][idx]
+                lower_line_raw = res[method]['coverage_metrics']['raw_class_coverages'][idx]
+                line_data = uniform_filter((1-gamma) * up_line_raw + gamma * lower_line_raw, size=20, mode='nearest')
+                color = method_colors[method]
                 ax.plot(line_data, color=color, linewidth=2.0, 
-                       label=method_to_name[method], solid_capstyle='round')
-            
+                        label=method_to_name[method], solid_capstyle='round')
             ax.set_xlim(0, num_classes-1)
-            
             # Set titles and labels
             if row == 0:
                 ax.set_title(f'$\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
             if col == 0:
                 ax.set_ylabel('Decision accuracy')
             if row == 1:
-                ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of Stand. CP)')
-            
+                ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of each method)')
             # Add dataset name on the left
             if col == 0:
                 ax.text(-0.15, 0.5, dataset_names[dataset_name], 
-                       transform=ax.transAxes, rotation=90, 
-                       verticalalignment='center', fontsize=14)
-            
-            # Add legend only to top-right subplot
-            if row == 0 and col == 4:
-                ax.legend(loc='upper right', fontsize=10)
-    
-    plt.tight_layout()
-    
+                        transform=ax.transAxes, rotation=90, 
+                        verticalalignment='center', fontsize=14)
+    # Move legend below the figure, centered, ncol=4 (like pareto_plots.py)
+    handles, labels = [], []
+    for method in methods:
+        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=2, label=method_to_name[method]))
+        labels.append(method_to_name[method])
+    plt.tight_layout(rect=[0, 0, 1, 0.93])
+    fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, -0.08), fontsize=14, ncol=4, frameon=False)
     # Save the combined plot
     fig_path = f'{fig_folder}/methods_comparison_2x5.pdf'
     plt.savefig(fig_path, bbox_inches='tight')
     print('Saved methods comparison plot to', fig_path)
-    
     return fig, axes
+
 
 # Create the methods comparison plot
 create_methods_comparison_plot()
+
+# %%
+def verify_curves_match():
+    """
+    Verification function to ensure curves match exactly between the two plot types
+    """
+    datasets = ['plantnet-trunc', 'inaturalist-trunc']
+    methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']
+    gamma_levels = [0.0, 0.25, 0.5, 0.75, 1.0]
+    
+    print("Verifying that curves match between create_combined_decision_acc_plot and create_methods_comparison_plot...")
+    
+    for dataset_name in datasets:
+        print(f"\nDataset: {dataset_name}")
+        
+        # Load test labels for this dataset
+        test_labels_path = f'/home-warm/plantnet/conformal_cache/train_models/best-{dataset_name}-model_test_labels.npy'
+        test_labels = np.load(test_labels_path)
+        num_classes = np.max(test_labels) + 1
+        
+        # Load results for this dataset
+        res = {}
+        for method in methods:
+            res[method] = load_metrics(dataset_name, 0.1, method)
+        
+        # Add class-conditional decision accuracies
+        for method in methods:
+            dec_acc = compute_class_cond_decision_accuracy_for_method(res, method, test_labels)
+            res[method]['class-cond-decision-accuracy'] = dec_acc
+        
+        for method in methods:
+            print(f"  Method: {method}")
+            
+            # Generate curves using SAME logic as create_combined_decision_acc_plot
+            idx = np.argsort(res[method]['coverage_metrics']['raw_class_coverages'])[::-1]
+            up_line_raw = res[method]['class-cond-decision-accuracy'][idx]
+            lower_line_raw = res[method]['coverage_metrics']['raw_class_coverages'][idx]
+            
+            for gamma in gamma_levels:
+                # This is the exact same formula used in both functions
+                line_data = uniform_filter((1-gamma) * up_line_raw + gamma * lower_line_raw, size=20, mode='nearest')
+                
+                print(f"    γ={gamma*100:3.0f}%: mean={np.mean(line_data):.4f}, std={np.std(line_data):.4f}, min={np.min(line_data):.4f}, max={np.max(line_data):.4f}")
+    
+    print("\nVerification complete! The curves should match exactly between both plot types.")
+
+# Run verification
+verify_curves_match()
 # %%

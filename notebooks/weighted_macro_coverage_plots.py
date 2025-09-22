@@ -126,7 +126,10 @@ def compute_wpas_results(all_res, at_risk_species, num_classes):
     test_labels = np.load(test_labels_path)
     
     # Define gamma values for WPAS
-    gammas = [2, 10, 100, 500]
+    # gammas = [10, 100,  1000]
+    gammas = [1, 10, 100, 1000]
+    # gammas = [5, 10, 50, 100, 500, 1000]
+
     alphas = [0.2, 0.1, 0.05, 0.01]
     
     # Compute WPAS for each gamma value
@@ -176,8 +179,8 @@ def compute_wpas_results(all_res, at_risk_species, num_classes):
 def compute_results_from_scores(dataset, alphas, methods, at_risk_species=None):
     """
     Compute conformal prediction results directly from softmax scores.
-    This function loads raw data and performs all computations directly,
-    including the WPAS calculation with different gamma values.
+    This function is kept for potential future use but currently not needed
+    since we use cached scores in compute_wpas_results.
     """
     print("Computing results directly from scores...")
     
@@ -200,73 +203,8 @@ def compute_results_from_scores(dataset, alphas, methods, at_risk_species=None):
         print("Falling back to pre-computed results.")
         return None
     
-    # Load data
-    print("✓ All required data files found. Loading data...")
-    train_labels = np.load(train_labels_path)
-    cal_softmax = np.load(cal_softmax_path)
-    cal_labels = np.load(cal_labels_path)
-    test_softmax = np.load(test_softmax_path)
-    test_labels = np.load(test_labels_path)
-    
-    num_classes = train_labels.max() + 1
-    
-    # Define gamma values for WPAS
-    gammas = [2, 10, 100, 500]  # Scalar values for upweighting at-risk species
-    
-    # Define gamma values for WPAS
-    gammas = [2, 10, 100, 500]  # Scalar values for upweighting at-risk species
-    
-    # Initialize result structure
-    all_res = {f'alpha={alpha}': {} for alpha in alphas}
-    
-    # Process all score types: standard, PAS, and WPAS with different gammas
-    for score, b in zip(['softmax', 'PAS', 'WPAS', 'WPAS', 'WPAS', 'WPAS'], 
-                       [None, None] + gammas):
-        
-        print(f"Computing scores for {score}" + 
-              (f" with γ={b}" if score == 'WPAS' else ""))
-        
-        # Prepare weights for WPAS
-        if score == 'WPAS':
-            weights = np.ones((num_classes,))
-            weights[at_risk_species] = b
-            weights = weights / np.sum(weights)
-        else:
-            weights = None
-            
-        # Get conformal scores
-        cal_scores = get_conformal_scores(cal_softmax, score, 
-                                          train_labels_path=train_labels_path, 
-                                          weights=weights)
-        test_scores = get_conformal_scores(test_softmax, score, 
-                                          train_labels_path=train_labels_path, 
-                                          weights=weights)
-        
-        # Run standard CP for different alphas
-        for alpha in alphas:
-            # Compute quantile threshold, prediction sets and metrics
-            qhat = compute_qhat(cal_scores, cal_labels, alpha)
-            preds = create_prediction_sets(test_scores, qhat)
-            coverage_metrics, set_size_metrics = compute_all_metrics(test_labels, preds, alpha)
-            
-            # Create result entry
-            res = {
-                'pred_sets': preds,
-                'qhat': qhat, 
-                'coverage_metrics': coverage_metrics,
-                'set_size_metrics': set_size_metrics
-            }
-            
-            # Store with appropriate name
-            if score == 'WPAS':
-                score_name = f'WPAS ($\\gamma=$ {b})'
-            else:
-                score_name = 'standard' if score == 'softmax' else 'prevalence-adjusted'
-                
-            all_res[f'alpha={alpha}'][score_name] = res
-    
-    print("✓ Direct computation complete")
-    return all_res
+    # This function is currently not used since we compute WPAS separately
+    return None
 
 
 def get_plantnet_at_risk_species():
@@ -318,36 +256,34 @@ def display_results_table(all_res, at_risk_species, alphas, num_classes):
 
 def plot_results(all_res, at_risk_species, alphas, num_classes, dataset):
     """Generate plots showing the performance of different methods."""
-    # Define color scheme - matching notebook display
+    # Define color scheme
     score_to_color = {
         'standard': 'blue',
-        'prevalence-adjusted': 'orange',  # This is PAS
-        # WPAS colors for different gamma values
-        'WPAS ($\\gamma=$ 2)': (0.3, 0.13, 0.7),
-        'WPAS ($\\gamma=$ 10)': (0.5, 0.13, 0.7),  
-        'WPAS ($\\gamma=$ 100)': (0.7, 0.13, 0.7),
-        'WPAS ($\\gamma=$ 500)': (0.9, 0.13, 0.7),
+        'prevalence-adjusted': 'orange',
+        'WPAS ($\\gamma=$ 1)': 'green',
+        'WPAS ($\\gamma=$ 10)': 'green',
+        'WPAS ($\\gamma=$ 100)': 'green',
+        'WPAS ($\\gamma=$ 1000)': 'green',
     }
     
-    # Marker styles for different method types
+    # Marker styles
     score_to_marker = {
         'standard': 'X',
-        'prevalence-adjusted': '^',  # PAS
-        # WPAS methods all use circles
-        'WPAS ($\\gamma=$ 2)': 'o',
+        'prevalence-adjusted': '^',
+        'WPAS ($\\gamma=$ 1)': 'o',
         'WPAS ($\\gamma=$ 10)': 'o',
         'WPAS ($\\gamma=$ 100)': 'o', 
-        'WPAS ($\\gamma=$ 500)': 'o',
+        'WPAS ($\\gamma=$ 1000)': 'o',
     }
 
-    # Methods to display (now including WPAS)
+    # Methods to display
     display_methods = [
         'standard',
-        'prevalence-adjusted',  # PAS
-        'WPAS ($\\gamma=$ 2)',
-        'WPAS ($\\gamma=$ 10)', 
+        'prevalence-adjusted',
+        'WPAS ($\\gamma=$ 1)',
+        'WPAS ($\\gamma=$ 10)',
         'WPAS ($\\gamma=$ 100)',
-        'WPAS ($\\gamma=$ 500)'
+        'WPAS ($\\gamma=$ 1000)'
     ]
     markersizes = [4, 5, 6, 7]
 
@@ -366,7 +302,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset):
         for j, alpha in enumerate(alphas):
             alpha_key = f'alpha={alpha}'
             if alpha_key in all_res:
-                # Only plot the requested methods
+                # Only plot available methods
                 for score in display_methods:
                     if score in all_res[alpha_key]:
                         res = all_res[alpha_key][score]
@@ -385,10 +321,63 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset):
                             x = res['coverage_metrics']['marginal_cov']
                             
                         y = res['set_size_metrics']['mean']
+                        
+                        # Set marker size based on method
+                        if score == 'prevalence-adjusted':
+                            markersize = 8  # Larger marker for PAS
+                            zorder = 10  # Max zorder for PAS to appear on top
+                        else:
+                            markersize = markersizes[j]
+                            zorder = 5
+                        
+                        # Set display label
+                        if score == 'standard':
+                            display_label = 'Standard'
+                        elif score == 'prevalence-adjusted':
+                            display_label = 'Standard w. PAS'
+                        elif score.startswith('WPAS'):
+                            # Only show legend for the first WPAS method to avoid clutter
+                            if score == 'WPAS ($\\gamma=$ 1)':
+                                display_label = 'Standard w. WPAS'
+                            else:
+                                display_label = None  # No legend for other WPAS methods
+                        else:
+                            display_label = score
                        
-                        ax.plot(x, y, marker, alpha=0.6, markersize=markersizes[j],
-                                color=color, label=f'{score}, $\\alpha=$ {alpha}')
+                        # Only add label if display_label is not None
+                        if display_label is not None:
+                            label_text = f'{display_label}, $\\alpha=$ {alpha}'
+                        else:
+                            label_text = ''  # Empty label for legend
+                            
+                        ax.plot(x, y, marker, alpha=0.6, markersize=markersize,
+                                color=color, label=label_text, zorder=zorder)
                         ax.spines[['right', 'top']].set_visible(False)
+                
+                # Plot WPAS line connecting all gamma values for this alpha
+                wpas_data = []
+                for score in display_methods:
+                    if score.startswith('WPAS') and score in all_res[alpha_key]:
+                        res = all_res[alpha_key][score]
+                        # Calculate metric value based on column (same as above)
+                        if i == 0:  # Avg of at risk
+                            x = np.mean(res['coverage_metrics']['raw_class_coverages'][at_risk_species])
+                        elif i == 1:  # Avg of not at risk species
+                            other_species = np.setdiff1d(np.arange(num_classes), at_risk_species)
+                            x = np.mean(res['coverage_metrics']['raw_class_coverages'][other_species])
+                        elif i == 2:  # Macro-coverage
+                            x = np.mean(res['coverage_metrics']['raw_class_coverages'])
+                        elif i == 3:  # Marginal coverage
+                            x = res['coverage_metrics']['marginal_cov']
+                        y = res['set_size_metrics']['mean']
+                        wpas_data.append((x, y))
+                
+                # Draw connecting line for WPAS methods
+                if len(wpas_data) > 1:
+                    wpas_data.sort()  # Sort by x-coordinate
+                    wpas_x, wpas_y = zip(*wpas_data)
+                    ax.plot(wpas_x, wpas_y, '-', color='green', alpha=0.5, zorder=3,
+                            linewidth=1.5)
         ax.set_xlabel(metric_names[i])
         ax.set_ylim(bottom=0)
         
@@ -399,7 +388,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset):
     plt.suptitle(dataset_names.get(dataset, dataset), y=1.02)
 
     os.makedirs(f'{fig_folder}/weighted_macro_coverage', exist_ok=True)
-    pth = f'{fig_folder}/weighted_macro_coverage/{dataset}_conformal_comparison.pdf'
+    pth = f'{fig_folder}/weighted_macro_coverage/{dataset}_conformal_comparison_js.pdf'
     plt.savefig(pth, bbox_inches='tight')
     print(f'✅ Plot saved to {pth}')
     plt.show()
@@ -407,42 +396,32 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset):
     # Display summary
     print('\n✅ Analysis complete! The plot shows:')
     print('   - Standard conformal prediction (blue X)')
-    print('   - PAS: Prevalence-adjusted scoring (orange triangle)')
-    print('   - WPAS: Weighted prevalence-adjusted scoring with γ=2,10,100,500 (purple circles)')
+    print('   - Standard w. PAS: Standard with prevalence-adjusted scoring (orange triangle, larger marker)')
+    print('   - Standard w. WPAS: Weighted prevalence-adjusted scoring with γ=1,10,100,1000 (green circles connected by lines)')
     print('   - WPAS successfully improves coverage for at-risk species while maintaining reasonable set sizes')
 
 
 def main():
     """Main function to run the analysis and generate plots."""
     alphas = [0.2, 0.1, 0.05, 0.01]
-    
-    # Define base methods (WPAS will be computed separately)
     methods = ['standard', 'prevalence-adjusted']
     
     # Get at-risk species for PlantNet
     at_risk_species = get_plantnet_at_risk_species()
     
-    # First try to compute directly from scores
-    direct_results = compute_results_from_scores(dataset, alphas, methods, at_risk_species)
-    
-    if direct_results is not None:
-        # Use directly computed results
-        all_res = direct_results
-        print("Using results computed directly from scores")
-    else:
-        # Fall back to pre-computed results
-        print('Loading pre-computed results...')
-        available_methods = []
-        for method in methods:
-            try:
-                test_result = load_one_result(dataset, 0.1, method, score='softmax')
-                available_methods.append(method)
-                print(f'✓ Found method: {method}')
-            except FileNotFoundError:
-                print(f'⚠ Method {method} not found')
+    # Load pre-computed results for standard and PAS methods
+    print('Loading pre-computed results...')
+    available_methods = []
+    for method in methods:
+        try:
+            test_result = load_one_result(dataset, 0.1, method, score='softmax')
+            available_methods.append(method)
+            print(f'✓ Found method: {method}')
+        except FileNotFoundError:
+            print(f'⚠ Method {method} not found')
 
-        # Load all basic results
-        all_res = load_all_results(dataset, alphas, available_methods, score='softmax')
+    # Load all basic results
+    all_res = load_all_results(dataset, alphas, available_methods, score='softmax')
     
     # Get structure information from standard result
     sample_result = all_res['alpha=0.1']['standard']
@@ -452,10 +431,6 @@ def main():
     print(f'Dataset: {dataset}')
     print(f'Number of classes: {num_classes}')
     print(f'Number of test samples: {num_test_samples}')
-    
-    # Check if we have raw_is_covered in the results
-    has_raw_is_covered = 'raw_is_covered' in sample_result['coverage_metrics']
-    print(f'Has raw_is_covered: {has_raw_is_covered}')
     
     # Compute WPAS results
     all_res = compute_wpas_results(all_res, at_risk_species, num_classes)
