@@ -122,10 +122,19 @@ def plot_set_size_vs_cov_metric(
     # --- markersizes ---
     n = len(alphas)
     if markersizes is None:
-        markersizes = np.linspace(7, 3, n)
+        base_markersizes = np.linspace(11, 7, n)
+    else:
+        base_markersizes = markersizes
+
+    # Function to get marker size for a specific method
+    def get_marker_size(base_size, method_key):
+        if method_key == 'cvx':
+            return base_size - 2
+        else:
+            return base_size
 
     # --- fixed definitions ---
-    # cw_weights = 1 - np.array([0, .001, .01, .025, .05, .1, .15, .2, .4, .6, .8, 1])
+    cw_weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1]
     rarity_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 10, 1000]
     random_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 10, 1000]
     quantile_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 10, 1000]
@@ -133,19 +142,21 @@ def plot_set_size_vs_cov_metric(
         ('standard',             'Standard',       'blue',      'X'),
         ('classwise',            'Classwise',      'red',       'X'),
         ('classwise-exact',      'Exact Classwise','magenta',  'x'),
-        ('clustered',            'Clustered',      'limegreen', 'x'),
+        ('clustered',            'Clustered',      'purple', 'P'),
         ('prevalence-adjusted',  'Standard w. PAS','orange',    '^'),
         ('standard-softmax',     'Standard w. softmax', 'blue',  'x'),
     ]
 
     # --- plot main curves ---
-    for alpha, ms in zip(alphas, markersizes):
+    for alpha, base_ms in zip(alphas, base_markersizes):
         res = all_res.get(f'alpha={alpha}', {})
         suffix = f'{label_prefix}, $\\alpha={alpha}$'
 
         # core scatter methods (only if present)
         for key, label, color, mk in core_methods:
             if key in res:
+                # Get method-specific marker size
+                ms = get_marker_size(base_ms, key)
                 # Set higher zorder for prevalence-adjusted to put it on top
                 plot_zorder = 20 if key == 'prevalence-adjusted' else 10
                 ax.plot(
@@ -160,6 +171,7 @@ def plot_set_size_vs_cov_metric(
         # convex interpolation (only weights that exist)
         valid_w = [w for w in cw_weights if f'cvx-cw_weight={w}' in res]
         if valid_w:
+            ms = get_marker_size(base_ms, 'cvx')  # Regular size for cvx methods
             x_cvx = [res[f'cvx-cw_weight={w}']['coverage_metrics'][coverage_metric] for w in valid_w]
             y_cvx = [res[f'cvx-cw_weight={w}']['set_size_metrics'][set_size_metric]     for w in valid_w]
             ax.plot(
@@ -180,6 +192,7 @@ def plot_set_size_vs_cov_metric(
         ]:
             valid_b = [b for b in rarity_bandwidths if f'{tag}-{b}' in res]
             if valid_b:
+                ms = get_marker_size(base_ms, tag)  # Regular size for fuzzy methods
                 xs = [res[f'{tag}-{b}']['coverage_metrics'][coverage_metric] for b in valid_b]
                 ys = [res[f'{tag}-{b}']['set_size_metrics'][set_size_metric]    for b in valid_b]
                 ax.plot(
@@ -196,6 +209,7 @@ def plot_set_size_vs_cov_metric(
         ]:
             valid_b = [b for b in rarity_bandwidths if f'{tag}-{b}' in res]
             if valid_b:
+                ms = get_marker_size(base_ms, tag)  # Regular size for fuzzy methods
                 xs = [res[f'{tag}-{b}']['coverage_metrics'][coverage_metric] for b in valid_b]
                 ys = [res[f'{tag}-{b}']['set_size_metrics'][set_size_metric]    for b in valid_b]
                 ax.plot(
@@ -212,6 +226,7 @@ def plot_set_size_vs_cov_metric(
         ]:
             valid_b = [b for b in rarity_bandwidths if f'{tag}-{b}' in res]
             if valid_b:
+                ms = get_marker_size(base_ms, tag)  # Regular size for fuzzy methods
                 xs = [res[f'{tag}-{b}']['coverage_metrics'][coverage_metric] for b in valid_b]
                 ys = [res[f'{tag}-{b}']['set_size_metrics'][set_size_metric]    for b in valid_b]
                 ax.plot(
@@ -235,12 +250,14 @@ def plot_set_size_vs_cov_metric(
         axins.patch.set_alpha(0.7)
 
         # replot all alphas for all methods, with the same presence checks
-        for alpha, ms in zip(alphas, 0.5 * np.array(markersizes)):
+        for alpha, base_ms in zip(alphas, 0.5 * np.array(base_markersizes)):
             res = all_res.get(f'alpha={alpha}', {})
 
             # core
             for key, _, color, mk in core_methods:
                 if key in res:
+                    # Get method-specific marker size for inset
+                    ms = get_marker_size(base_ms, key)
                     # Set higher zorder for prevalence-adjusted to put it on top
                     plot_zorder = 20 if key == 'prevalence-adjusted' else 10
                     axins.plot(
@@ -253,6 +270,7 @@ def plot_set_size_vs_cov_metric(
             # convex
             valid_w = [w for w in cw_weights if f'cvx-cw_weight={w}' in res]
             if valid_w:
+                ms = get_marker_size(base_ms, 'cvx')
                 axins.plot(
                     [res[f'cvx-cw_weight={w}']['coverage_metrics'][coverage_metric] for w in valid_w],
                     [res[f'cvx-cw_weight={w}']['set_size_metrics'][set_size_metric]    for w in valid_w],
@@ -263,6 +281,7 @@ def plot_set_size_vs_cov_metric(
             for tag, mk_sym, alpha_val in [('fuzzy-rarity','o',0.3),('fuzzy-RErarity','^',0.5)]:
                 valid_b = [b for b in rarity_bandwidths if f'{tag}-{b}' in res]
                 if valid_b:
+                    ms = get_marker_size(base_ms, tag)
                     axins.plot(
                         [res[f'{tag}-{b}']['coverage_metrics'][coverage_metric] for b in valid_b],
                         [res[f'{tag}-{b}']['set_size_metrics'][set_size_metric]    for b in valid_b],
@@ -533,9 +552,6 @@ for dataset in dataset_names.keys():
     df.to_csv(pth, index=False)
     print(f'Saved cleaned csv of metrics for alpha={selected_alpha} to {pth}')
 
-
-remove the inset plots for all methods# %%
-df
 
 # %% [markdown]
 # ## Appendix plots
