@@ -223,7 +223,7 @@ def create_methods_comparison_plot():
     - Uses the same colors and smoothing as the original function
     """
     # Create 2x5 subplot layout
-    fig, axes = plt.subplots(2, 5, figsize=(20, 8))
+    fig, axes = plt.subplots(2, 5, figsize=(20, 8), sharey=True)
     
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
     methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']  # Same order as create_combined_decision_acc_plot
