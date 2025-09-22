@@ -249,17 +249,14 @@ def create_methods_comparison_plot():
         test_labels_path = f'/home-warm/plantnet/conformal_cache/train_models/best-{dataset_name}-model_test_labels.npy'
         test_labels = np.load(test_labels_path)
         num_classes = np.max(test_labels) + 1
-        
         # Load results for this dataset
         res = {}
         for method in methods:
             res[method] = load_metrics(dataset_name, 0.1, method)
-        
         # Add class-conditional decision accuracies
         for method in methods:
             dec_acc = compute_class_cond_decision_accuracy_for_method(res, method, test_labels)
             res[method]['class-cond-decision-accuracy'] = dec_acc
-        
         for col, gamma in enumerate(gamma_levels):
             ax = axes[row, col]
             # Plot each method for this gamma level
@@ -273,17 +270,13 @@ def create_methods_comparison_plot():
                         label=method_to_name[method], solid_capstyle='round')
             ax.set_xlim(0, num_classes-1)
             # Set titles and labels
-            if row == 0:
-                ax.set_title(f'$\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
             if col == 0:
+                ax.set_title(f"{dataset_names[dataset_name]}\n$\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$", loc='left', fontsize=15, fontweight='bold')
                 ax.set_ylabel('Decision accuracy')
+            else:
+                ax.set_title(f'$\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
             if row == 1:
                 ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of each method)')
-            # Add dataset name on the left
-            if col == 0:
-                ax.text(-0.15, 0.5, dataset_names[dataset_name], 
-                        transform=ax.transAxes, rotation=90, 
-                        verticalalignment='center', fontsize=14)
     # Move legend below the figure, centered, ncol=4 (like pareto_plots.py)
     handles, labels = [], []
     for method in methods:
