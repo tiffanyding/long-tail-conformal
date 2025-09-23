@@ -223,7 +223,7 @@ def create_methods_comparison_plot():
     - Uses the same colors and smoothing as the original function
     """
     # Create 2x5 subplot layout
-    fig, axes = plt.subplots(2, 5, figsize=(24, 8), sharey=True)
+    fig, axes = plt.subplots(2, 5, figsize=(20, 8), sharey=True)
     
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
     methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']  # Same order as create_combined_decision_acc_plot
@@ -271,10 +271,10 @@ def create_methods_comparison_plot():
             ax.set_xlim(0, num_classes-1)
             # Set titles and labels
             if col == 0:
-                ax.set_title(f"{dataset_names[dataset_name]}\n$\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$", loc='left', fontsize=15, fontweight='bold')
+                ax.set_title(f"\\textbf{{{dataset_names[dataset_name]}}}\nExpert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$", loc='left', fontsize=15, fontweight='bold')
                 ax.set_ylabel('Decision accuracy')
             else:
-                ax.set_title(f'$\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
+                ax.set_title(f'Expert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
             if row == 1:
                 ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of each method)')
     # Move legend below the figure, centered, ncol=4 (like pareto_plots.py)
@@ -283,7 +283,7 @@ def create_methods_comparison_plot():
         handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=2, label=method_to_name[method]))
         labels.append(method_to_name[method])
     plt.tight_layout(rect=[0, 0, 1, 0.93])
-    fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, -0.08), fontsize=14, ncol=4, frameon=False)
+    fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, -0.08), fontsize=14, ncol=4, frameon=True)
     # Save the combined plot
     fig_path = f'{fig_folder}/methods_comparison_2x5.pdf'
     plt.savefig(fig_path, bbox_inches='tight')
