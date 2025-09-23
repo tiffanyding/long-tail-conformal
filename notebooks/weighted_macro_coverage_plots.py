@@ -550,7 +550,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
         0.2: 1.0     # Least conservative -> highest opacity
         }
 
-    fig, axes = plt.subplots(1, len(metric_names), figsize=(16, 2.2), sharey=True)
+    fig, axes = plt.subplots(1, len(metric_names), figsize=(13, 3), sharey=True)
     for i in range(len(metric_names)):
         ax = axes[i]
         if i == 3:
@@ -674,7 +674,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
     fig.legend(
         handles, labels,
         loc='lower center',
-        bbox_to_anchor=(0.5, -0.5),  # 0.01 is just below the axes area
+        bbox_to_anchor=(0.5, -0.35),  # 0.01 is just below the axes area
         ncol=len(alphas),
         fontsize=12,
         frameon=True
