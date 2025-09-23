@@ -186,19 +186,22 @@ def create_combined_decision_acc_plot():
                         label=label)
             
             ax.set_xlim(0, num_classes-1)
+            ax.spines[['right', 'top']].set_visible(False)
             ax.set_title(f'{dataset_names[dataset_name]} - {method_to_name[method]}')
             
             # Set y-label only for first column
             if col == 0:
-                ax.set_ylabel('Decision accuracy')
+                ax.set_ylabel('Decision accuracy', fontsize=18)
+
             
             # Set x-label only for second row
             if row == 1:
-                ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of each method)')
+                ax.set_xlabel('Class', fontsize=18)
+                # (sorted by $\\hat{c}_y$ of each method)
             
             # Add legend only for plantnet-trunc Standard (row=0, col=0)
             if row == 0 and col == 0:
-                legend = fig.legend(loc='center right', bbox_to_anchor=(1.08, 0.5), fontsize=10, title='Expert proportion', ncol=1)
+                legend = fig.legend(loc='center right', bbox_to_anchor=(1.08, 0.5), fontsize=14, title='Expert proportion', ncol=1)
                 legend.get_title().set_fontsize(11)
     
     plt.tight_layout()
@@ -269,14 +272,16 @@ def create_methods_comparison_plot():
                 ax.plot(line_data, color=color, linewidth=2.0, 
                         label=method_to_name[method], solid_capstyle='round')
             ax.set_xlim(0, num_classes-1)
+            ax.spines[['right', 'top']].set_visible(False)
             # Set titles and labels
             if col == 0:
                 ax.set_title(f"\\textbf{{{dataset_names[dataset_name]}}}\nExpert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$", loc='left', fontsize=15, fontweight='bold')
-                ax.set_ylabel('Decision accuracy')
+                ax.set_ylabel('Decision accuracy', fontsize=18)
             else:
                 ax.set_title(f'Expert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
             if row == 1:
-                ax.set_xlabel('Class (sorted by $\\hat{c}_y$ of each method)')
+                ax.set_xlabel('Class', fontsize=18)
+                # (sorted by $\\hat{c}_y$ of each method)
     # Move legend below the figure, centered, ncol=4 (like pareto_plots.py)
     handles, labels = [], []
     for method in methods:
