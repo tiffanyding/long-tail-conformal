@@ -613,7 +613,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
                 wpas_data = []
                 for score in display_methods:
                     if score.startswith('WPAS') and score in all_res[alpha_key]:
-                    res = all_res[alpha_key][score]
+                        res = all_res[alpha_key][score]
                         # Calculate metric value based on column (same as above)
                         if i == 0:  # Avg of at risk
                             x = np.mean(res['coverage_metrics']['raw_class_coverages'][at_risk_species])

@@ -370,7 +370,7 @@ def plot_set_size_vs_cov_metric(
     # --- legend & layout ---
     if show_legend:
         ax.legend(fontsize=6, bbox_to_anchor=(1, 1))
-    plt.tight_layout(pad=1.3)
+    # Use consistent layout - no tight_layout to avoid width changes
 
 # Specify where to zoom in 
 def get_inset_lims(dataset, coverage_metric):
@@ -470,20 +470,55 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     axes[0].set_ylabel('Average set size')
     plt.suptitle(dataset_names[dataset], y=1)
     
+    # Use tight layout for clean, properly sized plots
+    plt.tight_layout()
+    
     fig_path = f'{fig_folder}/{dataset}/ALL_metrics_{dataset}_{score}{save_suffix}_pareto_NO_LEGEND_js.pdf'
     os.makedirs(f'{fig_folder}/{dataset}', exist_ok=True)
     
-    # Save version without legend
-    plt.savefig(fig_path)
+    # Save clean version without legend
+    plt.savefig(fig_path, bbox_inches='tight')
     
-    # # Save version with legend
+    # Create legend for the plot
     if len(alphas) > 1:
-        axes[0].legend(ncols=len(alphas), loc='upper left', bbox_to_anchor=(-0.25,-0.35), fontsize=legendfontsize)
+        legend = axes[0].legend(ncols=len(alphas), loc='upper center', bbox_to_anchor=(2.0, -0.08), fontsize=8)
     else:
-        axes[0].legend(ncols=3, loc='upper left', bbox_to_anchor=(0.5,-0.35), fontsize=legendfontsize)
-
-    plt.savefig(fig_path.replace('NO_LEGEND_js.pdf', 'WITH_LEGEND_js.pdf'), bbox_inches='tight')
-    plt.savefig(fig_path.replace('NO_LEGEND_js.pdf', 'WITH_LEGEND_js.jpg'), bbox_inches='tight') # Also save as jpg
+        legend = axes[0].legend(ncols=3, loc='upper center', bbox_to_anchor=(2.0, -0.08), fontsize=8)
+    
+    # Save version with legend (for reference)
+    plt.subplots_adjust(left=0.08, bottom=0.40, right=0.95, top=0.85, wspace=0.25)
+    plt.savefig(fig_path.replace('NO_LEGEND_js.pdf', 'WITH_LEGEND_js.pdf'), bbox_inches=None)
+    plt.savefig(fig_path.replace('NO_LEGEND_js.pdf', 'WITH_LEGEND_js.jpg'), bbox_inches=None)
+    
+    # Create standalone legend PDF
+    legend_fig = plt.figure(figsize=(12, 2))  # Wide figure for horizontal legend
+    legend_fig.patch.set_visible(False)  # Make figure background transparent
+    
+    # Get legend handles and labels from the main plot
+    handles, labels = axes[0].get_legend_handles_labels()
+    
+    # Create standalone legend
+    if len(alphas) > 1:
+        legend_standalone = legend_fig.legend(handles, labels, ncol=len(alphas), 
+                                            loc='center', fontsize=8, frameon=True)
+    else:
+        legend_standalone = legend_fig.legend(handles, labels, ncol=3, 
+                                            loc='center', fontsize=8, frameon=True)
+    
+    # Remove axes from legend figure
+    legend_fig.gca().set_axis_off()
+    
+    # Save standalone legend
+    legend_path = fig_path.replace('NO_LEGEND_js.pdf', 'LEGEND_ONLY_js.pdf')
+    legend_fig.savefig(legend_path, bbox_inches='tight', transparent=True)
+    
+    print(f'✅ Saved three versions:')
+    print(f'   - Main plot: {fig_path}')
+    print(f'   - With legend: {fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.pdf")}')
+    print(f'   - Legend only: {legend_path}')
+    
+    # Close the legend figure to free memory
+    plt.close(legend_fig)
     
     print('Saved no-legend version to', fig_path, 'and version with legend to [...]WITH_LEGEND_js.pdf and _js.jpg' )
     
@@ -634,7 +669,7 @@ methods = ['standard', 'classwise', 'clustered'] + \
 
 
 for dataset in dataset_names.keys():
-    generate_all_pareto_plots(dataset, score, alphas, methods, legendfontsize=13)
+    generate_all_pareto_plots(dataset, score, alphas, methods, legendfontsize=15)
 
 # %% [markdown]
 # ### Fuzzy with Random and Quantile projections
