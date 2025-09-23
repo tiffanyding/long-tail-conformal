@@ -15,8 +15,8 @@ plt.rcParams.update({
     'axes.titlesize': 18,   # subplot titles
     'axes.labelsize': 16,   # x/y labels
     'legend.fontsize': 16,  # legend text
-    'xtick.labelsize': 16,  # tick labels
-    'ytick.labelsize': 16,
+    'xtick.labelsize': 22,  # tick labels
+    'ytick.labelsize': 22,
 
 })
 # use tex with matplotlib
@@ -201,8 +201,8 @@ def create_combined_decision_acc_plot():
             
             # Add legend only for plantnet-trunc Standard (row=0, col=0)
             if row == 0 and col == 0:
-                legend = fig.legend(loc='center right', bbox_to_anchor=(1.08, 0.5), fontsize=14, title='Expert proportion', ncol=1)
-                legend.get_title().set_fontsize(11)
+                legend = fig.legend(loc='center right', bbox_to_anchor=(1.08, 0.5), fontsize=16, title='Expert proportion', ncol=1)
+                legend.get_title().set_fontsize(16)
     
     plt.tight_layout()
     
@@ -274,21 +274,23 @@ def create_methods_comparison_plot():
             ax.set_xlim(0, num_classes-1)
             ax.spines[['right', 'top']].set_visible(False)
             # Set titles and labels
+   
+
             if col == 0:
-                ax.set_title(f"\\textbf{{{dataset_names[dataset_name]}}}\nExpert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$", loc='left', fontsize=15, fontweight='bold')
-                ax.set_ylabel('Decision accuracy', fontsize=18)
+                ax.set_title(f"\\textbf{{{dataset_names[dataset_name]}}}\nExpert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$", loc='left', fontsize=20, fontweight='bold')
+                ax.set_ylabel('Decision accuracy', fontsize=25)
             else:
                 ax.set_title(f'Expert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
             if row == 1:
-                ax.set_xlabel('Class', fontsize=18)
+                ax.set_xlabel('Class', fontsize=25)
                 # (sorted by $\\hat{c}_y$ of each method)
     # Move legend below the figure, centered, ncol=4 (like pareto_plots.py)
     handles, labels = [], []
     for method in methods:
-        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=2, label=method_to_name[method]))
+        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=4, label=method_to_name[method]))
         labels.append(method_to_name[method])
     plt.tight_layout(rect=[0, 0, 1, 0.93])
-    fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, -0.08), fontsize=14, ncol=4, frameon=True)
+    fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, -0.08), fontsize=25, ncol=4, frameon=True)
     # Save the combined plot
     fig_path = f'{fig_folder}/methods_comparison_2x5.pdf'
     plt.savefig(fig_path, bbox_inches='tight')
