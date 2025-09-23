@@ -31,7 +31,7 @@ plt.rcParams.update({
 # use tex with matplotlib
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-plt.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}'
+plt.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}\usepackage{xcolor}'
 
 dataset_names = {
     "plantnet": "Pl@ntNet-300K",
@@ -39,6 +39,28 @@ dataset_names = {
     "inaturalist": "iNaturalist-2018",
     # "inaturalist-trunc": "iNaturalist-2018 (truncated)",
 }
+
+def format_legend_label(method_label, alpha, label_prefix='', total_width=22):
+    """
+    Format legend label with perfect alignment using LaTeX makebox.
+    
+    Args:
+        method_label (str): Method name (e.g., 'Standard', 'Standard w. PAS')
+        alpha (float): Alpha value
+        label_prefix (str): Optional prefix
+        total_width (int): Fixed width in ex units for alignment
+    
+    Returns:
+        str: Formatted label with perfect alignment
+    """
+    if label_prefix:
+        # If there's a prefix, include it before the alpha
+        alpha_part = f'{label_prefix}, $\\alpha={alpha}$'
+    else:
+        alpha_part = f'($\\alpha={alpha}$)'
+    
+    # Use LaTeX makebox for bulletproof fixed-width alignment
+    return f'\\makebox[{total_width}ex][l]{{{method_label}}}{alpha_part}'
 
 # %%
 # Load in paths from folders.json
@@ -123,7 +145,8 @@ def plot_set_size_vs_cov_metric(
     # --- markersizes ---
     n = len(alphas)
     if markersizes is None:
-        base_markersizes = np.linspace(11, 7, n)
+        base_markersizes = [3, 4, 6, 8]
+
     else:
         base_markersizes = markersizes
 
@@ -151,7 +174,6 @@ def plot_set_size_vs_cov_metric(
     # --- plot main curves ---
     for alpha, base_ms in zip(alphas, base_markersizes):
         res = all_res.get(f'alpha={alpha}', {})
-        suffix = f'{label_prefix}, $\\alpha={alpha}$'
 
         # core scatter methods (only if present)
         for key, label, color, mk in core_methods:
@@ -160,12 +182,16 @@ def plot_set_size_vs_cov_metric(
                 ms = get_marker_size(base_ms, key)
                 # Set higher zorder for prevalence-adjusted to put it on top
                 plot_zorder = 20 if key == 'prevalence-adjusted' else 10
+                
+                # Format label with perfect alignment
+                formatted_label = format_legend_label(label, alpha, label_prefix)
+                
                 ax.plot(
                     res[key]['coverage_metrics'][coverage_metric],
                     res[key]['set_size_metrics'][set_size_metric],
                     linestyle='', marker=mk, color=color,
                     markersize=ms, alpha=0.8,
-                    label=(label + suffix),
+                    label=formatted_label,
                     zorder=plot_zorder
                 )
 
@@ -175,11 +201,25 @@ def plot_set_size_vs_cov_metric(
             ms = get_marker_size(base_ms, 'cvx')  # Regular size for cvx methods
             x_cvx = [res[f'cvx-cw_weight={w}']['coverage_metrics'][coverage_metric] for w in valid_w]
             y_cvx = [res[f'cvx-cw_weight={w}']['set_size_metrics'][set_size_metric]     for w in valid_w]
+            
+            # Format label with perfect alignment
+            formatted_label = format_legend_label('Interp-Q', alpha, label_prefix)
+            
+            # Test fixed transparency values: 1, 0.8, 0.6, 0.4
+            # Map alpha values to fixed transparency levels
+            alpha_to_transparency = {
+                0.01: 0.25,   # Most conservative -> lowest opacity
+                0.05: 0.5,   # 
+                0.1: 0.75,    # 
+                0.2: 1.0     # Least conservative -> highest opacity
+            }
+            alpha_transparency = alpha_to_transparency.get(alpha, 0.8)  # Default to 0.8 if alpha not found
+            
             ax.plot(
                 x_cvx, y_cvx,
                 '-o', color='dodgerblue', markersize=ms,
-                alpha=0.5,
-                label=('Interp-Q' + suffix)
+                alpha=alpha_transparency,
+                label=formatted_label
             )
 
         # fuzzy rarity projection 
@@ -196,11 +236,15 @@ def plot_set_size_vs_cov_metric(
                 ms = get_marker_size(base_ms, tag)  # Regular size for fuzzy methods
                 xs = [res[f'{tag}-{b}']['coverage_metrics'][coverage_metric] for b in valid_b]
                 ys = [res[f'{tag}-{b}']['set_size_metrics'][set_size_metric]    for b in valid_b]
+                
+                # Format label with perfect alignment
+                formatted_label = format_legend_label(label, alpha, label_prefix)
+                
                 ax.plot(
                     xs, ys,
                     '-' + mk_sym, color='salmon', markersize=ms,
                     alpha=alpha_val,
-                    label=(label + suffix)
+                    label=formatted_label
                 )
 
         # fuzzy random projection 
@@ -213,11 +257,15 @@ def plot_set_size_vs_cov_metric(
                 ms = get_marker_size(base_ms, tag)  # Regular size for fuzzy methods
                 xs = [res[f'{tag}-{b}']['coverage_metrics'][coverage_metric] for b in valid_b]
                 ys = [res[f'{tag}-{b}']['set_size_metrics'][set_size_metric]    for b in valid_b]
+                
+                # Format label with perfect alignment
+                formatted_label = format_legend_label(label, alpha, label_prefix)
+                
                 ax.plot(
                     xs, ys,
                     '-' + mk_sym, color='tab:purple', markersize=ms,
                     alpha=alpha_val,
-                    label=(label + suffix)
+                    label=formatted_label
                 )
                 
         # fuzzy quantile projection 
@@ -230,11 +278,15 @@ def plot_set_size_vs_cov_metric(
                 ms = get_marker_size(base_ms, tag)  # Regular size for fuzzy methods
                 xs = [res[f'{tag}-{b}']['coverage_metrics'][coverage_metric] for b in valid_b]
                 ys = [res[f'{tag}-{b}']['set_size_metrics'][set_size_metric]    for b in valid_b]
+                
+                # Format label with perfect alignment
+                formatted_label = format_legend_label(label, alpha, label_prefix)
+                
                 ax.plot(
                     xs, ys,
                     '-' + mk_sym, color='gold', markersize=ms,
                     alpha=alpha_val,
-                    label=(label + suffix)
+                    label=formatted_label
                 )
 
 
@@ -572,7 +624,10 @@ for dataset in dataset_names.keys():
 
 # %%
 score = 'PAS'
-methods = ['standard', 'classwise', 'classwise-exact', 'clustered'] + \
+alphas = [0.1, 0.2, 0.05, 0.01]
+
+# 'classwise-exact'
+methods = ['standard', 'classwise', 'clustered'] + \
             [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] +\
             [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] +\
             [f'cvx-cw_weight={w}' for w in cw_weights] 
