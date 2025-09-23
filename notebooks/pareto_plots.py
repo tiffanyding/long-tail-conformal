@@ -199,8 +199,20 @@ def plot_set_size_vs_cov_metric(
         valid_w = [w for w in cw_weights if f'cvx-cw_weight={w}' in res]
         if valid_w:
             ms = get_marker_size(base_ms, 'cvx')  # Regular size for cvx methods
-            x_cvx = [res[f'cvx-cw_weight={w}']['coverage_metrics'][coverage_metric] for w in valid_w]
-            y_cvx = [res[f'cvx-cw_weight={w}']['set_size_metrics'][set_size_metric]     for w in valid_w]
+            x_cvx = []
+            y_cvx = []
+            
+            for w in valid_w:
+                # For tau=1 (cw_weight=1), use classwise results instead due to numerical issues
+                if w == 1 and 'classwise' in res:
+                    x_val = res['classwise']['coverage_metrics'][coverage_metric]
+                    y_val = res['classwise']['set_size_metrics'][set_size_metric]
+                else:
+                    x_val = res[f'cvx-cw_weight={w}']['coverage_metrics'][coverage_metric]
+                    y_val = res[f'cvx-cw_weight={w}']['set_size_metrics'][set_size_metric]
+                
+                x_cvx.append(x_val)
+                y_cvx.append(y_val)
             
             # Format label with perfect alignment
             formatted_label = format_legend_label('Interp-Q', alpha, label_prefix)
@@ -335,11 +347,22 @@ def plot_set_size_vs_cov_metric(
             valid_w = [w for w in cw_weights if f'cvx-cw_weight={w}' in res]
             if valid_w:
                 ms = get_marker_size(base_ms, 'cvx')
-                axins.plot(
-                    [res[f'cvx-cw_weight={w}']['coverage_metrics'][coverage_metric] for w in valid_w],
-                    [res[f'cvx-cw_weight={w}']['set_size_metrics'][set_size_metric]    for w in valid_w],
-                    '-o', color='dodgerblue', markersize=ms, alpha=0.5
-                )
+                x_cvx_inset = []
+                y_cvx_inset = []
+                
+                for w in valid_w:
+                    # For tau=1 (cw_weight=1), use classwise results instead due to numerical issues
+                    if w == 1 and 'classwise' in res:
+                        x_val = res['classwise']['coverage_metrics'][coverage_metric]
+                        y_val = res['classwise']['set_size_metrics'][set_size_metric]
+                    else:
+                        x_val = res[f'cvx-cw_weight={w}']['coverage_metrics'][coverage_metric]
+                        y_val = res[f'cvx-cw_weight={w}']['set_size_metrics'][set_size_metric]
+                    
+                    x_cvx_inset.append(x_val)
+                    y_cvx_inset.append(y_val)
+                
+                axins.plot(x_cvx_inset, y_cvx_inset, '-o', color='dodgerblue', markersize=ms, alpha=0.5)
 
             # fuzzy
             for tag, mk_sym, alpha_val in [('fuzzy-rarity','o',0.3),('fuzzy-RErarity','^',0.5)]:
