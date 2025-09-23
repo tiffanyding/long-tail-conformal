@@ -537,13 +537,19 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
         'WPAS ($\\gamma=$ 100)',
         'WPAS ($\\gamma=$ 1000)'
     ]
-    markersizes = [4, 6, 8, 10]
+    markersizes = [3, 4, 6, 8]
 
     metric_names = ['At-risk average $\\hat{c}_y$',
                     'Not-at-risk average $\\hat{c}_y$',
                     'MacroCov',
                     'MarginalCov']
-                 
+    alpha_to_transparency = {
+        0.01: 0.25,   # Most conservative -> lowest opacity
+        0.05: 0.5,   # 
+        0.1: 0.75,    # 
+        0.2: 1.0     # Least conservative -> highest opacity
+        }
+
     fig, axes = plt.subplots(1, len(metric_names), figsize=(16, 2.2), sharey=True)
     for i in range(len(metric_names)):
         ax = axes[i]
@@ -604,8 +610,21 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
                             label_text = f'\\makebox[{total_width}ex][l]{{{display_label}}}{alpha_part}'
                         else:
                             label_text = ''  # Empty label for legend
+                        
+                        # Set dynamic transparency for WPAS methods based on alpha values
+                        if score.startswith('WPAS'):
+                            # Map alpha values to transparency levels (similar to pareto plots)
+                            alpha_to_transparency = {
+                                0.01: 0.25,   # Most conservative -> lowest opacity
+                                0.05: 0.5,    # 
+                                0.1: 0.75,    # 
+                                0.2: 1.0      # Least conservative -> highest opacity
+                            }
+                            alpha_transparency = alpha_to_transparency.get(alpha, 0.6)  # Default to 0.6 if alpha not found
+                        else:
+                            alpha_transparency = 0.6  # Default transparency for non-WPAS methods
                             
-                        ax.plot(x, y, marker, alpha=0.6, markersize=markersize,
+                        ax.plot(x, y, marker, alpha=alpha_transparency, markersize=markersize,
                                 color=color, label=label_text, zorder=zorder)
                         ax.spines[['right', 'top']].set_visible(False)
                 
@@ -627,11 +646,21 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
                         y = res['set_size_metrics']['mean']
                         wpas_data.append((x, y))
                 
-                # Draw connecting line for WPAS methods
+                # Draw connecting line for WPAS methods with dynamic transparency
                 if len(wpas_data) > 1:
                     wpas_data.sort()  # Sort by x-coordinate
                     wpas_x, wpas_y = zip(*wpas_data)
-                    ax.plot(wpas_x, wpas_y, '-', color='green', alpha=0.5, zorder=3,
+                    
+                    # Use same alpha transparency mapping for connecting line
+                    alpha_to_transparency = {
+                        0.01: 0.25,   # Most conservative -> lowest opacity
+                        0.05: 0.5,    # 
+                        0.1: 0.75,    # 
+                        0.2: 1.0      # Least conservative -> highest opacity
+                    }
+                    line_alpha = alpha_to_transparency.get(alpha, 0.5) * 0.7  # Slightly more transparent for line
+                    
+                    ax.plot(wpas_x, wpas_y, '-', color='green', alpha=line_alpha, zorder=3,
                             linewidth=1.5)
         ax.set_xlabel(metric_names[i])
         ax.set_ylim(bottom=0)
