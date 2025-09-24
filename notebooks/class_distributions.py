@@ -42,9 +42,9 @@ plt.rcParams.update({
 # Dataset configuration
 dataset_names = {
     "plantnet": "Pl@ntNet-300K",
-    "plantnet-trunc": "Pl@ntNet-300K (truncated)",
+    "plantnet-trunc": "Pl@ntNet-300K-truncated",
     "inaturalist": "iNaturalist-2018",
-    "inaturalist-trunc": "iNaturalist-2018 (truncated)",
+    "inaturalist-trunc": "iNaturalist-2018-truncated",
 }
 
 # Load PlantNet datasets

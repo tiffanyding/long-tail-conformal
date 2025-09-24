@@ -38,7 +38,9 @@ dataset_names = {
 # dataset = 'inaturalist'
 dataset = 'inaturalist-trunc'
 
-methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] 
+# methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] 
+methods = ['standard', 'classwise', 'prevalence-adjusted'] 
+
 
 
 alphas = [0.2, 0.1, 0.05, 0.01]
