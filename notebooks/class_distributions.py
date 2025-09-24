@@ -86,7 +86,7 @@ def plot_class_distributions(train_labels, val_labels, test_labels, title=None, 
     # Format plot
     ax.set_yscale("log")
     ax.set_xlim(0, num_classes)
-    ax.set_xlabel("Class (sorted by prevalence)")
+    ax.set_xlabel("Class")
     ax.set_ylabel(r"$\#$ of examples")
     ax.set_title(title)
     
