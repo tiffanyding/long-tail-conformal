@@ -174,7 +174,7 @@ def plot_set_size_vs_cov_metric(
         ('classwise-exact',      'Exact Classwise','magenta',  'x'),
         ('clustered',            'Clustered',      'purple', 'P'),
         ('prevalence-adjusted',  'Standard w. PAS','orange',    '^'),
-        ('standard-softmax',     'Standard w. softmax', 'blue',  'x'),
+        ('standard-softmax',     'Standard (softmax)', 'blue',  'x'),
     ]
 
     # --- plot main curves ---
