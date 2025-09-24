@@ -653,7 +653,7 @@ cw_weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1] # CHANGED!
 # cw_weights = 1 - np.array([0, .001, .01, .025, .05, .1, .2, .4, .8, 1])
 
 
-methods = ['standard', 'classwise', 'prevalence-adjusted'] + \
+methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] + \
             [f'cvx-cw_weight={w}' for w in cw_weights
             # [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] +\
             # [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] +\
@@ -661,7 +661,7 @@ methods = ['standard', 'classwise', 'prevalence-adjusted'] + \
 
 for dataset in ['plantnet', 'inaturalist']:
     # Generate standard plots (using default softmax results)
-    generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='', legendfontsize=14, show_grid=True, use_focal_loss=True, show_inset=False)
+    generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='', legendfontsize=14, show_grid=True, use_focal_loss=False, show_inset=False)
     
     # Generate focal loss plots (uncomment to use focal loss results)
     # generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_alpha=0.1', legendfontsize=14, show_grid=True, use_focal_loss=True)
@@ -673,8 +673,8 @@ for dataset in ['plantnet', 'inaturalist']:
 alphas = [0.2, 0.1, 0.05, 0.01]
 score = 'softmax'
 
-rarity_bandwidths = [1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
-cw_weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1] # CHANGED!
+# rarity_bandwidths = [1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
+# cw_weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1] # CHANGED!
 # cw_weights = 1 - np.array([0, .001, .01, .025, .05, .1, .2, .4, .8, 1])
 
 # methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] + \
