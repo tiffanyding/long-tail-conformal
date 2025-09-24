@@ -59,10 +59,11 @@ def save(res, path):
     print(f'Saved res', path)
 
 
-def get_results(dataset, alphas, methods, score='softmax', 
-                results_folder='results', model_type='best', loss='cross_entropy'):
+def get_results(dataset, alphas, methods, score='softmax', results_folder='results', 
+                model_type='best', loss='cross_entropy', override_saved=False):
     '''
     model_type: 'best' or 'last_epoch'
+    override_saved: whether to override saved results (if False, we skip recomputing)
     '''
     print(f'Results will be computed for: \n{dataset=}\n{alphas=}\n{methods=}')
     os.makedirs(results_folder, exist_ok=True)
@@ -99,7 +100,7 @@ def get_results(dataset, alphas, methods, score='softmax',
         ## Standard CP 
         if 'standard' in methods: 
             save_path = f'{results_prefix}_standard.pkl'
-            if not os.path.exists(save_path):
+            if not os.path.exists(save_path) or override_saved:
                 standard_qhat, pred_sets, _, _ = standard_conformal(val_scores, val_labels, 
                                                            test_scores, test_labels, alpha)
                 res = {'pred_sets': pred_sets, 'qhat': standard_qhat}
@@ -109,7 +110,7 @@ def get_results(dataset, alphas, methods, score='softmax',
         ## Classwise CP
         if 'classwise' in methods:
             save_path = f'{results_prefix}_classwise.pkl'
-            if not os.path.exists(save_path):
+            if not os.path.exists(save_path) or override_saved:
                 classwise_qhats, pred_sets, _, _ = classwise_conformal(val_scores, val_labels, 
                                                            test_scores, test_labels, alpha,
                                                            num_classes, default_qhat=np.inf)
@@ -122,7 +123,7 @@ def get_results(dataset, alphas, methods, score='softmax',
         # ## Classwise CP with randomization to achieve exact coverage
         if 'classwise-exact' in methods:
             save_path = f'{results_prefix}_classwise-exact.pkl'
-            if not os.path.exists(save_path):
+            if not os.path.exists(save_path) or override_saved:
                 qhats, pred_sets, _, _ = classwise_conformal(val_scores, val_labels, 
                                                            test_scores, test_labels, alpha,
                                                            num_classes, default_qhat=np.inf, exact_coverage=True)
@@ -133,7 +134,7 @@ def get_results(dataset, alphas, methods, score='softmax',
         ## Clustered CP
         if 'clustered' in methods:
             save_path = f'{results_prefix}_clustered.pkl'
-            if not os.path.exists(save_path):
+            if not os.path.exists(save_path) or override_saved:
                 qhats, pred_sets, _, _ = clustered_conformal(val_scores, val_labels, alpha,
                                                             test_scores, test_labels)
                 res = {'pred_sets': pred_sets, 'qhats': qhats}
@@ -147,7 +148,7 @@ def get_results(dataset, alphas, methods, score='softmax',
         # Compute the new score
         if 'prevalence-adjusted' in methods:
             save_path = f'{results_prefix}_prevalence-adjusted.pkl'
-            if not os.path.exists(save_path):    
+            if not os.path.exists(save_path) or override_saved:    
                 train_labels = np.load(train_labels_path)
                 train_class_distr = np.array([np.sum(train_labels == k) for k in range(num_classes)]) / len(train_labels) 
                 val_scores_prevalence = 1 - (val_softmax / train_class_distr)
@@ -165,7 +166,7 @@ def get_results(dataset, alphas, methods, score='softmax',
             random_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
             for bandwidth in random_bandwidths:
                 save_path = f'{results_prefix}_fuzzy-random-{bandwidth}.pkl'
-                if not os.path.exists(save_path): 
+                if not os.path.exists(save_path) or override_saved: 
                     qhats, pred_sets, proj_arr = fuzzy_classwise_CP(val_scores, val_labels, alpha, 
                                                           val_scores_all=test_scores, 
                                                           projection='random', mode='weight', 
@@ -179,7 +180,7 @@ def get_results(dataset, alphas, methods, score='softmax',
             rarity_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
             for bandwidth in rarity_bandwidths:
                 save_path = f'{results_prefix}_fuzzy-rarity-{bandwidth}.pkl'
-                if not os.path.exists(save_path): 
+                if not os.path.exists(save_path) or override_saved: 
                     qhats, pred_sets, proj_arr = fuzzy_classwise_CP(val_scores, val_labels, alpha, 
                                                           val_scores_all=test_scores, 
                                                           projection='rarity', mode='weight', 
@@ -196,7 +197,7 @@ def get_results(dataset, alphas, methods, score='softmax',
             QP_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
             for bandwidth in QP_bandwidths:
                 save_path = f'{results_prefix}_fuzzy-quantile-{bandwidth}.pkl'
-                if not os.path.exists(save_path): 
+                if not os.path.exists(save_path) or override_saved: 
                     qhats, pred_sets, proj_arr = fuzzy_classwise_CP(val_scores, val_labels, alpha, 
                                                           val_scores_all=test_scores, 
                                                           projection='quantile', mode='weight', 
@@ -224,7 +225,7 @@ def get_results(dataset, alphas, methods, score='softmax',
             random_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
             for bandwidth in random_bandwidths:
                 save_path = f'{results_prefix}_fuzzy-RErandom-{bandwidth}.pkl'
-                if not os.path.exists(save_path): 
+                if not os.path.exists(save_path) or override_saved: 
                     qhats, pred_sets, proj_arr = fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, 
                                                           val_scores_all=test_scores, 
                                                           projection='random', mode='weight', 
@@ -240,7 +241,7 @@ def get_results(dataset, alphas, methods, score='softmax',
             rarity_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
             for bandwidth in rarity_bandwidths:
                 save_path = f'{results_prefix}_fuzzy-RErarity-{bandwidth}.pkl'
-                if not os.path.exists(save_path): 
+                if not os.path.exists(save_path) or override_saved: 
                     qhats, pred_sets, proj_arr = fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, 
                                                           val_scores_all=test_scores, 
                                                           projection='rarity', mode='weight', 
@@ -259,7 +260,7 @@ def get_results(dataset, alphas, methods, score='softmax',
             rarity_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
             for bandwidth in rarity_bandwidths:
                 save_path = f'{results_prefix}_fuzzy-READDrarity-{bandwidth}.pkl'
-                if not os.path.exists(save_path):
+                if not os.path.exists(save_path) or override_saved:
                     qhats, pred_sets, proj_arr = fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, 
                                                           val_scores_all=test_scores, 
                                                           projection='rarity', mode='weight', 
@@ -278,7 +279,7 @@ def get_results(dataset, alphas, methods, score='softmax',
             QP_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
             for bandwidth in QP_bandwidths:
                 save_path = f'{results_prefix}_fuzzy-REquantile-{bandwidth}.pkl'
-                if not os.path.exists(save_path): 
+                if not os.path.exists(save_path) or override_saved: 
                     qhats, pred_sets, proj_arr = fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, 
                                                           val_scores_all=test_scores, 
                                                           projection='quantile', mode='weight', 
@@ -305,7 +306,7 @@ def get_results(dataset, alphas, methods, score='softmax',
         if 'cvx' in methods:
             for w_cw in weights:
                 save_path = f'{results_prefix}_cvx-cw_weight={w_cw}.pkl'
-                if not os.path.exists(save_path): 
+                if not os.path.exists(save_path) or override_saved: 
                     cvx_classwise_qhats = w_cw * cw_qhats + (1 - w_cw) * standard_qhat
                     cvx_classwise_pred_sets = create_classwise_prediction_sets(test_scores, cvx_classwise_qhats)
                     res = {'pred_sets': cvx_classwise_pred_sets, 'qhats': cvx_classwise_qhats}
@@ -318,7 +319,7 @@ def get_results(dataset, alphas, methods, score='softmax',
             print(f"# of classes with classwise qhat larger than standard qhat: {np.sum(keep_as_cw)}")
             for w_cw in weights:
                 save_path = f'{results_prefix}_monotonic-cvx-cw_weight={w_cw}.pkl'
-                if not os.path.exists(save_path): 
+                if not os.path.exists(save_path) or override_saved: 
                     cvx_classwise_qhats = w_cw * cw_qhats + (1 - w_cw) * standard_qhat
                     cvx_classwise_qhats[keep_as_cw] = cw_qhats[keep_as_cw]
                     cvx_classwise_pred_sets = create_classwise_prediction_sets(test_scores, cvx_classwise_qhats)
@@ -350,6 +351,9 @@ if __name__ == "__main__":
                                'OR the best val-acc weights (where val is separate from cal)' )
     parser.add_argument('--loss', type=str, default='cross_entropy',
                     help='Loss function: Options are "cross_entropy" or "focal" (designed for imbalanced data)')
+    parser.add_argument('--override_saved', action='store_true',
+                help='If set, overrides existing saved results instead of skipping them, which is the default')
+
     
 
     args = parser.parse_args()
@@ -359,6 +363,7 @@ if __name__ == "__main__":
     methods = args.methods
     model_type = args.model_type
     loss = args.loss
+    override_saved = args.override_saved
 
 
     # alphas = [0.3, 0.2, 0.1, 0.05, 0.03, 0.02, 0.01]
@@ -383,7 +388,7 @@ if __name__ == "__main__":
     
     print('Results will be saved to', results_folder)
     get_results(args.dataset, alphas, methods, score, results_folder=results_folder, 
-                model_type=model_type, loss=loss)
+                model_type=model_type, loss=loss, override_saved=override_saved)
 
     print(f'Time taken: {(time.time() - st) / 60:.2f} minutes')
     
