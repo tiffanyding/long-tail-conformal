@@ -32,9 +32,9 @@ plt.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}\usepackage{xcolor}'
 
 dataset_names = {
     "plantnet": "Pl@ntNet-300K",
-    # "plantnet-trunc": "Pl@ntNet-300K-truncated-",
+    "plantnet-trunc": "Pl@ntNet-300K-truncated-",
     "inaturalist": "iNaturalist-2018",
-    # "inaturalist-trunc": "iNaturalist-2018-truncated",
+    "inaturalist-trunc": "iNaturalist-2018-truncated",
 }
 
 def format_legend_label(method_label, alpha, label_prefix='', total_width=22):
