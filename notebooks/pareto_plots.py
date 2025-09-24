@@ -796,7 +796,7 @@ methods = ['standard', 'classwise', 'clustered'] + \
 
 for dataset in dataset_names.keys():
     # Generate standard PAS plots 
-    generate_all_pareto_plots(dataset, score, alphas, methods, legendfontsize=15)
+    generate_all_pareto_plots(dataset, score, alphas, methods, legendfontsize=15, show_inset=True)
     
     # Generate focal loss PAS plots (uncomment to use focal loss results)
     # generate_all_pareto_plots(dataset, score, alphas, methods, legendfontsize=15, use_focal_loss=True)
