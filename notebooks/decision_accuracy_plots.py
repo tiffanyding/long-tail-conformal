@@ -26,9 +26,9 @@ plt.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}'
 
 dataset_names = {
     "plantnet": "Pl@ntNet-300K",
-    "plantnet-trunc": "Pl@ntNet-300K (truncated)",
+    "plantnet-trunc": "Pl@ntNet-300K-truncated",
     "inaturalist": "iNaturalist-2018",
-    "inaturalist-trunc": "iNaturalist-2018 (truncated)",
+    "inaturalist-trunc": "iNaturalist-2018-truncated",
 }
 
 # %%
@@ -280,7 +280,7 @@ def create_methods_comparison_plot():
    
 
             if col == 0:
-                ax.set_title(f"\\textbf{{{dataset_names[dataset_name]}}}\nExpert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$", loc='left', fontsize=20, fontweight='bold')
+                ax.set_title(f"\\textbf{{{dataset_names[dataset_name]} (Cross-Entropy)}}\nExpert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$", loc='left', fontsize=20, fontweight='bold')
                 ax.set_ylabel('Decision accuracy', fontsize=25)
             else:
                 ax.set_title(f'Expert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
