@@ -128,7 +128,7 @@ def plot_set_size_vs_cov_metric(
     alphas=None,
     set_size_metric='mean',
     ax=None,
-    show_legend=True,
+    show_legend=False,
     markersizes=None,
     label_prefix='',
     add_inset=True,
@@ -559,7 +559,7 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     
     # Add loss type to title
     loss_type = " (Focal Loss)" if use_focal_loss else " (Cross-Entropy)"
-    plt.suptitle(dataset_names[dataset] + loss_type, y=0.98)
+    plt.suptitle(dataset_names[dataset] + loss_type, y=0.9)  # Reduced from 0.98 to minimize gap
     
     # Use tight layout for clean, properly sized plots
     plt.tight_layout()
@@ -573,16 +573,11 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     # Save clean version without legend
     plt.savefig(fig_path, bbox_inches='tight')
     
-    # Create legend for the plot
+    # Create legend for standalone legend generation (but don't save WITH_LEGEND version)
     if len(alphas) > 1:
         legend = axes[0].legend(ncols=len(alphas), loc='upper center', bbox_to_anchor=(2.0, -0.08), fontsize=8)
     else:
         legend = axes[0].legend(ncols=3, loc='upper center', bbox_to_anchor=(2.0, -0.08), fontsize=8)
-    
-    # Save version with legend (for reference)
-    plt.subplots_adjust(left=0.08, bottom=0.40, right=0.95, top=0.85, wspace=0.25)
-    plt.savefig(fig_path.replace(f'NO_LEGEND_js{loss_suffix}.pdf', f'WITH_LEGEND_js{loss_suffix}.pdf'), bbox_inches=None)
-    plt.savefig(fig_path.replace(f'NO_LEGEND_js{loss_suffix}.pdf', f'WITH_LEGEND_js{loss_suffix}.jpg'), bbox_inches=None)
     
     # Create standalone legend PDF
     legend_fig = plt.figure(figsize=(12, 2))  # Wide figure for horizontal legend
@@ -606,15 +601,12 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     legend_path = fig_path.replace(f'NO_LEGEND_js{loss_suffix}.pdf', f'LEGEND_ONLY_js{loss_suffix}.pdf')
     legend_fig.savefig(legend_path, bbox_inches='tight', transparent=True)
     
-    print(f'✅ Saved three versions:')
+    print(f'✅ Saved two versions:')
     print(f'   - Main plot: {fig_path}')
-    print(f'   - With legend: {fig_path.replace(f"NO_LEGEND_js{loss_suffix}.pdf", f"WITH_LEGEND_js{loss_suffix}.pdf")}')
     print(f'   - Legend only: {legend_path}')
     
     # Close the legend figure to free memory
     plt.close(legend_fig)
-    
-    print('Saved no-legend version to', fig_path, f'and version with legend to [...]WITH_LEGEND_js{loss_suffix}.pdf and _js{loss_suffix}.jpg' )
     
     plt.show()
 
@@ -792,7 +784,7 @@ for dataset in dataset_names.keys():
 # ### Fuzzy and Interp-Q with PAS
 
 # %%
-score = 'PAS'
+score = 'softmax'
 alphas = [0.1, 0.2, 0.05, 0.01]
 
 # 'classwise-exact'
