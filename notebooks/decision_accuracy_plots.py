@@ -38,7 +38,7 @@ dataset_names = {
 # dataset = 'inaturalist'
 dataset = 'inaturalist-trunc'
 
-methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] 
+methods = ['standard', 'classwise', 'prevalence-adjusted'] 
 # methods = ['standard', 'classwise', 'prevalence-adjusted'] 
 
 
@@ -123,7 +123,7 @@ def create_combined_decision_acc_plot():
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
     
     # methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']
-    methods = ['classwise', 'standard', 'clustered', 'fuzzy-RErarity-0.0001']
+    methods = ['classwise', 'standard', 'fuzzy-RErarity-0.0001']
 
     colors = ['tab:green', 'tab:green', 'tab:green', 'tab:green']
     
@@ -232,7 +232,7 @@ def create_methods_comparison_plot():
     fig, axes = plt.subplots(2, 5, figsize=(20, 8), sharey=True)
     
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
-    methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']  # Same order as create_combined_decision_acc_plot
+    methods = ['classwise', 'standard', 'prevalence-adjusted']  # Same order as create_combined_decision_acc_plot
     gamma_levels = [0.0, 0.25, 0.5, 0.75, 1.0]  # 0%, 25%, 50%, 75%, 100%
     
     # Use colorblind-friendly colors for each method
