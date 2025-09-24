@@ -32,7 +32,7 @@ plt.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}\usepackage{xcolor}'
 
 dataset_names = {
     "plantnet": "Pl@ntNet-300K",
-    "plantnet-trunc": "Pl@ntNet-300K-truncated-",
+    "plantnet-trunc": "Pl@ntNet-300K-truncated",
     "inaturalist": "iNaturalist-2018",
     "inaturalist-trunc": "iNaturalist-2018-truncated",
 }
@@ -558,7 +558,7 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     axes[0].set_ylabel('Average set size')
     
     # Add loss type to title
-    loss_type = " (Focal Loss)" if use_focal_loss else " (Cross-Entropy)"
+    loss_type = " (Focal Loss)" if use_focal_loss else ""
     plt.suptitle(dataset_names[dataset] + loss_type, y=0.9)  # Reduced from 0.98 to minimize gap
     
     # Use tight layout for clean, properly sized plots

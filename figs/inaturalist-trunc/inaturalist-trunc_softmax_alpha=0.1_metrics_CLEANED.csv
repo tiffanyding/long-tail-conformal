@@ -1,7 +1,7 @@
 Method,FracBelow50% $\downarrow$,UnderCovGap $\downarrow$,MacroCov $\uparrow$,MarginalCov (desired = 0.9),Avg. set size $\downarrow$
 Standard,0.0677,0.103,0.813,0.898,3.19
 Classwise,0.0,0.0102,0.96,0.922,458.0
-Clustered,0.0583,0.103,0.809,0.891,3.18
+Clustered,0.0665,0.101,0.814,0.893,3.43
 Standard w. PAS,0.014,0.0449,0.877,0.898,4.08
 Interp-Q ($\tau=0.9$),0.028,0.0524,0.873,0.905,5.28
 Interp-Q ($\tau=0.99$),0.0105,0.0272,0.914,0.915,10.4
