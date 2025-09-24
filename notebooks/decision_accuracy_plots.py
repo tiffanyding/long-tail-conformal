@@ -204,7 +204,7 @@ def create_combined_decision_acc_plot():
             
             # Add legend only for plantnet-trunc Standard (row=0, col=0)
             if row == 0 and col == 0:
-                legend = fig.legend(loc='center right', bbox_to_anchor=(1.08, 0.5), fontsize=16, title='Expert proportion', ncol=1)
+                legend = fig.legend(loc='center right', bbox_to_anchor=(1.08, 0.5), fontsize=20, title='', ncol=1)
                 legend.get_title().set_fontsize(16)
     
     plt.tight_layout()
@@ -280,10 +280,10 @@ def create_methods_comparison_plot():
    
 
             if col == 0:
-                ax.set_title(f"\\textbf{{{dataset_names[dataset_name]}}}\nExpert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$", loc='left', fontsize=20, fontweight='bold')
+                ax.set_title(f"\\textbf{{{dataset_names[dataset_name]}}}\n $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$", loc='left', fontsize=20, fontweight='bold')
                 ax.set_ylabel('Decision accuracy', fontsize=25)
             else:
-                ax.set_title(f'Expert proportion: $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
+                ax.set_title(f' $\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$')
             if row == 1:
                 ax.set_xlabel('Class', fontsize=25)
                 # (sorted by $\\hat{c}_y$ of each method)
@@ -303,6 +303,81 @@ def create_methods_comparison_plot():
 
 # Create the methods comparison plot
 create_methods_comparison_plot()
+
+# %%
+def create_methods_comparison_plots_separate():
+    """
+    Create two separate figures:
+    1. plantnet-trunc (top row)
+    2. inaturalist-trunc (bottom row)
+    3. Legend only
+    """
+    import matplotlib.pyplot as plt
+    from scipy.ndimage import uniform_filter
+    datasets = ['plantnet-trunc', 'inaturalist-trunc']
+    methods = ['classwise', 'standard', 'prevalence-adjusted']
+    gamma_levels = [0.0, 0.25, 0.5, 0.75, 1.0]
+    method_colors = {
+        'standard': 'blue',
+        'classwise': 'red',
+        'clustered': 'purple',
+        'prevalence-adjusted': 'orange',
+    }
+    method_to_name = {
+        'standard': 'Standard',
+        'classwise': 'Classwise',
+        'clustered': 'Clustered',
+        'prevalence-adjusted': 'Standard w. PAS',
+    }
+    fig_folder = get_figs_folder()
+    for dataset_name in datasets:
+        fig, axes = plt.subplots(1, 5, figsize=(20, 4), sharey=True)
+        test_labels_path = f'/home-warm/plantnet/conformal_cache/train_models/best-{dataset_name}-model_test_labels.npy'
+        test_labels = np.load(test_labels_path)
+        num_classes = np.max(test_labels) + 1
+        res = {}
+        for method in methods:
+            res[method] = load_metrics(dataset_name, 0.1, method)
+        for method in methods:
+            dec_acc = compute_class_cond_decision_accuracy_for_method(res, method, test_labels)
+            res[method]['class-cond-decision-accuracy'] = dec_acc
+        for col, gamma in enumerate(gamma_levels):
+            ax = axes[col]
+            for method in methods:
+                idx = np.argsort(res[method]['coverage_metrics']['raw_class_coverages'])[::-1]
+                up_line_raw = res[method]['class-cond-decision-accuracy'][idx]
+                lower_line_raw = res[method]['coverage_metrics']['raw_class_coverages'][idx]
+                line_data = uniform_filter((1-gamma) * up_line_raw + gamma * lower_line_raw, size=20, mode='nearest')
+                color = method_colors[method]
+                ax.plot(line_data, color=color, linewidth=4.0, label=method_to_name[method], solid_capstyle='round')
+            ax.set_xlim(0, num_classes-1)
+            ax.spines[['right', 'top']].set_visible(False)
+            ax.set_title(f'$\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$', fontsize=20)
+            if col == 0:
+                ax.set_ylabel('Decision accuracy', fontsize=25)
+            ax.set_xlabel('Class', fontsize=25)
+        fig.suptitle(dataset_names[dataset_name], y=0.95, fontsize=22)
+        plt.tight_layout(rect=[0, 0, 1, 0.93])
+        fig_path = f'{fig_folder}/methods_comparison_{dataset_name}.pdf'
+        fig.savefig(fig_path, bbox_inches='tight')
+        print(f'Saved plot for {dataset_name} to', fig_path)
+        plt.close(fig)
+    # --- Legend only ---
+    handles, labels = [], []
+    for method in methods:
+        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=9, label=method_to_name[method]))
+        labels.append(method_to_name[method])
+    legend_fig = plt.figure(figsize=(12, 2))
+    legend_fig.patch.set_visible(False)
+    legend = legend_fig.legend(handles, labels, loc='center', fontsize=25, ncol=4, frameon=True)
+    legend_fig.gca().set_axis_off()
+    legend_path = f'{fig_folder}/methods_comparison_LEGEND_ONLY.pdf'
+    legend_fig.savefig(legend_path, bbox_inches='tight', transparent=True)
+    print('Saved legend only to', legend_path)
+    plt.close(legend_fig)
+
+# Create the separate plots
+create_methods_comparison_plots_separate()
 
 # %%
 def verify_curves_match():
