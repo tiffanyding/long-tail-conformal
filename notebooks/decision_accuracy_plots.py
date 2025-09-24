@@ -45,6 +45,7 @@ alphas = [0.2, 0.1, 0.05, 0.01]
 
 score = 'softmax'
 
+
 # Load in paths from folders.json
 results_folder = get_outputs_folder()
 fig_folder = get_figs_folder()
@@ -287,7 +288,7 @@ def create_methods_comparison_plot():
     # Move legend below the figure, centered, ncol=4 (like pareto_plots.py)
     handles, labels = [], []
     for method in methods:
-        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=4, label=method_to_name[method]))
+        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=5, label=method_to_name[method]))
         labels.append(method_to_name[method])
     plt.tight_layout(rect=[0, 0, 1, 0.93])
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, -0.08), fontsize=25, ncol=4, frameon=True)

@@ -10,14 +10,11 @@ import pandas as pd
 import pickle
 
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
-from matplotlib.ticker import LogFormatter
+from matplotlib.ticker import LogFormatter, LogLocator, MultipleLocator
 
 from utils.conformal_utils import *
 from utils.experiment_utils import get_inputs_folder, get_outputs_folder, get_figs_folder
 
-
-%load_ext autoreload
-%autoreload 2
 
 plt.rcParams.update({
     'font.size': 16,        # base font size
@@ -63,8 +60,9 @@ def format_legend_label(method_label, alpha, label_prefix='', total_width=22):
     return f'\\makebox[{total_width}ex][l]{{{method_label}}}{alpha_part}'
 
 # %%
-# Load in paths from folders.json
+# Default paths (can be overridden in generate_all_pareto_plots)
 inputs_folder = get_inputs_folder()
+# Set default folders for backward compatibility with existing code
 results_folder = get_outputs_folder()
 fig_folder = get_figs_folder()
 
@@ -79,7 +77,10 @@ def compute_train_weighted_average_set_size(dataset, metrics, train_class_distr,
     return np.sum(train_class_distr * avg_size_by_class)
 
 def load_one_result(dataset, alpha, method_name, score='softmax',
-                train_class_distr=None, test_labels=None):
+                train_class_distr=None, test_labels=None, results_folder=None):
+    
+    if results_folder is None:
+        results_folder = get_outputs_folder()
     
     with open(f'{results_folder}/{dataset}_{score}_alpha={alpha}_{method_name}.pkl', 'rb') as f:
         metrics = pickle.load(f)
@@ -94,7 +95,10 @@ def load_one_result(dataset, alpha, method_name, score='softmax',
     
     return metrics
 
-def load_all_results(dataset, alphas, methods, score='softmax'):
+def load_all_results(dataset, alphas, methods, score='softmax', results_folder=None):
+    if results_folder is None:
+        results_folder = get_outputs_folder()
+        
     # For truncated datasets, we need to load these in to compute train-weighted average set size
     if dataset.endswith('-trunc'): 
         train_labels_path = f'{inputs_folder}/{dataset}_train_labels.npy'
@@ -110,9 +114,10 @@ def load_all_results(dataset, alphas, methods, score='softmax'):
         for method in methods:
             if dataset.endswith('-trunc'): # Compute train-weighted average set size
                 res[method] = load_one_result(dataset, alpha, method, score=score,
-                                           train_class_distr=train_class_distr, test_labels=test_labels)
+                                           train_class_distr=train_class_distr, test_labels=test_labels, 
+                                           results_folder=results_folder)
             else:
-                res[method] = load_one_result(dataset, alpha, method, score=score)
+                res[method] = load_one_result(dataset, alpha, method, score=score, results_folder=results_folder)
         all_res[f'alpha={alpha}'] = res
 
     return all_res
@@ -130,7 +135,8 @@ def plot_set_size_vs_cov_metric(
     inset_loc='upper right',
     inset_lims=(0.1, 0.3, 1, 15),
     inset_width="50%",
-    inset_pad=0
+    inset_pad=0,
+    dataset=None
 ):
     # --- prepare main axis ---
     if ax is None:
@@ -145,7 +151,7 @@ def plot_set_size_vs_cov_metric(
     # --- markersizes ---
     n = len(alphas)
     if markersizes is None:
-        base_markersizes = [3, 4, 6, 8]
+        base_markersizes = [5, 6, 7, 8]
 
     else:
         base_markersizes = markersizes
@@ -190,7 +196,7 @@ def plot_set_size_vs_cov_metric(
                     res[key]['coverage_metrics'][coverage_metric],
                     res[key]['set_size_metrics'][set_size_metric],
                     linestyle='', marker=mk, color=color,
-                    markersize=ms, alpha=0.8,
+                    markersize=ms, alpha=0.8, markeredgewidth=0,
                     label=formatted_label,
                     zorder=plot_zorder
                 )
@@ -204,12 +210,12 @@ def plot_set_size_vs_cov_metric(
             
             for w in valid_w:
                 # For tau=1 (cw_weight=1), use classwise results instead due to numerical issues
-                if w == 1 and 'classwise' in res:
-                    x_val = res['classwise']['coverage_metrics'][coverage_metric]
-                    y_val = res['classwise']['set_size_metrics'][set_size_metric]
-                else:
-                    x_val = res[f'cvx-cw_weight={w}']['coverage_metrics'][coverage_metric]
-                    y_val = res[f'cvx-cw_weight={w}']['set_size_metrics'][set_size_metric]
+                # if w == 1 and 'classwise' in res:
+                #     x_val = res['classwise']['coverage_metrics'][coverage_metric]
+                #     y_val = res['classwise']['set_size_metrics'][set_size_metric]
+                # else:
+                x_val = res[f'cvx-cw_weight={w}']['coverage_metrics'][coverage_metric]
+                y_val = res[f'cvx-cw_weight={w}']['set_size_metrics'][set_size_metric]
                 
                 x_cvx.append(x_val)
                 y_cvx.append(y_val)
@@ -229,7 +235,7 @@ def plot_set_size_vs_cov_metric(
             
             ax.plot(
                 x_cvx, y_cvx,
-                '-o', color='dodgerblue', markersize=ms,
+                '-o', color='dodgerblue', markersize=ms, markeredgewidth=0,
                 alpha=alpha_transparency,
                 label=formatted_label
             )
@@ -237,8 +243,8 @@ def plot_set_size_vs_cov_metric(
         # fuzzy rarity projection 
         for tag, mk_sym, alpha_val, label in [
             ## Uncomment to use short name for Fuzzy
-            ('fuzzy-rarity',   'o', 0.3, 'Raw Fuzzy'),
-            ('fuzzy-RErarity', '^', 0.5, 'Fuzzy'),
+            ('fuzzy-rarity',   'D', 0.3, 'Raw Fuzzy'),
+            ('fuzzy-RErarity', 'v', 0.5, 'Fuzzy'),
             # # Uncomment to use long name for Fuzzy
             # ('fuzzy-rarity',   'o', 0.3, 'Raw Fuzzy-$\\Pi_{\\mathrm{prevalence}}$'),
             # ('fuzzy-RErarity', '^', 0.5, 'Fuzzy-$\\Pi_{\\mathrm{prevalence}}$'),
@@ -254,7 +260,7 @@ def plot_set_size_vs_cov_metric(
                 
                 ax.plot(
                     xs, ys,
-                    '-' + mk_sym, color='salmon', markersize=ms,
+                    '-' + mk_sym, color='salmon', markersize=ms, markeredgewidth=0,
                     alpha=alpha_val,
                     label=formatted_label
                 )
@@ -296,7 +302,7 @@ def plot_set_size_vs_cov_metric(
                 
                 ax.plot(
                     xs, ys,
-                    '-' + mk_sym, color='gold', markersize=ms,
+                    '-' + mk_sym, color='gold', markersize=ms, markeredgewidth=0,
                     alpha=alpha_val,
                     label=formatted_label
                 )
@@ -304,6 +310,15 @@ def plot_set_size_vs_cov_metric(
 
     # --- style main axis ---
     ax.set_yscale('log')
+    
+    # Set up y-axis ticks with both major and minor ticks
+    # Major ticks at powers of 10
+    major_locator = LogLocator(base=10.0, numticks=12)
+    ax.yaxis.set_major_locator(major_locator)
+    
+    # Minor ticks at intermediate values
+    minor_locator = LogLocator(base=10.0, subs=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9), numticks=12)
+    ax.yaxis.set_minor_locator(minor_locator)
     
     # Set custom y-axis tick labels to show numeric values instead of powers of 10
     class CustomLogFormatter(LogFormatter):
@@ -315,6 +330,7 @@ def plot_set_size_vs_cov_metric(
                 return f'{x:.3f}'
     
     ax.yaxis.set_major_formatter(CustomLogFormatter())
+
     ax.spines[['right', 'top']].set_visible(False)
 
     # --- inset ---
@@ -340,7 +356,7 @@ def plot_set_size_vs_cov_metric(
                         res[key]['coverage_metrics'][coverage_metric],
                         res[key]['set_size_metrics'][set_size_metric],
                         linestyle='', marker=mk, color=color,
-                        markersize=ms, alpha=0.8, zorder=plot_zorder
+                        markersize=ms, alpha=0.8, zorder=plot_zorder,markeredgewidth=0,
                     )
 
             # convex
@@ -362,7 +378,7 @@ def plot_set_size_vs_cov_metric(
                     x_cvx_inset.append(x_val)
                     y_cvx_inset.append(y_val)
                 
-                axins.plot(x_cvx_inset, y_cvx_inset, '-o', color='dodgerblue', markersize=ms, alpha=0.5)
+                axins.plot(x_cvx_inset, y_cvx_inset, '-o', color='dodgerblue', markersize=ms, markeredgewidth=0, alpha=0.5)
 
             # fuzzy
             for tag, mk_sym, alpha_val in [('fuzzy-rarity','o',0.3),('fuzzy-RErarity','^',0.5)]:
@@ -372,15 +388,25 @@ def plot_set_size_vs_cov_metric(
                     axins.plot(
                         [res[f'{tag}-{b}']['coverage_metrics'][coverage_metric] for b in valid_b],
                         [res[f'{tag}-{b}']['set_size_metrics'][set_size_metric]    for b in valid_b],
-                        '-' + mk_sym, color='salmon', markersize=ms, alpha=alpha_val
+                        '-' + mk_sym, color='salmon', markersize=ms, alpha=alpha_val,markeredgewidth=0,
                     )
 
         # zoom & ticks
         axins.set_xlim(xmin, xmax)
         axins.set_ylim(ymin, ymax)
-        yticks = np.arange(int(np.ceil(ymin)), int(ymax) + 1)
-        axins.set_yticks(yticks)
-        axins.set_yticklabels([str(int(y)) if (int(y) % 2 == 0) else '' for y in yticks])
+        
+        # Customize y-tick positions and labels based on dataset
+        if dataset and 'inaturalist' in dataset.lower():
+            # For iNaturalist, only show ticks and labels at multiples of 10
+            yticks_with_labels = np.arange(int(np.ceil(ymin/20)*20), int(ymax) + 1, 20)
+            axins.set_yticks(yticks_with_labels)
+            axins.set_yticklabels([str(int(y)) for y in yticks_with_labels])
+        else:
+            # Default behavior: show ticks at all positions, labels at even numbers
+            yticks = np.arange(int(np.ceil(ymin)), int(ymax) + 1)
+            axins.set_yticks(yticks)
+            axins.set_yticklabels([str(int(y)) if (int(y) % 2 == 0) else '' for y in yticks])
+            
         for spine in axins.spines.values():
             spine.set_edgecolor('grey')
         axins.tick_params(axis='both', colors='grey', labelsize=8, pad=1)
@@ -403,29 +429,67 @@ def get_inset_lims(dataset, coverage_metric):
              'plantnet-trunc': {'cov_below50': (0.01, 0.17), 
                                 'undercov_gap': (0.02, 0.2),
                                 'macro_cov': (0.77, 0.87)},
-             'inaturalist': {'cov_below50': (0.025, 0.16), 
-                            'undercov_gap': (0.05, 0.175),
-                            'macro_cov': (0.71, 0.9)},
+             'inaturalist': {'cov_below50': (0.005, 0.04), 
+                            'undercov_gap': (0.01, 0.1),
+                            'macro_cov': (0.85, 0.95)},
              'inaturalist-trunc': {'cov_below50': (0.01, 0.07), 
                                    'undercov_gap': (0.03, 0.11),
                                    'macro_cov': (0.75, 0.92)}
             }
     ylims = {'plantnet': (0.9, 8), 
              'plantnet-trunc': (0.9, 5),
-             'inaturalist': (2, 15),
+             'inaturalist': (5, 90),
              'inaturalist-trunc': (1.1, 13)}
 
     return *xlims[dataset][coverage_metric], *ylims[dataset]
 
 
 def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
-                              save_suffix='', show_inset=None, legendfontsize=14):
+                              save_suffix='', show_inset=None, legendfontsize=14, use_focal_loss=False):
+    """
+    Generate comprehensive Pareto plots for conformal prediction methods.
+    
+    Parameters:
+    -----------
+    dataset : str
+        Dataset name ('plantnet', 'inaturalist', etc.)
+    score : str  
+        Score type ('softmax', 'PAS', etc.)
+    alphas : list
+        List of alpha values for coverage
+    methods : list
+        List of method names to include
+    show_grid : bool, default=False
+        Whether to show grid on plots
+    save_suffix : str, default=''
+        Additional suffix for filename
+    show_inset : bool, default=None
+        Whether to show inset zoom plots
+    legendfontsize : int, default=14
+        Font size for legend
+    use_focal_loss : bool, default=False
+        If True, uses focal_loss subfolder for results and adds '_Focal_Loss' to filenames.
+        Also adds ' (Focal Loss)' to plot title.
+        If False, uses standard results folder and adds ' (Cross-Entropy)' to title.
+    """
+    
+    # Set up folder paths based on focal_loss option
+    if use_focal_loss:
+        results_folder = get_outputs_folder() + '/focal_loss'
+        fig_folder = get_figs_folder() + '/focal_loss'
+        loss_suffix = '_Focal_Loss'
+    else:
+        results_folder = get_outputs_folder()
+        fig_folder = get_figs_folder()
+        loss_suffix = ''
+    
+    os.makedirs(fig_folder, exist_ok=True)
     
     # Load pre-computed metrics
-    all_res = load_all_results(dataset, alphas, methods, score=score)
+    all_res = load_all_results(dataset, alphas, methods, score=score, results_folder=results_folder)
 
     if score == 'PAS':
-        std_with_softmax = load_all_results(dataset, alphas, ['standard'], score='softmax')
+        std_with_softmax = load_all_results(dataset, alphas, ['standard'], score='softmax', results_folder=results_folder)
         for alpha in alphas:
             all_res[f'{alpha=}']['standard-softmax'] = std_with_softmax[f'{alpha=}']['standard']
 
@@ -477,7 +541,8 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
             inset_lims=inset_lims,
             inset_width="50%",
             inset_pad=inset_pad,
-            show_legend=False
+            show_legend=False,
+            dataset=dataset
         )
         
         ax.set_xlabel(xlabel)
@@ -491,12 +556,18 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
         axes[3].set_xlim(1-alphas[0]-.05, 1-alphas[0]+.05)
     
     axes[0].set_ylabel('Average set size')
-    plt.suptitle(dataset_names[dataset], y=1)
+    
+    # Add loss type to title
+    loss_type = " (Focal Loss)" if use_focal_loss else " (Cross-Entropy)"
+    plt.suptitle(dataset_names[dataset] + loss_type, y=1)
     
     # Use tight layout for clean, properly sized plots
     plt.tight_layout()
     
-    fig_path = f'{fig_folder}/{dataset}/ALL_metrics_{dataset}_{score}{save_suffix}_pareto_NO_LEGEND_js.pdf'
+    # Add INSET to filename if show_inset is True
+    inset_suffix = '_INSET' if show_inset else ''
+    
+    fig_path = f'{fig_folder}/{dataset}/ALL_metrics_{dataset}_{score}{save_suffix}_pareto{inset_suffix}_NO_LEGEND_js{loss_suffix}.pdf'
     os.makedirs(f'{fig_folder}/{dataset}', exist_ok=True)
     
     # Save clean version without legend
@@ -510,8 +581,8 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     
     # Save version with legend (for reference)
     plt.subplots_adjust(left=0.08, bottom=0.40, right=0.95, top=0.85, wspace=0.25)
-    plt.savefig(fig_path.replace('NO_LEGEND_js.pdf', 'WITH_LEGEND_js.pdf'), bbox_inches=None)
-    plt.savefig(fig_path.replace('NO_LEGEND_js.pdf', 'WITH_LEGEND_js.jpg'), bbox_inches=None)
+    plt.savefig(fig_path.replace(f'NO_LEGEND_js{loss_suffix}.pdf', f'WITH_LEGEND_js{loss_suffix}.pdf'), bbox_inches=None)
+    plt.savefig(fig_path.replace(f'NO_LEGEND_js{loss_suffix}.pdf', f'WITH_LEGEND_js{loss_suffix}.jpg'), bbox_inches=None)
     
     # Create standalone legend PDF
     legend_fig = plt.figure(figsize=(12, 2))  # Wide figure for horizontal legend
@@ -532,37 +603,68 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     legend_fig.gca().set_axis_off()
     
     # Save standalone legend
-    legend_path = fig_path.replace('NO_LEGEND_js.pdf', 'LEGEND_ONLY_js.pdf')
+    legend_path = fig_path.replace(f'NO_LEGEND_js{loss_suffix}.pdf', f'LEGEND_ONLY_js{loss_suffix}.pdf')
     legend_fig.savefig(legend_path, bbox_inches='tight', transparent=True)
     
     print(f'✅ Saved three versions:')
     print(f'   - Main plot: {fig_path}')
-    print(f'   - With legend: {fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.pdf")}')
+    print(f'   - With legend: {fig_path.replace(f"NO_LEGEND_js{loss_suffix}.pdf", f"WITH_LEGEND_js{loss_suffix}.pdf")}')
     print(f'   - Legend only: {legend_path}')
     
     # Close the legend figure to free memory
     plt.close(legend_fig)
     
-    print('Saved no-legend version to', fig_path, 'and version with legend to [...]WITH_LEGEND_js.pdf and _js.jpg' )
+    print('Saved no-legend version to', fig_path, f'and version with legend to [...]WITH_LEGEND_js{loss_suffix}.pdf and _js{loss_suffix}.jpg' )
     
     plt.show()
 
         
 
-# %% [markdown]
-# ## Main Pareto plots
-# 
-# ### (a) Simple version for main paper
 
 # %%
-# alphas = [0.1] # Use alpha = 0.1 only
-# methods = ['standard', 'classwise', 'prevalence-adjusted'] + \
-#             [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] +\
-#             [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] +\
-#             [f'cvx-cw_weight={w}' for w in cw_weights] 
+# %% [markdown]
+# ## Example Usage of Focal Loss Option
+# 
+# The `generate_all_pareto_plots` function now supports a `use_focal_loss` parameter:
+# 
+# - `use_focal_loss=False` (default): Uses standard results from main output folder, title shows " (Cross-Entropy)"
+# - `use_focal_loss=True`: Uses focal loss results from 'focal_loss' subfolder, adds '_Focal_Loss' suffix to filenames, and title shows " (Focal Loss)"
 
-# for dataset in ['plantnet', 'inaturalist']:
-#     generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_alpha=0.1', legendfontsize=14, show_grid=True)
+# %%
+# Example: Generate plots with standard results (default behavior)
+# Title will be: "Pl@ntNet-300K (Cross-Entropy)"
+# Filename: ALL_metrics_plantnet_softmax_pareto_NO_LEGEND_js.pdf
+# generate_all_pareto_plots('plantnet', 'softmax', [0.1], ['standard', 'classwise'])
+
+# Example: Generate plots with focal loss results  
+# Title will be: "Pl@ntNet-300K (Focal Loss)"
+# Filename: ALL_metrics_plantnet_softmax_pareto_NO_LEGEND_js_Focal_Loss.pdf
+# generate_all_pareto_plots('plantnet', 'softmax', [0.1], ['standard', 'classwise'], use_focal_loss=True)
+
+## Main Pareto plots
+
+### (a) Simple version for main paper
+# %%
+alphas = [0.2, 0.1, 0.05, 0.01]
+score = 'softmax'
+
+rarity_bandwidths = [1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
+cw_weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1] # CHANGED!
+# cw_weights = 1 - np.array([0, .001, .01, .025, .05, .1, .2, .4, .8, 1])
+
+
+methods = ['standard', 'classwise', 'prevalence-adjusted'] + \
+            [f'cvx-cw_weight={w}' for w in cw_weights
+            # [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] +\
+            # [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] +\
+             ] 
+
+for dataset in ['plantnet', 'inaturalist']:
+    # Generate standard plots (using default softmax results)
+    generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_alpha=0.1', legendfontsize=14, show_grid=True, use_focal_loss=False, show_inset=False)
+    
+    # Generate focal loss plots (uncomment to use focal loss results)
+    # generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_alpha=0.1', legendfontsize=14, show_grid=True, use_focal_loss=True)
 
 # %% [markdown]
 # ### (b) Full version for Appendix
@@ -574,14 +676,23 @@ score = 'softmax'
 rarity_bandwidths = [1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
 cw_weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1] # CHANGED!
 # cw_weights = 1 - np.array([0, .001, .01, .025, .05, .1, .2, .4, .8, 1])
-methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] + \
-            [f'cvx-cw_weight={w}' for w in cw_weights] 
-            # [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] +\
-            # [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] +\
+
+# methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] + \
+#             [f'cvx-cw_weight={w}' for w in cw_weights] 
+
+# APPENDIX:
+methods = ['standard', 'classwise', 'classwise-exact', 'clustered', 'prevalence-adjusted'] + \
+            [f'cvx-cw_weight={w}' for w in cw_weights] +\
+            [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] +\
+            [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] 
 
 for dataset in dataset_names.keys():
 # for dataset in ['plantnet-trunc']:
-    generate_all_pareto_plots(dataset, score, alphas, methods, show_inset=False)
+    # Generate standard plots (using default softmax results)
+    generate_all_pareto_plots(dataset, score, alphas, methods, show_inset=True)
+    
+    # Generate focal loss plots (uncomment to use focal loss results) 
+    # generate_all_pareto_plots(dataset, score, alphas, methods, show_inset=True, use_focal_loss=True)
 
 # %%
 # x = np.load("/home/tding/code/clean/long-tail-conformal/train_models/data/plantnet-trunc_train_labels.npy")
@@ -615,7 +726,7 @@ for dataset in dataset_names.keys():
     set_size_metric = 'train_mean' if dataset.endswith('-trunc') else 'mean'
     
     # Load the results
-    all_res = load_all_results(dataset, alphas, methods, score=score)
+    all_res = load_all_results(dataset, alphas, methods, score=score, results_folder=results_folder)
     
     # Extract into DataFrame
     df = extract_metric_table(
@@ -692,7 +803,11 @@ methods = ['standard', 'classwise', 'clustered'] + \
 
 
 for dataset in dataset_names.keys():
+    # Generate standard PAS plots 
     generate_all_pareto_plots(dataset, score, alphas, methods, legendfontsize=15)
+    
+    # Generate focal loss PAS plots (uncomment to use focal loss results)
+    # generate_all_pareto_plots(dataset, score, alphas, methods, legendfontsize=15, use_focal_loss=True)
 
 # %% [markdown]
 # ### Fuzzy with Random and Quantile projections
@@ -709,7 +824,11 @@ methods = ['standard', 'classwise'] + \
         [f'fuzzy-REquantile-{bw}' for bw in bandwidths] 
 
 for dataset in dataset_names.keys():
+    # Generate standard plots with extra projections
     generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_extra_projections', show_inset=False)
+    
+    # Generate focal loss plots with extra projections (uncomment to use focal loss results)
+    # generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_extra_projections', show_inset=False, use_focal_loss=True)
 
 # %%
 
