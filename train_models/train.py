@@ -276,9 +276,13 @@ def get_datasets(dataset_name, truncate=False, root=None, return_labels=False, s
                 _, _, _, label_remapping = truncate_and_resplit_dataset(train_dataset, val_dataset, test_dataset, 
                                      num_test_samples=100, frac_val=0.1,
                                      return_label_arrays=False, print_info=False)
-                with open(pth, 'wb') as f:
-                    pickle.dump(label_remapping, f)
-                    print('Saved label remapping after truncation to' + pth)
+                try:
+                    with open(pth, 'wb') as f:
+                        pickle.dump(label_remapping, f)
+                        print('Saved label remapping after truncation to ' + pth)
+                except (PermissionError, OSError) as e:
+                    print(f'Warning: Could not save label remapping to {pth}: {e}')
+                    print('Continuing without caching the label remapping...')
                      
             # Reload datasets with target_transform (to remap classes to consecutive 0,1,2,...)
             target_transform = lambda k: label_remapping[k]
@@ -325,9 +329,13 @@ def get_datasets(dataset_name, truncate=False, root=None, return_labels=False, s
                 _, _, _, label_remapping = truncate_and_resplit_dataset(full_train_dataset, val_dataset, test_dataset=None, 
                                      num_test_samples=100, frac_val=0.1,
                                      return_label_arrays=False, print_info=False)
-                with open(pth, 'wb') as f:
-                    pickle.dump(label_remapping, f)
-                    print('Saved label remapping after truncation to' + pth)
+                try:
+                    with open(pth, 'wb') as f:
+                        pickle.dump(label_remapping, f)
+                        print('Saved label remapping after truncation to ' + pth)
+                except (PermissionError, OSError) as e:
+                    print(f'Warning: Could not save label remapping to {pth}: {e}')
+                    print('Continuing without caching the label remapping...')
                     
             # Reload datasets with target_transform (to remap classes to consecutive 0,1,2,...)
             target_transform = lambda k: label_remapping[k]

@@ -30,6 +30,7 @@ def get_outputs_folder():
 def get_figs_folder():
     return cfg['figs']
 
+
 # data_dir    = Path(cfg["data_dir"])
 # figures_dir = Path(cfg["figures_dir"])
 # results_dir = Path(cfg["results_dir"])
