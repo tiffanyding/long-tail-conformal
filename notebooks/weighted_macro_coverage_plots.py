@@ -514,10 +514,10 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
     score_to_marker = {
         'standard': 'X',
         'prevalence-adjusted': '^',
-        'WPAS ($\\gamma=$ 1)': 'o',
-        'WPAS ($\\gamma=$ 10)': 'o',
-        'WPAS ($\\gamma=$ 100)': 'o', 
-        'WPAS ($\\gamma=$ 1000)': 'o',
+        'WPAS ($\\gamma=$ 1)': '*',
+        'WPAS ($\\gamma=$ 10)': '*',
+        'WPAS ($\\gamma=$ 100)': '*', 
+        'WPAS ($\\gamma=$ 1000)': '*',
     }
 
     # Calculate maximum display label length for perfect bracket alignment
@@ -537,7 +537,8 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
         'WPAS ($\\gamma=$ 100)',
         'WPAS ($\\gamma=$ 1000)'
     ]
-    markersizes = [3, 4, 6, 8]
+    markersizes = [5, 6, 7, 8]
+
 
     metric_names = ['At-risk average $\\hat{c}_y$',
                     'Not-at-risk average $\\hat{c}_y$',
@@ -667,25 +668,57 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
     
     # Add labels and save plot
     axes[0].set_ylabel('Average set size')
+    plt.suptitle(dataset_names.get(dataset, dataset), y=1.02)
 
-    # Get handles and labels from the first axis
+    # Use tight layout for clean, properly sized plots
+    plt.tight_layout()
+
+    os.makedirs(f'{fig_folder}/weighted_macro_coverage', exist_ok=True)
+    fig_path = f'{fig_folder}/weighted_macro_coverage/{dataset}_conformal_comparison_NO_LEGEND_js.pdf'
+    
+    # Save clean version without legend
+    plt.savefig(fig_path, bbox_inches='tight')
+
+    # Get handles and labels from the first axis for legend
     handles, labels = axes[0].get_legend_handles_labels()
-    plt.tight_layout(rect=[0, 0.12, 1, 1])  # leave space at bottom for legend
+    
+    # Create legend for the plot
     fig.legend(
         handles, labels,
         loc='lower center',
-        bbox_to_anchor=(0.5, -0.35),  # 0.01 is just below the axes area
+        bbox_to_anchor=(0.5, -0.35),
         ncol=len(alphas),
         fontsize=12,
         frameon=True
     )
+    
+    # Save version with legend (for reference)
     plt.subplots_adjust(bottom=0.22)  # adjust as needed for space
-    plt.suptitle(dataset_names.get(dataset, dataset), y=1.02)
-
-    os.makedirs(f'{fig_folder}/weighted_macro_coverage', exist_ok=True)
-    pth = f'{fig_folder}/weighted_macro_coverage/{dataset}_conformal_comparison_js.pdf'
-    plt.savefig(pth, bbox_inches='tight')
-    print(f'✅ Plot saved to {pth}')
+    plt.savefig(fig_path.replace('NO_LEGEND_js.pdf', 'WITH_LEGEND_js.pdf'), bbox_inches='tight')
+    plt.savefig(fig_path.replace('NO_LEGEND_js.pdf', 'WITH_LEGEND_js.jpg'), bbox_inches='tight')
+    
+    # Create standalone legend PDF
+    legend_fig = plt.figure(figsize=(12, 2))  # Wide figure for horizontal legend
+    legend_fig.patch.set_visible(False)  # Make figure background transparent
+    
+    # Create standalone legend
+    legend_standalone = legend_fig.legend(handles, labels, ncol=len(alphas), 
+                                        loc='center', fontsize=12, frameon=True)
+    
+    # Remove axes from legend figure
+    legend_fig.gca().set_axis_off()
+    
+    # Save standalone legend
+    legend_path = fig_path.replace('NO_LEGEND_js.pdf', 'LEGEND_ONLY_js.pdf')
+    legend_fig.savefig(legend_path, bbox_inches='tight', transparent=True)
+    
+    print(f'✅ Saved three versions:')
+    print(f'   - Main plot: {fig_path}')
+    print(f'   - With legend: {fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.pdf")}')
+    print(f'   - Legend only: {legend_path}')
+    
+    # Close the legend figure to free memory
+    plt.close(legend_fig)
     plt.show()
     
     # Display summary
