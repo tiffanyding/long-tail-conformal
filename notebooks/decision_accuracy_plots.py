@@ -290,7 +290,7 @@ def create_methods_comparison_plot():
     # Move legend below the figure, centered, ncol=4 (like pareto_plots.py)
     handles, labels = [], []
     for method in methods:
-        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=9, label=method_to_name[method]))
+        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=4, label=method_to_name[method]))
         labels.append(method_to_name[method])
     plt.tight_layout(rect=[0, 0, 1, 0.93])
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, -0.08), fontsize=25, ncol=4, frameon=True)
@@ -365,7 +365,7 @@ def create_methods_comparison_plots_separate():
     # --- Legend only ---
     handles, labels = [], []
     for method in methods:
-        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=9, label=method_to_name[method]))
+        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=5, label=method_to_name[method]))
         labels.append(method_to_name[method])
     legend_fig = plt.figure(figsize=(12, 2))
     legend_fig.patch.set_visible(False)

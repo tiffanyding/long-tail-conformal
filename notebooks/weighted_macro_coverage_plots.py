@@ -553,6 +553,8 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
         }
 
     fig, axes = plt.subplots(1, len(metric_names), figsize=(13, 3), sharey=True)
+    for ax in axes:
+        ax.grid(True, alpha=0.2)
     for i in range(len(metric_names)):
         ax = axes[i]
         if i == 3:
@@ -668,8 +670,8 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
         ax.set_ylim(bottom=0)
         
         # Add minor ticks every 5 units on y-axis
-        ax.yaxis.set_minor_locator(MultipleLocator(5))
-        ax.tick_params(axis='y', which='minor', length=3, width=1, color='gray')
+        ax.yaxis.set_major_locator(MultipleLocator(5))
+        ax.tick_params(axis='y', which='major', length=3, width=1, color='gray')
     
     # Add labels and save plot
     axes[0].set_ylabel('Average set size')
