@@ -676,7 +676,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
     
     # Add Cross-Entropy to title to match pareto_plots.py pattern
     title_with_loss = dataset_names.get(dataset, dataset) + " (Cross-Entropy)"
-    plt.suptitle(title_with_loss, y=1.02)
+    plt.suptitle(title_with_loss, y=0.88)
 
     # Use tight layout for clean, properly sized plots
     plt.tight_layout()

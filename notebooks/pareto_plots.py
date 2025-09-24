@@ -559,7 +559,7 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     
     # Add loss type to title
     loss_type = " (Focal Loss)" if use_focal_loss else " (Cross-Entropy)"
-    plt.suptitle(dataset_names[dataset] + loss_type, y=1)
+    plt.suptitle(dataset_names[dataset] + loss_type, y=0.98)
     
     # Use tight layout for clean, properly sized plots
     plt.tight_layout()
