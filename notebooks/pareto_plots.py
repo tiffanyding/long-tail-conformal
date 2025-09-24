@@ -817,7 +817,7 @@ methods = ['standard', 'classwise'] + \
 
 for dataset in dataset_names.keys():
     # Generate standard plots with extra projections
-    generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_extra_projections', show_inset=False)
+    generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_extra_projections', show_inset=True)
     
     # Generate focal loss plots with extra projections (uncomment to use focal loss results)
     # generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_extra_projections', show_inset=False, use_focal_loss=True)
