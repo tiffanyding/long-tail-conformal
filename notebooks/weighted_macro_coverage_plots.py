@@ -538,7 +538,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
         'WPAS ($\\gamma=$ 100)',
         'WPAS ($\\gamma=$ 1000)'
     ]
-    markersizes = [5, 6, 7, 8]
+    markersizes = [8, 9, 10, 11]
 
 
     metric_names = ['At-risk average $\\hat{c}_y$',
@@ -567,7 +567,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
                     if score in all_res[alpha_key]:
                         res = all_res[alpha_key][score]
                         marker = score_to_marker.get(score, 'o')
-                        color = score_to_color.get(score, 'gray')
+                        color = score_to_color[score]
                         
                         # Calculate metric value based on column
                         if i == 0:  # Avg of at risk
@@ -622,9 +622,9 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
                                 0.1: 0.75,    # 
                                 0.2: 1.0      # Least conservative -> highest opacity
                             }
-                            alpha_transparency = alpha_to_transparency.get(alpha, 0.6)  # Default to 0.6 if alpha not found
+                            alpha_transparency = alpha_to_transparency.get(alpha, 1)  # Default to 0.6 if alpha not found
                         else:
-                            alpha_transparency = 0.6  # Default transparency for non-WPAS methods
+                            alpha_transparency = 1  # Default transparency for non-WPAS methods
                             
                         ax.plot(x, y, marker, alpha=alpha_transparency, markersize=markersize, markeredgewidth=0,
                                 color=color, label=label_text, zorder=zorder)
