@@ -38,8 +38,8 @@ dataset_names = {
 # dataset = 'inaturalist'
 dataset = 'inaturalist-trunc'
 
-# methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] 
-methods = ['standard', 'classwise', 'prevalence-adjusted'] 
+methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] 
+# methods = ['standard', 'classwise', 'prevalence-adjusted'] 
 
 
 
@@ -122,8 +122,8 @@ def create_combined_decision_acc_plot():
     
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
     
-    methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']
-    # methods = ['classwise', 'standard', 'clustered', 'fuzzy-RErarity-0.0001']
+    # methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']
+    methods = ['classwise', 'standard', 'clustered', 'fuzzy-RErarity-0.0001']
 
     colors = ['tab:green', 'tab:green', 'tab:green', 'tab:green']
     
@@ -184,7 +184,7 @@ def create_combined_decision_acc_plot():
                 
                 zorder = 5 - i
                 ax.plot(line_data, color=colors_grad[i], 
-                        linewidth=2.0,
+                        linewidth=5.0,
                         zorder=zorder,
                         label=label)
             
@@ -272,7 +272,7 @@ def create_methods_comparison_plot():
                 lower_line_raw = res[method]['coverage_metrics']['raw_class_coverages'][idx]
                 line_data = uniform_filter((1-gamma) * up_line_raw + gamma * lower_line_raw, size=20, mode='nearest')
                 color = method_colors[method]
-                ax.plot(line_data, color=color, linewidth=2.0, 
+                ax.plot(line_data, color=color, linewidth=4.0, 
                         label=method_to_name[method], solid_capstyle='round')
             ax.set_xlim(0, num_classes-1)
             ax.spines[['right', 'top']].set_visible(False)
@@ -290,7 +290,7 @@ def create_methods_comparison_plot():
     # Move legend below the figure, centered, ncol=4 (like pareto_plots.py)
     handles, labels = [], []
     for method in methods:
-        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=5, label=method_to_name[method]))
+        handles.append(plt.Line2D([0], [0], color=method_colors[method], lw=9, label=method_to_name[method]))
         labels.append(method_to_name[method])
     plt.tight_layout(rect=[0, 0, 1, 0.93])
     fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, -0.08), fontsize=25, ncol=4, frameon=True)
