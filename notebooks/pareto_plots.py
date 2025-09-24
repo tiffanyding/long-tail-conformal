@@ -784,7 +784,7 @@ for dataset in dataset_names.keys():
 # ### Fuzzy and Interp-Q with PAS
 
 # %%
-score = 'softmax'
+score = 'PAS'
 alphas = [0.1, 0.2, 0.05, 0.01]
 
 # 'classwise-exact'
