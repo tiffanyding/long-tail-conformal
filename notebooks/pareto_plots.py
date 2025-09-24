@@ -82,7 +82,13 @@ def load_one_result(dataset, alpha, method_name, score='softmax',
     if results_folder is None:
         results_folder = get_outputs_folder()
     
-    with open(f'{results_folder}/{dataset}_{score}_alpha={alpha}_{method_name}.pkl', 'rb') as f:
+    # Centralize override logic for PAS and standard-softmax
+    if score == 'PAS' and method_name == 'standard-softmax':
+        score = 'softmax'
+        method_name = 'softmax_standard'
+
+    file_path = f'{results_folder}/{dataset}_{score}_alpha={alpha}_{method_name}.pkl'
+    with open(file_path, 'rb') as f:
         metrics = pickle.load(f)
 
     # Compute train-weighted average set size
@@ -95,29 +101,44 @@ def load_one_result(dataset, alpha, method_name, score='softmax',
     
     return metrics
 
-def load_all_results(dataset, alphas, methods, score='softmax', results_folder=None):
+def load_all_results(dataset, alphas, methods, scores=None, results_folder=None):
     if results_folder is None:
         results_folder = get_outputs_folder()
-        
+
+    # Ensure scores matches methods length
+    if isinstance(score, str):
+        scores = [score] * len(methods)
+    elif isinstance(score, list):
+        if len(score) != len(methods):
+            raise ValueError(f"Length mismatch: methods={len(methods)}, scores={len(score)}")
+        scores = score
+    else:
+        raise TypeError("score must be a string or a list of strings.")
+
+    # Debugging: Print lengths of methods and scores
+    print(f"Methods: {methods}")
+    print(f"Scores: {scores}")
+    print(f"Length of methods: {len(methods)}, Length of scores: {len(scores)}")
+
     # For truncated datasets, we need to load these in to compute train-weighted average set size
-    if dataset.endswith('-trunc'): 
+    if dataset.endswith('-trunc'):
         train_labels_path = f'{inputs_folder}/{dataset}_train_labels.npy'
         train_labels = np.load(train_labels_path)
         num_classes = np.max(train_labels) + 1
-        train_class_distr = np.array([np.sum(train_labels == k) for k in range(num_classes)]) / len(train_labels) 
+        train_class_distr = np.array([np.sum(train_labels == k) for k in range(num_classes)]) / len(train_labels)
 
-        test_labels = test_labels = np.load(f'{inputs_folder}/best-{dataset}-model_test_labels.npy')
-        
+        test_labels = np.load(f'{inputs_folder}/best-{dataset}-model_test_labels.npy')
+
     all_res = {}
     for alpha in alphas:
         res = {}
-        for method in methods:
-            if dataset.endswith('-trunc'): # Compute train-weighted average set size
-                res[method] = load_one_result(dataset, alpha, method, score=score,
-                                           train_class_distr=train_class_distr, test_labels=test_labels, 
-                                           results_folder=results_folder)
+        for method, method_score in zip(methods, scores):
+            if dataset.endswith('-trunc'):
+                res[method] = load_one_result(dataset, alpha, method, score=method_score,
+                                               train_class_distr=train_class_distr, test_labels=test_labels,
+                                               results_folder=results_folder)
             else:
-                res[method] = load_one_result(dataset, alpha, method, score=score, results_folder=results_folder)
+                res[method] = load_one_result(dataset, alpha, method, score=method_score, results_folder=results_folder)
         all_res[f'alpha={alpha}'] = res
 
     return all_res
@@ -468,11 +489,19 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     legendfontsize : int, default=14
         Font size for legend
     use_focal_loss : bool, default=False
-        If True, uses focal_loss subfolder for results and adds '_Focal_Loss' to filenames.
-        Also adds ' (Focal Loss)' to plot title.
-        If False, uses standard results folder and adds ' (Cross-Entropy)' to title.
+        Whether to use focal loss results (default: False)
     """
     
+    # Ensure score is a list or replicate if string
+    if isinstance(score, str):
+        scores = [score] * len(methods)
+    elif isinstance(score, list):
+        if len(score) != len(methods):
+            raise ValueError("Length of score list must match length of methods list.")
+        scores = score
+    else:
+        raise TypeError("score must be a string or a list of strings.")
+
     # Set up folder paths based on focal_loss option
     if use_focal_loss:
         results_folder = get_outputs_folder() + '/focal_loss'
@@ -486,12 +515,17 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     os.makedirs(fig_folder, exist_ok=True)
     
     # Load pre-computed metrics
-    all_res = load_all_results(dataset, alphas, methods, score=score, results_folder=results_folder)
+    all_res = load_all_results(dataset, alphas, methods, scores=scores, results_folder=results_folder)
 
+    # Ensure 'standard-softmax' is explicitly added to the methods and results
     if score == 'PAS':
-        std_with_softmax = load_all_results(dataset, alphas, ['standard'], score='softmax', results_folder=results_folder)
+        if 'standard-softmax' not in methods:
+            methods.append('standard-softmax')
+        # Load standard results with softmax
+        std_with_softmax = load_all_results(dataset, alphas, ['standard'], score='softmax')
         for alpha in alphas:
-            all_res[f'{alpha=}']['standard-softmax'] = std_with_softmax[f'{alpha=}']['standard']
+            # Map standard-softmax to standard results
+            all_res[f'alpha={alpha}']['standard-softmax'] = std_with_softmax[f'alpha={alpha}']['standard']
 
     # Make plots
     set_size_metric = 'train_mean' if dataset.endswith('-trunc') else 'mean'
@@ -567,11 +601,25 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     # Add INSET to filename if show_inset is True
     inset_suffix = '_INSET' if show_inset else ''
     
-    fig_path = f'{fig_folder}/{dataset}/ALL_metrics_{dataset}_{score}{save_suffix}_pareto{inset_suffix}_NO_LEGEND_js{loss_suffix}.pdf'
+    # Simplify scores representation for file name
+    if isinstance(scores, list):
+        scores_repr = 'multi_scores' if len(set(scores)) > 1 else scores[0]
+    else:
+        scores_repr = scores
+
+    # Update file path with simplified scores representation
+    fig_path = f'{fig_folder}/{dataset}/ALL_metrics_{dataset}_{scores_repr}{save_suffix}_pareto_NO_LEGEND.pdf'
     os.makedirs(f'{fig_folder}/{dataset}', exist_ok=True)
     
     # Save clean version without legend
     plt.savefig(fig_path, bbox_inches='tight')
+    
+    # Save version with legend
+    if len(alphas) > 1:
+        legend_path = fig_path.replace('NO_LEGEND.pdf', 'WITH_LEGEND.pdf')
+        axes[0].legend(ncols=len(alphas), loc='upper left', bbox_to_anchor=(-0.25, -0.35), fontsize=legendfontsize)
+        plt.savefig(legend_path, bbox_inches='tight')
+        print(f"Saved version with legend to {legend_path}")
     
     # Create legend for standalone legend generation (but don't save WITH_LEGEND version)
     if len(alphas) > 1:
@@ -718,7 +766,7 @@ for dataset in dataset_names.keys():
     set_size_metric = 'train_mean' if dataset.endswith('-trunc') else 'mean'
     
     # Load the results
-    all_res = load_all_results(dataset, alphas, methods, score=score, results_folder=results_folder)
+    all_res = load_all_results(dataset, alphas, methods, scores=score, results_folder=results_folder)
     
     # Extract into DataFrame
     df = extract_metric_table(
@@ -784,19 +832,27 @@ for dataset in dataset_names.keys():
 # ### Fuzzy and Interp-Q with PAS
 
 # %%
-score = 'PAS'
+
 alphas = [0.1, 0.2, 0.05, 0.01]
+
+dataset_names = {
+    "plantnet": "Pl@ntNet-300K",
+    # "plantnet-trunc": "Pl@ntNet-300K-truncated",
+    "inaturalist": "iNaturalist-2018",
+    # "inaturalist-trunc": "iNaturalist-2018-truncated",
+}
 
 # 'classwise-exact'
 methods = ['standard', 'classwise', 'clustered'] + \
             [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] +\
             [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] +\
-            [f'cvx-cw_weight={w}' for w in cw_weights] 
+            [f'cvx-cw_weight={w}' for w in cw_weights]+['standard'] 
 
-
+scores = ['PAS']*len(methods)
+scores[-1] = 'softmax'
 for dataset in dataset_names.keys():
     # Generate standard PAS plots 
-    generate_all_pareto_plots(dataset, score, alphas, methods, legendfontsize=15, show_inset=False)
+    generate_all_pareto_plots(dataset, scores, alphas, methods, legendfontsize=15, show_inset=False)
     
     # Generate focal loss PAS plots (uncomment to use focal loss results)
     # generate_all_pareto_plots(dataset, score, alphas, methods, legendfontsize=15, use_focal_loss=True)
