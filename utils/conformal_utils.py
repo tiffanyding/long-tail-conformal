@@ -963,9 +963,10 @@ def fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, val_scores_all=None,
             # This implies the score function s(x,y) = What quantile of the w(y)-weighted score distribution should I have
             # taken to include y in the prediction set?
 
-            S = np.array([F[y].cdf(reconf_scores[i]) for i,y in enumerate(reconf_labels)]) # CHECK
+            S = np.array([F[y].cdf(reconf_scores[i]) for i,y in enumerate(reconf_labels)]) 
             alpha_hat = 1-get_conformal_quantile(S, alpha) 
-            class_qhats = np.array([F[y].ppf(1-alpha_hat) for y in range(num_classes)])
+            # class_qhats = np.array([F[y].ppf(1-alpha_hat) for y in range(num_classes)])
+            class_qhats = np.array([F[y].ppf(1-alpha_hat + 1e-10) for y in range(num_classes)])  # ADDED to enforce score < q instead of <=
         else:
             raise ValueError('Invalid "reconformalize" option. Options are "additive", "multiplicative", and "alpha"')
         
