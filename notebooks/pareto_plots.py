@@ -661,7 +661,7 @@ methods = ['standard', 'classwise', 'prevalence-adjusted'] + \
 
 for dataset in ['plantnet', 'inaturalist']:
     # Generate standard plots (using default softmax results)
-    generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_alpha=0.1', legendfontsize=14, show_grid=True, use_focal_loss=False, show_inset=False)
+    generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='', legendfontsize=14, show_grid=True, use_focal_loss=True, show_inset=False)
     
     # Generate focal loss plots (uncomment to use focal loss results)
     # generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_alpha=0.1', legendfontsize=14, show_grid=True, use_focal_loss=True)
