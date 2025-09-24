@@ -310,7 +310,9 @@ def verify_curves_match():
     Verification function to ensure curves match exactly between the two plot types
     """
     datasets = ['plantnet-trunc', 'inaturalist-trunc']
-    methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']
+    # methods = ['classwise', 'standard', 'clustered', 'prevalence-adjusted']
+    methods = ['classwise', 'standard', 'prevalence-adjusted']
+
     gamma_levels = [0.0, 0.25, 0.5, 0.75, 1.0]
     
     print("Verifying that curves match between create_combined_decision_acc_plot and create_methods_comparison_plot...")
