@@ -324,8 +324,8 @@ def create_methods_comparison_plots_separate():
         'prevalence-adjusted': 'orange',
     }
     method_style = {
-        'standard': '--',
-        'classwise': '-.',
+        'standard': '-.',
+        'classwise': ':',
         'clustered': 'x',
         'prevalence-adjusted': '-',
     }
