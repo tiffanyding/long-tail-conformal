@@ -323,6 +323,12 @@ def create_methods_comparison_plots_separate():
         'clustered': 'purple',
         'prevalence-adjusted': 'orange',
     }
+    method_style = {
+        'standard': '--',
+        'classwise': '-.',
+        'clustered': 'x',
+        'prevalence-adjusted': '-',
+    }
     method_to_name = {
         'standard': 'Standard',
         'classwise': 'Classwise',
@@ -349,15 +355,18 @@ def create_methods_comparison_plots_separate():
                 lower_line_raw = res[method]['coverage_metrics']['raw_class_coverages'][idx]
                 line_data = uniform_filter((1-gamma) * up_line_raw + gamma * lower_line_raw, size=20, mode='nearest')
                 color = method_colors[method]
-                ax.plot(line_data, color=color, linewidth=4.0, label=method_to_name[method], solid_capstyle='round')
+                ax.plot(line_data, color=color, linewidth=4.0,
+                linestyle=method_style[method],
+                label=method_to_name[method], solid_capstyle='round')
             ax.set_xlim(0, num_classes-1)
             ax.spines[['right', 'top']].set_visible(False)
-            ax.set_title(f'$\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$', fontsize=20)
+            ax.set_title(f'$\\gamma_{{\\mathrm{{exp.}}}} = {int(gamma*100)}\\%$', fontsize=30)
             if col == 0:
                 ax.set_ylabel('Decision accuracy', fontsize=25)
             ax.set_xlabel('Class', fontsize=25)
-        fig.suptitle(dataset_names[dataset_name], y=0.95, fontsize=22)
-        plt.tight_layout(rect=[0, 0, 1, 0.93])
+        fig.suptitle(dataset_names[dataset_name], y=0.95, fontsize=30)
+        plt.tight_layout()
+        # plt.tight_layout(rect=[0, 0, 1, 0.93])
         fig_path = f'{fig_folder}/methods_comparison_{dataset_name}.pdf'
         fig.savefig(fig_path, bbox_inches='tight')
         print(f'Saved plot for {dataset_name} to', fig_path)
