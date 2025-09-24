@@ -499,6 +499,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
     """Generate plots showing the performance of different methods."""
     # Import matplotlib here to reduce startup time
     lazy_import_matplotlib(fast_mode=fast_mode)
+    from matplotlib.ticker import MultipleLocator
     
     # Define color scheme
     score_to_color = {
@@ -625,7 +626,7 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
                         else:
                             alpha_transparency = 0.6  # Default transparency for non-WPAS methods
                             
-                        ax.plot(x, y, marker, alpha=alpha_transparency, markersize=markersize,
+                        ax.plot(x, y, marker, alpha=alpha_transparency, markersize=markersize, markeredgewidth=0,
                                 color=color, label=label_text, zorder=zorder)
                         ax.spines[['right', 'top']].set_visible(False)
                 
@@ -665,10 +666,17 @@ def plot_results(all_res, at_risk_species, alphas, num_classes, dataset, fast_mo
                             linewidth=1.5)
         ax.set_xlabel(metric_names[i])
         ax.set_ylim(bottom=0)
+        
+        # Add minor ticks every 5 units on y-axis
+        ax.yaxis.set_minor_locator(MultipleLocator(5))
+        ax.tick_params(axis='y', which='minor', length=3, width=1, color='gray')
     
     # Add labels and save plot
     axes[0].set_ylabel('Average set size')
-    plt.suptitle(dataset_names.get(dataset, dataset), y=1.02)
+    
+    # Add Cross-Entropy to title to match pareto_plots.py pattern
+    title_with_loss = dataset_names.get(dataset, dataset) + " (Cross-Entropy)"
+    plt.suptitle(title_with_loss, y=1.02)
 
     # Use tight layout for clean, properly sized plots
     plt.tight_layout()
