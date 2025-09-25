@@ -207,17 +207,21 @@ def plot_set_size_vs_cov_metric(
     for alpha, base_ms in zip(alphas, base_markersizes):
         res = all_res.get(f'alpha={alpha}', {})
 
-        # Only plot 'Standard (Softmax)' if both PAS and softmax results for 'standard' are present for this alpha
-        has_standard_pas = (
-            'standard' in res and hasattr(res['standard'], 'score_used') and res['standard']['score_used'] == 'PAS'
-        )
-        has_standard_softmax = (
-            'standard' in res and hasattr(res['standard'], 'score_used') and res['standard']['score_used'] == 'softmax'
-        )
-        if has_standard_pas and has_standard_softmax:
+        # Distinguish between 'Standard' (PAS) and 'Standard (Softmax)' for 'standard' method
+        if 'standard' in res and 'score_used' in res['standard']:
             ms = get_marker_size(base_ms, 'standard')
             plot_zorder = 10
-            formatted_label = format_legend_label('Standard (Softmax)', alpha, label_prefix)
+            if res['standard']['score_used'] == 'softmax':
+                formatted_label = format_legend_label('Standard (Softmax)', alpha, label_prefix)
+            elif res['standard']['score_used'] == 'PAS':
+                formatted_label = format_legend_label('Standard', alpha, label_prefix)
+            else:
+                formatted_label = format_legend_label('Standard', alpha, label_prefix)
+            cov_metrics = res['standard'].get('coverage_metrics', {})
+            set_metrics = res['standard'].get('set_size_metrics', {})
+            if all((v is None or (isinstance(v, list) and all(x is None for x in v))) for v in cov_metrics.values()) and \
+               all((v is None or (isinstance(v, list) and all(x is None for x in v))) for v in set_metrics.values()):
+                raise ValueError(f"Missing or None metrics for method 'standard' at alpha={alpha}. Check your result files.")
             ax.plot(
                 res['standard']['coverage_metrics'][coverage_metric],
                 res['standard']['set_size_metrics'][set_size_metric],
@@ -227,12 +231,11 @@ def plot_set_size_vs_cov_metric(
                 zorder=plot_zorder
             )
 
-        # core scatter methods (only if present)
+        # core scatter methods (only if present), skip 'standard' since handled above
         for key, label, color, mk in core_methods:
+            if key == 'standard':
+                continue
             if key in res:
-                # If this is the special softmax/standard case, skip (already plotted above)
-                if key == 'standard' and hasattr(res[key], 'score_used') and res[key].score_used == 'softmax':
-                    continue
                 cov_metrics = res[key].get('coverage_metrics', {})
                 set_metrics = res[key].get('set_size_metrics', {})
                 if all((v is None or (isinstance(v, list) and all(x is None for x in v))) for v in cov_metrics.values()) and \
@@ -741,6 +744,12 @@ alphas = [0.2, 0.1, 0.05, 0.01]
 cw_weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1]
 rarity_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 10, 1000]
 # For 'standard', load both PAS and softmax, assign unique keys
+dataset_names = {
+    "plantnet": "Pl@ntNet-300K",
+    "plantnet-trunc": "Pl@ntNet-300K-truncated",
+    "inaturalist": "iNaturalist-2018",
+    "inaturalist-trunc": "iNaturalist-2018-truncated",
+}
 
 
 # --- Only softmax for all methods (no PAS logic) ---
@@ -873,7 +882,7 @@ dataset_names = {
     # "inaturalist-trunc": "iNaturalist-2018-truncated",
 }
 
-methods = [ 'classwise', 'clustered'] + \
+methods = ['standard',  'classwise', 'clustered'] + \
           [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] + \
           [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] + \
           [f'cvx-cw_weight={w}' for w in cw_weights] + \
