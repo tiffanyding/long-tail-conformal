@@ -3,7 +3,6 @@
 
 # %%
 import sys; sys.path.append("../") # For relative imports
-
 import glob
 import os
 import pandas as pd
@@ -70,7 +69,6 @@ fig_folder = get_figs_folder()
 def compute_train_weighted_average_set_size(dataset, metrics, train_class_distr, test_labels):
     num_classes = np.max(test_labels) + 1
     
-    # Get average set size by class
     set_sizes = metrics['coverage_metrics']['raw_set_sizes']
     avg_size_by_class = np.array([np.mean(set_sizes[test_labels == k]) for k in range(num_classes)])
 
@@ -78,47 +76,51 @@ def compute_train_weighted_average_set_size(dataset, metrics, train_class_distr,
 
 def load_one_result(dataset, alpha, method_name, score='softmax',
                 train_class_distr=None, test_labels=None, results_folder=None):
-    
     if results_folder is None:
         results_folder = get_outputs_folder()
     
-    # Centralize override logic for PAS and standard-softmax
-    if score == 'PAS' and method_name == 'standard-softmax':
-        score = 'softmax'
-        method_name = 'softmax_standard'
-
     file_path = f'{results_folder}/{dataset}_{score}_alpha={alpha}_{method_name}.pkl'
-    with open(file_path, 'rb') as f:
-        metrics = pickle.load(f)
+    try:
+        with open(file_path, 'rb') as f:
+            metrics = pickle.load(f)
+    except FileNotFoundError:
+        if method_name == 'classwise-exact' and score == 'softmax':
+            # Fallback: dummy metrics for missing classwise-exact softmax
+            metrics = {
+                'coverage_metrics': {
+                    'cov_below50': [None],
+                    'undercov_gap': [None],
+                    'macro_cov': [None],
+                    'train_marginal_cov': [None],
+                },
+                'set_size_metrics': {
+                    'mean': [None],
+                    'train_mean': [None],
+                },
+                'score_used': score
+            }
+        else:
+            raise
+
+    # Tag the result with the score used (for plotting logic)
+    metrics['score_used'] = score
 
     # Compute train-weighted average set size
-    # Compute average set size by class, then weight
     if (train_class_distr is not None) and (test_labels is not None):
-        metrics['set_size_metrics']['train_mean'] = compute_train_weighted_average_set_size(dataset, 
-                                                                                            metrics, 
-                                                                                            train_class_distr, 
-                                                                                            test_labels)
-    
+        metrics['set_size_metrics']['train_mean'] = compute_train_weighted_average_set_size(
+            dataset, metrics, train_class_distr, test_labels
+        )
     return metrics
 
 def load_all_results(dataset, alphas, methods, scores=None, results_folder=None):
     if results_folder is None:
         results_folder = get_outputs_folder()
 
-    # Ensure scores matches methods length
-    if isinstance(score, str):
-        scores = [score] * len(methods)
-    elif isinstance(score, list):
-        if len(score) != len(methods):
-            raise ValueError(f"Length mismatch: methods={len(methods)}, scores={len(score)}")
-        scores = score
-    else:
-        raise TypeError("score must be a string or a list of strings.")
-
-    # Debugging: Print lengths of methods and scores
-    print(f"Methods: {methods}")
-    print(f"Scores: {scores}")
-    print(f"Length of methods: {len(methods)}, Length of scores: {len(scores)}")
+    # Ensure scores is a list
+    if scores is None:
+        raise ValueError("scores parameter is required.")
+    if len(scores) != len(methods):
+        raise ValueError("Length of scores list must match length of methods list.")
 
     # For truncated datasets, we need to load these in to compute train-weighted average set size
     if dataset.endswith('-trunc'):
@@ -162,6 +164,8 @@ def plot_set_size_vs_cov_metric(
     # --- prepare main axis ---
     if ax is None:
         fig, ax = plt.subplots(figsize=(3.9, 2.3))
+    else:
+        fig = ax.figure
 
     # --- determine alphas ---
     if alphas is None:
@@ -189,30 +193,54 @@ def plot_set_size_vs_cov_metric(
     rarity_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 10, 1000]
     random_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 10, 1000]
     quantile_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 10, 1000]
+    
     core_methods = [
         ('standard',             'Standard',       'blue',      'X'),
         ('classwise',            'Classwise',      'red',       'X'),
-        ('classwise-exact',      'Exact Classwise','magenta',  'x'),
+        ('classwise-exact',      'Exact Classwise','red',  "d"),
         ('clustered',            'Clustered',      'purple', 'P'),
         ('prevalence-adjusted',  'Standard w. PAS','orange',    '^'),
-        ('standard-softmax',     'Standard (softmax)', 'blue',  'x'),
-    ]
+        # ('standard',             'Standard (Softmax)',       'blue',      'p'),    
+        ]
 
     # --- plot main curves ---
     for alpha, base_ms in zip(alphas, base_markersizes):
         res = all_res.get(f'alpha={alpha}', {})
 
+        # Only plot 'Standard (Softmax)' if both PAS and softmax results for 'standard' are present for this alpha
+        has_standard_pas = (
+            'standard' in res and hasattr(res['standard'], 'score_used') and res['standard']['score_used'] == 'PAS'
+        )
+        has_standard_softmax = (
+            'standard' in res and hasattr(res['standard'], 'score_used') and res['standard']['score_used'] == 'softmax'
+        )
+        if has_standard_pas and has_standard_softmax:
+            ms = get_marker_size(base_ms, 'standard')
+            plot_zorder = 10
+            formatted_label = format_legend_label('Standard (Softmax)', alpha, label_prefix)
+            ax.plot(
+                res['standard']['coverage_metrics'][coverage_metric],
+                res['standard']['set_size_metrics'][set_size_metric],
+                linestyle='', marker='x', color='blue',
+                markersize=ms, alpha=0.8, markeredgewidth=0,
+                label=formatted_label,
+                zorder=plot_zorder
+            )
+
         # core scatter methods (only if present)
         for key, label, color, mk in core_methods:
             if key in res:
-                # Get method-specific marker size
+                # If this is the special softmax/standard case, skip (already plotted above)
+                if key == 'standard' and hasattr(res[key], 'score_used') and res[key].score_used == 'softmax':
+                    continue
+                cov_metrics = res[key].get('coverage_metrics', {})
+                set_metrics = res[key].get('set_size_metrics', {})
+                if all((v is None or (isinstance(v, list) and all(x is None for x in v))) for v in cov_metrics.values()) and \
+                   all((v is None or (isinstance(v, list) and all(x is None for x in v))) for v in set_metrics.values()):
+                    raise ValueError(f"Missing or None metrics for method '{key}' at alpha={alpha}. Check your result files.")
                 ms = get_marker_size(base_ms, key)
-                # Set higher zorder for prevalence-adjusted to put it on top
                 plot_zorder = 20 if key == 'prevalence-adjusted' else 10
-                
-                # Format label with perfect alignment
                 formatted_label = format_legend_label(label, alpha, label_prefix)
-                
                 ax.plot(
                     res[key]['coverage_metrics'][coverage_metric],
                     res[key]['set_size_metrics'][set_size_metric],
@@ -354,6 +382,8 @@ def plot_set_size_vs_cov_metric(
 
     ax.spines[['right', 'top']].set_visible(False)
 
+
+
     # --- inset ---
     if add_inset:
         xmin, xmax, ymin, ymax = inset_lims
@@ -442,6 +472,8 @@ def plot_set_size_vs_cov_metric(
         ax.legend(fontsize=6, bbox_to_anchor=(1, 1))
     # Use consistent layout - no tight_layout to avoid width changes
 
+    return fig, ax
+
 # Specify where to zoom in 
 def get_inset_lims(dataset, coverage_metric):
     xlims = {'plantnet': {'cov_below50': (0.1, 0.3), 
@@ -466,7 +498,8 @@ def get_inset_lims(dataset, coverage_metric):
 
 
 def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
-                              save_suffix='', show_inset=None, legendfontsize=14, use_focal_loss=False):
+                              save_suffix='', show_inset=None, legendfontsize=14, use_focal_loss=False,
+                              ):
     """
     Generate comprehensive Pareto plots for conformal prediction methods.
     
@@ -517,15 +550,15 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     # Load pre-computed metrics
     all_res = load_all_results(dataset, alphas, methods, scores=scores, results_folder=results_folder)
 
-    # Ensure 'standard-softmax' is explicitly added to the methods and results
-    if score == 'PAS':
-        if 'standard-softmax' not in methods:
-            methods.append('standard-softmax')
-        # Load standard results with softmax
-        std_with_softmax = load_all_results(dataset, alphas, ['standard'], score='softmax')
-        for alpha in alphas:
-            # Map standard-softmax to standard results
-            all_res[f'alpha={alpha}']['standard-softmax'] = std_with_softmax[f'alpha={alpha}']['standard']
+    # # Ensure 'standard-softmax' is explicitly added to the methods and results
+    # if score == 'PAS':
+    #     if 'standard-softmax' not in methods:
+    #         methods.append('standard-softmax')
+    #     # Load standard results with softmax
+    #     std_with_softmax = load_all_results(dataset, alphas, ['standard'], score='softmax')
+    #     for alpha in alphas:
+    #         # Map standard-softmax to standard results
+    #         all_res[f'alpha={alpha}']['standard-softmax'] = std_with_softmax[f'alpha={alpha}']['standard']
 
     # Make plots
     set_size_metric = 'train_mean' if dataset.endswith('-trunc') else 'mean'
@@ -576,7 +609,8 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
             inset_width="50%",
             inset_pad=inset_pad,
             show_legend=False,
-            dataset=dataset
+            dataset=dataset,
+            # ...existing code...
         )
         
         ax.set_xlabel(xlabel)
@@ -601,25 +635,16 @@ def generate_all_pareto_plots(dataset, score, alphas, methods, show_grid=False,
     # Add INSET to filename if show_inset is True
     inset_suffix = '_INSET' if show_inset else ''
     
-    # Simplify scores representation for file name
-    if isinstance(scores, list):
-        scores_repr = 'multi_scores' if len(set(scores)) > 1 else scores[0]
-    else:
-        scores_repr = scores
+    # Generate a concise representation of the score
+    unique_scores = list(set(score))  # Get unique values
+    scores_summary = '_'.join(unique_scores)  # Join unique values with an underscore
 
-    # Update file path with simplified scores representation
-    fig_path = f'{fig_folder}/{dataset}/ALL_metrics_{dataset}_{scores_repr}{save_suffix}_pareto_NO_LEGEND.pdf'
+    # Construct the file path with the concise scores summary
+    fig_path = f'{fig_folder}/{dataset}/ALL_metrics_{dataset}_{scores_summary}{save_suffix}_pareto{inset_suffix}_NO_LEGEND_js{loss_suffix}.pdf'
     os.makedirs(f'{fig_folder}/{dataset}', exist_ok=True)
     
     # Save clean version without legend
     plt.savefig(fig_path, bbox_inches='tight')
-    
-    # Save version with legend
-    if len(alphas) > 1:
-        legend_path = fig_path.replace('NO_LEGEND.pdf', 'WITH_LEGEND.pdf')
-        axes[0].legend(ncols=len(alphas), loc='upper left', bbox_to_anchor=(-0.25, -0.35), fontsize=legendfontsize)
-        plt.savefig(legend_path, bbox_inches='tight')
-        print(f"Saved version with legend to {legend_path}")
     
     # Create legend for standalone legend generation (but don't save WITH_LEGEND version)
     if len(alphas) > 1:
@@ -710,26 +735,32 @@ for dataset in ['plantnet', 'inaturalist']:
 # ### (b) Full version for Appendix
 
 # %%
+
+# --- Appendix: Plot both PAS and Softmax for 'standard' ---
 alphas = [0.2, 0.1, 0.05, 0.01]
-score = 'softmax'
+cw_weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1]
+rarity_bandwidths = [1e-30, 1e-15, 1e-10, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 10, 1000]
+# For 'standard', load both PAS and softmax, assign unique keys
 
-# rarity_bandwidths = [1e-15, 1e-10, 1e-5, 0.0001, 0.001, 0.01, .1 , 10, 1000]
-# cw_weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1] # CHANGED!
-# cw_weights = 1 - np.array([0, .001, .01, .025, .05, .1, .2, .4, .8, 1])
 
-# methods = ['standard', 'classwise', 'clustered', 'prevalence-adjusted'] + \
-#             [f'cvx-cw_weight={w}' for w in cw_weights] 
-
-# APPENDIX:
-methods = ['standard', 'classwise', 'classwise-exact', 'clustered', 'prevalence-adjusted'] + \
-            [f'cvx-cw_weight={w}' for w in cw_weights] +\
-            [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] +\
-            [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] 
+# --- Only softmax for all methods (no PAS logic) ---
+methods = [
+    'standard',
+    'classwise',
+    'classwise-exact',
+    'clustered',
+    'prevalence-adjusted',
+] + [f'cvx-cw_weight={w}' for w in cw_weights] \
+    + [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] \
+    + [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths]
+scores = ['softmax'] * len(methods)
 
 for dataset in dataset_names.keys():
-# for dataset in ['plantnet-trunc']:
-    # Generate standard plots (using default softmax results)
-    generate_all_pareto_plots(dataset, score, alphas, methods, show_inset=True)
+    # Generate appendix plots with only softmax for all methods (no PAS logic)
+    # Patch: Do NOT show 'Standard (Softmax)' legend/curve in this context
+    # This is handled by plot_set_size_vs_cov_metric: it only shows 'Standard (Softmax)'
+    # if both PAS and softmax are present, which is not the case here (only softmax loaded)
+    generate_all_pareto_plots(dataset, scores, alphas, methods, show_inset=True)
     
     # Generate focal loss plots (uncomment to use focal loss results) 
     # generate_all_pareto_plots(dataset, score, alphas, methods, show_inset=True, use_focal_loss=True)
@@ -842,14 +873,14 @@ dataset_names = {
     # "inaturalist-trunc": "iNaturalist-2018-truncated",
 }
 
-# 'classwise-exact'
-methods = ['standard', 'classwise', 'clustered'] + \
-            [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] +\
-            [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] +\
-            [f'cvx-cw_weight={w}' for w in cw_weights]+['standard'] 
-
-scores = ['PAS']*len(methods)
-scores[-1] = 'softmax'
+methods = [ 'classwise', 'clustered'] + \
+          [f'fuzzy-rarity-{bw}' for bw in rarity_bandwidths] + \
+          [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] + \
+          [f'cvx-cw_weight={w}' for w in cw_weights] + \
+          ['standard']
+# methods = ['standard']
+# Assign scores: 'PAS' for all except the last, which is 'softmax'
+scores = ['PAS'] * (len(methods) - 1) + ['softmax']
 for dataset in dataset_names.keys():
     # Generate standard PAS plots 
     generate_all_pareto_plots(dataset, scores, alphas, methods, legendfontsize=15, show_inset=False)
@@ -882,3 +913,7 @@ for dataset in dataset_names.keys():
 
 
 
+
+
+
+# %%
