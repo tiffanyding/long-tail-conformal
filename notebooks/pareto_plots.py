@@ -134,13 +134,24 @@ def load_all_results(dataset, alphas, methods, scores=None, results_folder=None)
     all_res = {}
     for alpha in alphas:
         res = {}
-        for method, method_score in zip(methods, scores):
-            if dataset.endswith('-trunc'):
-                res[method] = load_one_result(dataset, alpha, method, score=method_score,
-                                               train_class_distr=train_class_distr, test_labels=test_labels,
-                                               results_folder=results_folder)
+        for idx, (method, method_score) in enumerate(zip(methods, scores)):
+            # If method is 'standard' and method_score is 'softmax' and there is already a 'standard' in res, store as 'standard_softmax'
+            if method == 'standard' and method_score == 'softmax' and 'standard' in res:
+                key = 'standard_softmax'
+            # If method is 'standard' and method_score is 'PAS' and 'standard' not in res, store as 'standard'
+            elif method == 'standard' and method_score == 'PAS' and 'standard' not in res:
+                key = 'standard'
+            # If method is 'standard' and method_score is 'PAS' and 'standard' already in res, store as 'standard_pas'
+            elif method == 'standard' and method_score == 'PAS' and 'standard' in res:
+                key = 'standard_pas'
             else:
-                res[method] = load_one_result(dataset, alpha, method, score=method_score, results_folder=results_folder)
+                key = method
+            if dataset.endswith('-trunc'):
+                res[key] = load_one_result(dataset, alpha, method, score=method_score,
+                                           train_class_distr=train_class_distr, test_labels=test_labels,
+                                           results_folder=results_folder)
+            else:
+                res[key] = load_one_result(dataset, alpha, method, score=method_score, results_folder=results_folder)
         all_res[f'alpha={alpha}'] = res
 
     return all_res
@@ -207,26 +218,48 @@ def plot_set_size_vs_cov_metric(
     for alpha, base_ms in zip(alphas, base_markersizes):
         res = all_res.get(f'alpha={alpha}', {})
 
-        # Distinguish between 'Standard' (PAS) and 'Standard (Softmax)' for 'standard' method
-        if 'standard' in res and 'score_used' in res['standard']:
+        # Plot both 'Standard (Softmax)' and 'Standard' (PAS) if both are present for this alpha
+        # Check for both PAS and softmax results for 'standard' (by method naming convention)
+        # If user loads both as separate keys, e.g., 'standard' (PAS) and 'standard' (softmax),
+        # they will appear as separate entries in res with different 'score_used'.
+        # So, scan all methods for 'standard' with PAS and with softmax.
+
+        # Plot 'Standard (Softmax)' if present
+        if 'standard_softmax' in res:
             ms = get_marker_size(base_ms, 'standard')
             plot_zorder = 10
-            if res['standard']['score_used'] == 'softmax':
-                formatted_label = format_legend_label('Standard (Softmax)', alpha, label_prefix)
-            elif res['standard']['score_used'] == 'PAS':
-                formatted_label = format_legend_label('Standard', alpha, label_prefix)
-            else:
-                formatted_label = format_legend_label('Standard', alpha, label_prefix)
+            formatted_label = format_legend_label('Standard (Softmax)', alpha, label_prefix)
+            marker_style = 'p'  # filled pentagon
+            cov_metrics = res['standard_softmax'].get('coverage_metrics', {})
+            set_metrics = res['standard_softmax'].get('set_size_metrics', {})
+            if all((v is None or (isinstance(v, list) and all(x is None for x in v))) for v in cov_metrics.values()) and \
+               all((v is None or (isinstance(v, list) and all(x is None for x in v))) for v in set_metrics.values()):
+                raise ValueError(f"Missing or None metrics for method 'standard (softmax)' at alpha={alpha}. Check your result files.")
+            ax.plot(
+                res['standard_softmax']['coverage_metrics'][coverage_metric],
+                res['standard_softmax']['set_size_metrics'][set_size_metric],
+                linestyle='', marker=marker_style, color='blue',
+                markersize=ms, alpha=0.8, markeredgewidth=0.5,
+                label=formatted_label,
+                zorder=plot_zorder
+            )
+
+        # Plot 'Standard' (PAS) if present
+        if 'standard' in res and res['standard'].get('score_used', None) == 'PAS':
+            ms = get_marker_size(base_ms, 'standard')
+            plot_zorder = 10
+            formatted_label = format_legend_label('Standard', alpha, label_prefix)
+            marker_style = 'X'  # filled X
             cov_metrics = res['standard'].get('coverage_metrics', {})
             set_metrics = res['standard'].get('set_size_metrics', {})
             if all((v is None or (isinstance(v, list) and all(x is None for x in v))) for v in cov_metrics.values()) and \
                all((v is None or (isinstance(v, list) and all(x is None for x in v))) for v in set_metrics.values()):
-                raise ValueError(f"Missing or None metrics for method 'standard' at alpha={alpha}. Check your result files.")
+                raise ValueError(f"Missing or None metrics for method 'standard (PAS)' at alpha={alpha}. Check your result files.")
             ax.plot(
                 res['standard']['coverage_metrics'][coverage_metric],
                 res['standard']['set_size_metrics'][set_size_metric],
-                linestyle='', marker='x', color='blue',
-                markersize=ms, alpha=0.8, markeredgewidth=0,
+                linestyle='', marker=marker_style, color='blue',
+                markersize=ms, alpha=0.8, markeredgewidth=0.5,
                 label=formatted_label,
                 zorder=plot_zorder
             )
