@@ -1,5 +1,4 @@
-mkdir train_models/data
-cd train_models/data
+cd data
 
 # Download files
 gdown 1k_PPQV3VJT44hz02CcnbqPstjQo70vGr # PlantNet-300K (0.42 GB)
@@ -14,4 +13,4 @@ unzip plantnet-trunc.zip
 unzip inaturalist.zip
 unzip inaturalist-trunc.zip
 unzip focal_loss.zip
-cd ../.. 
+cd ..
