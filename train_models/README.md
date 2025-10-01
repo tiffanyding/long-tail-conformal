@@ -1,3 +1,5 @@
+
+
 To train the models, you must first download the datasets
 
 ## Downloading Pl@ntNet-300K
@@ -64,19 +66,14 @@ To train a model using focal loss, simply add `--loss focal'. For example, to tr
         python run_train.py plantnet --loss focal
 ```
 
-## Training with a four-way data split
-
-By default, the validation dataset will not be separated from the calibration set used for the conformal procedures. This
-violates exchangeability in theory but does not lead to worse results in practice. If you want to have a clean calibration
-set, use the `--proper_cal` flag. This will separate out 30% of the validation set for validation purposes and leave the
-remaining 70% untouched for conformal calibration purposes.
-
-To train a model using focal loss, simply add `--loss focal'. For example, to train on PlantNet using the focal loss, run
-
-```
-        python run_train.py plantnet --loss focal
-```
-
 ## Training all models for paper
 
 Activate `train-env`, then run `sh train_all.sh`.
+
+## Downloading our trained weights
+
+If you want to run the trained ResNet-50s without doing the training yourself, you can download the model weights for all six models (two for full datasets, two for truncated datasets, and two for full datasets with focal loss) by running:
+```
+gdown 1tS-M-4IYyCGMeIxxyrgx2-XCZgdvw18S 
+unzip models.zip
+```
