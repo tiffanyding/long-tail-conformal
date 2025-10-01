@@ -1,14 +1,17 @@
-cd data
+mkdir train_models/data
+cd train_models/data
 
 # Download files
-gdown 1sNuOAYY-JzaSvdIGRDeE0jR9nTlDekvp # PlantNet (0.52 GB)
-gdown 1YPiC1tN7t_LD_72dt47c9UDHaWx-H9zJ # Truncated PlantNet (0.15 GB)
-gdown 1YedkBoqQtnU0wKuH7yUfdCTQrYp5h5uX # iNaturalist (5.86 GB)
-gdown 1FH3MEtIUpGeWRbFTKGkvwTHSXDhLfTAu # Truncated iNaturalist (0.68 GB)
+gdown 1k_PPQV3VJT44hz02CcnbqPstjQo70vGr # PlantNet-300K (0.42 GB)
+gdown 1W8R8Jj2bhS2PbR-3X9vEw-WkanbOk6mq # iNaturalist-2018 (4.64 GB)
+gdown 1a0SF6xbMDwxmAde2VgBoP4q_qYX2hslm # PlantNet-300K-truncated  (0.12 GB)
+gdown 1patL2K450vwiI4DGugWlCPXh-j6y6uCF # iNaturalist-2018-truncated  (0.62 GB)
+gdown 1rky60OUmL9imLBuThe4quNIVUWoqeSwp # Focal loss versions for PlantNet300K and iNaturalist-2018 (5.03 GB)
 
 # Unzip files
 unzip plantnet.zip
 unzip plantnet-trunc.zip
 unzip inaturalist.zip
 unzip inaturalist-trunc.zip
-cd ..
+unzip focal_loss.zip
+cd ../.. 
