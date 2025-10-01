@@ -166,6 +166,7 @@ datasets = [
 ]
 
 for i, (train_lab, val_lab, test_lab, name) in enumerate(datasets):
+    print(test_lab)
     plot_class_distributions(
         train_lab,
         val_lab,
