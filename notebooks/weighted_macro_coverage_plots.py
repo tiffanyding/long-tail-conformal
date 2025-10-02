@@ -16,7 +16,6 @@ import os
 import sys
 
 sys.path.append("../")
-import copy
 import pandas as pd
 import json
 import pickle
@@ -59,7 +58,9 @@ from utils.experiment_utils import (
     get_inputs_folder,
     get_outputs_folder,
     get_figs_folder,
+    get_cache_folder,
 )
+
 
 # Set up caching with faster settings
 cache_dir = os.path.expanduser("~/.cache/conformal_plots")
@@ -190,15 +191,6 @@ def load_complete_analysis_data(dataset_name, alphas, methods):
     }
 
 
-# Configure matplotlib settings only when imported
-# plt.rcParams.update({
-#     'font.size': 16, 'axes.titlesize': 18, 'axes.labelsize': 16,
-#     'legend.fontsize': 16, 'xtick.labelsize': 16, 'ytick.labelsize': 16,
-# })
-# plt.rc('text', usetex=True)
-# plt.rc('font', family='serif')
-# plt.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}'
-
 # Dataset display names
 dataset_names = {
     "plantnet": "Pl@ntNet-300K",
@@ -208,6 +200,7 @@ dataset_names = {
 }
 
 # Load paths and set dataset
+cacher_folder = get_cache_folder()
 inputs_folder = get_inputs_folder()
 results_folder = get_outputs_folder()
 fig_folder = get_figs_folder()
@@ -313,7 +306,6 @@ def _compute_wpas_results_internal(all_res, at_risk_species, num_classes, datase
     Internal function to compute WPAS results using available softmax scores from cache folder.
     """
     # Define paths to softmax and label files in cache
-    cache_folder = "/home-warm/plantnet/conformal_cache/train_models"
     cal_softmax_path = f"{cache_folder}/best-{dataset_name}-model_val_softmax.npy"
     cal_labels_path = f"{cache_folder}/best-{dataset_name}-model_val_labels.npy"
     test_softmax_path = f"{cache_folder}/best-{dataset_name}-model_test_softmax.npy"
@@ -394,7 +386,6 @@ def compute_wpas_results(all_res, at_risk_species, num_classes):
     print("Computing WPAS results from cached softmax scores...")
 
     # Define paths to softmax and label files in cache
-    cache_folder = "/home-warm/plantnet/conformal_cache/train_models"
     cal_softmax_path = f"{cache_folder}/best-{dataset}-model_val_softmax.npy"
     cal_labels_path = f"{cache_folder}/best-{dataset}-model_val_labels.npy"
     test_softmax_path = f"{cache_folder}/best-{dataset}-model_test_softmax.npy"
