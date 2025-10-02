@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2025-10-02T17:41:45.997015</dc:date>
+    <dc:date>2025-10-02T20:02:12.852952</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -37,7 +37,7 @@ z
    </g>
    <g id="line2d_1">
     <defs>
-     <path id="md69b78e348" d="M -1.25 2.5 
+     <path id="m5c74ea253b" d="M -1.25 2.5 
 L 0 1.25 
 L 1.25 2.5 
 L 2.5 1.25 
@@ -53,7 +53,7 @@ z
 " style="stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
     </defs>
     <g>
-     <use xlink:href="#md69b78e348" x="57.701967" y="49.862416" style="fill: #0000ff; fill-opacity: 0.8; stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
+     <use xlink:href="#m5c74ea253b" x="57.701967" y="49.862416" style="fill: #0000ff; fill-opacity: 0.8; stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
     </g>
    </g>
    <g id="text_1">
@@ -356,7 +356,7 @@ z
    </g>
    <g id="line2d_2">
     <defs>
-     <path id="ma74872f2fc" d="M -1.25 2.5 
+     <path id="m987e1eb45f" d="M -1.25 2.5 
 L 0 1.25 
 L 1.25 2.5 
 L 2.5 1.25 
@@ -372,7 +372,7 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#ma74872f2fc" x="57.701967" y="61.832528" style="fill: #ff0000; fill-opacity: 0.8"/>
+     <use xlink:href="#m987e1eb45f" x="57.701967" y="61.832528" style="fill: #ff0000; fill-opacity: 0.8"/>
     </g>
    </g>
    <g id="text_2">
@@ -537,14 +537,14 @@ z
    </g>
    <g id="line2d_3">
     <defs>
-     <path id="mddabef9776" d="M 0 -2.5 
+     <path id="m41d8e8ddd1" d="M 0 -2.5 
 L -2.5 2.5 
 L 2.5 2.5 
 z
 "/>
     </defs>
     <g>
-     <use xlink:href="#mddabef9776" x="57.701967" y="73.80264" style="fill: #ffa500; fill-opacity: 0.8"/>
+     <use xlink:href="#m41d8e8ddd1" x="57.701967" y="73.80264" style="fill: #ffa500; fill-opacity: 0.8"/>
     </g>
    </g>
    <g id="text_3">
@@ -637,7 +637,7 @@ z
    </g>
    <g id="line2d_4">
     <defs>
-     <path id="m46b035ff22" d="M -1.5 3 
+     <path id="m233917cfca" d="M -1.5 3 
 L 0 1.5 
 L 1.5 3 
 L 3 1.5 
@@ -653,7 +653,7 @@ z
 " style="stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
     </defs>
     <g>
-     <use xlink:href="#m46b035ff22" x="205.733892" y="49.862416" style="fill: #0000ff; fill-opacity: 0.8; stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
+     <use xlink:href="#m233917cfca" x="205.733892" y="49.862416" style="fill: #0000ff; fill-opacity: 0.8; stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
     </g>
    </g>
    <g id="text_4">
@@ -702,7 +702,7 @@ z
    </g>
    <g id="line2d_5">
     <defs>
-     <path id="mbc4b520e77" d="M -1.5 3 
+     <path id="m776b065eaa" d="M -1.5 3 
 L 0 1.5 
 L 1.5 3 
 L 3 1.5 
@@ -718,7 +718,7 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#mbc4b520e77" x="205.733892" y="61.832528" style="fill: #ff0000; fill-opacity: 0.8"/>
+     <use xlink:href="#m776b065eaa" x="205.733892" y="61.832528" style="fill: #ff0000; fill-opacity: 0.8"/>
     </g>
    </g>
    <g id="text_5">
@@ -744,14 +744,14 @@ z
    </g>
    <g id="line2d_6">
     <defs>
-     <path id="mb81a196633" d="M 0 -3 
+     <path id="mc517a5cc0f" d="M 0 -3 
 L -3 3 
 L 3 3 
 z
 "/>
     </defs>
     <g>
-     <use xlink:href="#mb81a196633" x="205.733892" y="73.80264" style="fill: #ffa500; fill-opacity: 0.8"/>
+     <use xlink:href="#mc517a5cc0f" x="205.733892" y="73.80264" style="fill: #ffa500; fill-opacity: 0.8"/>
     </g>
    </g>
    <g id="text_6">
@@ -781,7 +781,7 @@ z
    </g>
    <g id="line2d_7">
     <defs>
-     <path id="m80e10a01f5" d="M -1.75 3.5 
+     <path id="m675d4d677f" d="M -1.75 3.5 
 L 0 1.75 
 L 1.75 3.5 
 L 3.5 1.75 
@@ -797,7 +797,7 @@ z
 " style="stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
     </defs>
     <g>
-     <use xlink:href="#m80e10a01f5" x="353.765817" y="49.862416" style="fill: #0000ff; fill-opacity: 0.8; stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
+     <use xlink:href="#m675d4d677f" x="353.765817" y="49.862416" style="fill: #0000ff; fill-opacity: 0.8; stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
     </g>
    </g>
    <g id="text_7">
@@ -853,7 +853,7 @@ z
    </g>
    <g id="line2d_8">
     <defs>
-     <path id="m27de120dae" d="M -1.75 3.5 
+     <path id="mdaad28568f" d="M -1.75 3.5 
 L 0 1.75 
 L 1.75 3.5 
 L 3.5 1.75 
@@ -869,7 +869,7 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#m27de120dae" x="353.765817" y="61.832528" style="fill: #ff0000; fill-opacity: 0.8"/>
+     <use xlink:href="#mdaad28568f" x="353.765817" y="61.832528" style="fill: #ff0000; fill-opacity: 0.8"/>
     </g>
    </g>
    <g id="text_8">
@@ -896,14 +896,14 @@ z
    </g>
    <g id="line2d_9">
     <defs>
-     <path id="ma15f45cd3a" d="M 0 -3.5 
+     <path id="m4b6aee4957" d="M 0 -3.5 
 L -3.5 3.5 
 L 3.5 3.5 
 z
 "/>
     </defs>
     <g>
-     <use xlink:href="#ma15f45cd3a" x="353.765817" y="73.80264" style="fill: #ffa500; fill-opacity: 0.8"/>
+     <use xlink:href="#m4b6aee4957" x="353.765817" y="73.80264" style="fill: #ffa500; fill-opacity: 0.8"/>
     </g>
    </g>
    <g id="text_9">
@@ -934,7 +934,7 @@ z
    </g>
    <g id="line2d_10">
     <defs>
-     <path id="m2a8cbb0d63" d="M -2 4 
+     <path id="ma2524c5c09" d="M -2 4 
 L 0 2 
 L 2 4 
 L 4 2 
@@ -950,7 +950,7 @@ z
 " style="stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
     </defs>
     <g>
-     <use xlink:href="#m2a8cbb0d63" x="506.031925" y="49.862416" style="fill: #0000ff; fill-opacity: 0.8; stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
+     <use xlink:href="#ma2524c5c09" x="506.031925" y="49.862416" style="fill: #0000ff; fill-opacity: 0.8; stroke: #0000ff; stroke-opacity: 0.8; stroke-width: 0.5; stroke-linejoin: miter"/>
     </g>
    </g>
    <g id="text_10">
@@ -976,7 +976,7 @@ z
    </g>
    <g id="line2d_11">
     <defs>
-     <path id="mf336c7503c" d="M -2 4 
+     <path id="me30d13ad44" d="M -2 4 
 L 0 2 
 L 2 4 
 L 4 2 
@@ -992,7 +992,7 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#mf336c7503c" x="506.031925" y="61.832528" style="fill: #ff0000; fill-opacity: 0.8"/>
+     <use xlink:href="#me30d13ad44" x="506.031925" y="61.832528" style="fill: #ff0000; fill-opacity: 0.8"/>
     </g>
    </g>
    <g id="text_11">
@@ -1019,14 +1019,14 @@ z
    </g>
    <g id="line2d_12">
     <defs>
-     <path id="m87807af46a" d="M 0 -4 
+     <path id="mf175549704" d="M 0 -4 
 L -4 4 
 L 4 4 
 z
 "/>
     </defs>
     <g>
-     <use xlink:href="#m87807af46a" x="506.031925" y="73.80264" style="fill: #ffa500; fill-opacity: 0.8"/>
+     <use xlink:href="#mf175549704" x="506.031925" y="73.80264" style="fill: #ffa500; fill-opacity: 0.8"/>
     </g>
    </g>
    <g id="text_12">

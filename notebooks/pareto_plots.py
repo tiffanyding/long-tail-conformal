@@ -956,6 +956,7 @@ for dataset in ["plantnet", "inaturalist"]:
         show_grid=True,
         use_focal_loss=True,
         show_inset=False,
+        force_standard=True,
     )
 
 
@@ -994,7 +995,9 @@ for dataset in dataset_names.keys():
     # Patch: Do NOT show 'Standard (Softmax)' legend/curve in this context
     # This is handled by plot_set_size_vs_cov_metric: it only shows 'Standard (Softmax)'
     # if both PAS and softmax are present, which is not the case here (only softmax loaded)
-    generate_all_pareto_plots(dataset, scores, alphas, methods, show_inset=True)
+    generate_all_pareto_plots(
+        dataset, scores, alphas, methods, show_inset=True, force_standard=True
+    )
 
     # Generate focal loss plots (uncomment to use focal loss results)
     # generate_all_pareto_plots(dataset, score, alphas, methods, show_inset=True, use_focal_loss=True)
