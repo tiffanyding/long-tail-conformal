@@ -137,7 +137,9 @@ def load_one_result(
     return metrics
 
 
-def load_all_results(dataset, alphas, methods, scores=None, results_folder=None):
+def load_all_results(
+    dataset, alphas, methods, scores=None, results_folder=None, force_standard=True
+):
     if results_folder is None:
         results_folder = get_outputs_folder()
 
@@ -222,6 +224,7 @@ def plot_set_size_vs_cov_metric(
     inset_width="50%",
     inset_pad=0,
     dataset=None,
+    force_standard=False,
 ):
     # --- prepare main axis ---
     if ax is None:
@@ -308,36 +311,39 @@ def plot_set_size_vs_cov_metric(
                 zorder=plot_zorder,
             )
 
-        # Plot 'Standard' (PAS) if present
-        if "standard" in res and res["standard"].get("score_used", None) == "PAS":
-            ms = get_marker_size(base_ms, "standard")
-            plot_zorder = 10
-            formatted_label = format_legend_label("Standard", alpha, label_prefix)
-            marker_style = "X"  # filled X
-            cov_metrics = res["standard"].get("coverage_metrics", {})
-            set_metrics = res["standard"].get("set_size_metrics", {})
-            if all(
-                (v is None or (isinstance(v, list) and all(x is None for x in v)))
-                for v in cov_metrics.values()
-            ) and all(
-                (v is None or (isinstance(v, list) and all(x is None for x in v)))
-                for v in set_metrics.values()
-            ):
-                raise ValueError(
-                    f"Missing or None metrics for method 'standard (PAS)' at alpha={alpha}. Check your result files."
+        # Plot 'Standard' (PAS) if present, or if force_standard is True
+        if (
+            "standard" in res and res["standard"].get("score_used", None) == "PAS"
+        ) or force_standard:
+            if "standard" in res:
+                ms = get_marker_size(base_ms, "standard")
+                plot_zorder = 10
+                formatted_label = format_legend_label("Standard", alpha, label_prefix)
+                marker_style = "X"  # filled X
+                cov_metrics = res["standard"].get("coverage_metrics", {})
+                set_metrics = res["standard"].get("set_size_metrics", {})
+                if all(
+                    (v is None or (isinstance(v, list) and all(x is None for x in v)))
+                    for v in cov_metrics.values()
+                ) and all(
+                    (v is None or (isinstance(v, list) and all(x is None for x in v)))
+                    for v in set_metrics.values()
+                ):
+                    raise ValueError(
+                        f"Missing or None metrics for method 'standard (PAS)' at alpha={alpha}. Check your result files."
+                    )
+                ax.plot(
+                    res["standard"]["coverage_metrics"][coverage_metric],
+                    res["standard"]["set_size_metrics"][set_size_metric],
+                    linestyle="",
+                    marker=marker_style,
+                    color="blue",
+                    markersize=ms,
+                    alpha=0.8,
+                    markeredgewidth=0.5,
+                    label=formatted_label,
+                    zorder=plot_zorder,
                 )
-            ax.plot(
-                res["standard"]["coverage_metrics"][coverage_metric],
-                res["standard"]["set_size_metrics"][set_size_metric],
-                linestyle="",
-                marker=marker_style,
-                color="blue",
-                markersize=ms,
-                alpha=0.8,
-                markeredgewidth=0.5,
-                label=formatted_label,
-                zorder=plot_zorder,
-            )
 
         # core scatter methods (only if present), skip 'standard' since handled above
         for key, label, color, mk in core_methods:
@@ -709,6 +715,8 @@ def generate_all_pareto_plots(
     show_inset=None,
     legendfontsize=14,
     use_focal_loss=False,
+    extension=".pdf",
+    force_standard=False,
 ):
     """
     Generate comprehensive Pareto plots for conformal prediction methods.
@@ -829,7 +837,7 @@ def generate_all_pareto_plots(
             inset_pad=inset_pad,
             show_legend=False,
             dataset=dataset,
-            # ...existing code...
+            force_standard=force_standard,
         )
 
         ax.set_xlabel(xlabel)
@@ -861,7 +869,7 @@ def generate_all_pareto_plots(
     scores_summary = "_".join(unique_scores)  # Join unique values with an underscore
 
     # Construct the file path with the concise scores summary
-    fig_path = f"{fig_folder}/{dataset}/ALL_metrics_{dataset}_{scores_summary}{save_suffix}_pareto{inset_suffix}_NO_LEGEND_js{loss_suffix}.pdf"
+    fig_path = f"{fig_folder}/{dataset}/ALL_metrics_{dataset}_{scores_summary}{save_suffix}_pareto{inset_suffix}_NO_LEGEND_js{loss_suffix}{extension}"
     os.makedirs(f"{fig_folder}/{dataset}", exist_ok=True)
 
     # Save clean version without legend
@@ -902,7 +910,8 @@ def generate_all_pareto_plots(
 
     # Save standalone legend
     legend_path = fig_path.replace(
-        f"NO_LEGEND_js{loss_suffix}.pdf", f"LEGEND_ONLY_js{loss_suffix}.pdf"
+        f"NO_LEGEND_js{loss_suffix}{extension}",
+        f"LEGEND_ONLY_js{loss_suffix}{extension}",
     )
     legend_fig.savefig(legend_path, bbox_inches="tight", transparent=True)
 
@@ -1148,3 +1157,34 @@ for dataset in dataset_names.keys():
 
     # Generate focal loss plots with extra projections (uncomment to use focal loss results)
     # generate_all_pareto_plots(dataset, score, alphas, methods, save_suffix='_extra_projections', show_inset=False, use_focal_loss=True)cd
+
+
+# %%
+# blog version
+
+
+alphas = [0.1, 0.2, 0.05, 0.01]
+scores = ["softmax", "softmax", "softmax"]
+dataset_names = {
+    "plantnet": "Pl@ntNet-300K",
+}
+
+methods = ["standard", "classwise", "prevalence-adjusted"]
+# methods = ['standard']
+# Assign scores: 'PAS' for all except the last, which is 'softmax'
+# scores = ["PAS"] * (len(methods) - 1) + ["softmax"]
+for dataset in dataset_names.keys():
+    # Generate standard PAS plots
+    generate_all_pareto_plots(
+        dataset,
+        scores,
+        alphas,
+        methods,
+        use_focal_loss=False,
+        legendfontsize=15,
+        show_inset=False,
+        extension=".svg",
+        force_standard=True,
+    )
+
+# %%
