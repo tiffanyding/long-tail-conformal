@@ -615,45 +615,45 @@ plot_combined_analysis(
 # %%
 
 
-name1 = "Cirsium rivulare (Jacq.) All."
-name2 = "Cirsium tuberosum (L.) All."
+# name1 = "Cirsium rivulare (Jacq.) All."
+# name2 = "Cirsium tuberosum (L.) All."
 
 
-name1 = "Chaerophyllum aromaticum L."
-name2 = "Chaerophyllum temulum L."
+# name1 = "Chaerophyllum aromaticum L."
+# name2 = "Chaerophyllum temulum L."
 
 
-name1 = "Conostomium kenyense Bremek."
-name2 = "Conostomium quadrangulare (Rendle) Cufod."
+# name1 = "Conostomium kenyense Bremek."
+# name2 = "Conostomium quadrangulare (Rendle) Cufod."
 
-name1 = "Adenostyles alpina (L.) Bluff & Fingerh."
-name2 = "Adenostyles leucophylla (Willd.) Rchb."
-name3 = "Adenostyles alliariae (Gouan) A.Kern."
+# name1 = "Adenostyles alpina (L.) Bluff & Fingerh."
+# name2 = "Adenostyles leucophylla (Willd.) Rchb."
+# name3 = "Adenostyles alliariae (Gouan) A.Kern."
 
-name1 = "Zamia furfuracea L.f. ex Aiton"
-name2 = "Zamia pumila L."
+# name1 = "Zamia furfuracea L.f. ex Aiton"
+# name2 = "Zamia pumila L."
 
-name1 = "Nepenthes mirabilis (Lour.) Druce"
-name2 = "Nepenthes vieillardii Hook. f."
-name3 = "Nepenthes spp."
-name4 = "Nepenthes × neglecta Macfarl."
+# name1 = "Nepenthes mirabilis (Lour.) Druce"
+# name2 = "Nepenthes vieillardii Hook. f."
+# name3 = "Nepenthes spp."
+# name4 = "Nepenthes × neglecta Macfarl."
 
-name2 = "Cereus uruguayanus R. Kiesling"  # 1486501
-name1 = "Cereus jamacaru DC."  # 1389297
-name3 = "Cereus repandus (L.) Mill."  #  1408869
+# name2 = "Cereus uruguayanus R. Kiesling"  # 1486501
+# name1 = "Cereus jamacaru DC."  # 1389297
+# name3 = "Cereus repandus (L.) Mill."  #  1408869
 
 
-name1 = "Peperomia albovittata C. DC."  # 1643184
-# name2 = "Peperomia clusiifolia (Jacq.) Hook."  # 1643341
-# name3 = "Peperomia columella Rauh & Hutchison"  #  1643349
-name1 = "Alocasia sanderiana W.Bull"  # 1420795
+# name1 = "Peperomia albovittata C. DC."  # 1643184
+# # name2 = "Peperomia clusiifolia (Jacq.) Hook."  # 1643341
+# # name3 = "Peperomia columella Rauh & Hutchison"  #  1643349
+# name1 = "Alocasia sanderiana W.Bull"  # 1420795
 
-#################
-name1 = "Metasequoia glyptostroboides Hu & W.C.Cheng"  # 1396708
-name2 = "Metasequoia glyptostroboides Hu & W.C. Cheng"  # 1434712
-# name2 = "Zamia furfuracea L.f. ex Aiton"  # 1420896
-name2 = "Vanilla planifolia Jacks. ex Andrews"  # 1419807
-name3 = "Vanilla planifolia Jacks."  # 1404481
+# #################
+# name1 = "Metasequoia glyptostroboides Hu & W.C.Cheng"  # 1396708
+# name2 = "Metasequoia glyptostroboides Hu & W.C. Cheng"  # 1434712
+# # name2 = "Zamia furfuracea L.f. ex Aiton"  # 1420896
+# name2 = "Vanilla planifolia Jacks. ex Andrews"  # 1419807
+# name3 = "Vanilla planifolia Jacks."  # 1404481
 
 
 def show_species_info(species_name, alpha=0.1):
@@ -709,16 +709,16 @@ def show_species_info(species_name, alpha=0.1):
     print()  # Empty line for spacing
 
 
-# Example species to analyze
-species_list = [
-    "Metasequoia glyptostroboides Hu & W.C.Cheng",
-    "Vanilla planifolia Jacks. ex Andrews",
-    "Abeliophyllum distichum Nakai",
-    "Cereus uruguayanus R. Kiesling",
-]
+# Get all threatened species from the dataset
+threatened_species_list = df_to_plot[get_threatened_status(df_to_plot)][
+    "species_name"
+].tolist()
 
-# Display information for each species
-for species in species_list:
+print(f"Found {len(threatened_species_list)} threatened species in dataset")
+print("Generating markdown tables for all threatened species...\n")
+
+# Display information for each threatened species
+for species in threatened_species_list:
     show_species_info(species)
 
 # %%
