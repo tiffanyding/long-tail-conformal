@@ -228,7 +228,7 @@ results_folder = get_outputs_folder()
 
 
 def compute_train_weighted_average_set_size(
-    dataset, metrics, train_class_distr, test_labels
+    dataset, metrics, train_class_distr, test_labels, verbose=True
 ):
     """Compute average set size weighted by training class distribution."""
     num_classes = np.max(test_labels) + 1
@@ -240,26 +240,28 @@ def compute_train_weighted_average_set_size(
 
 
 def load_conformal_result(
-    dataset="plantnet", alpha=0.1, method="standard", score="softmax"
+    dataset="plantnet", alpha=0.1, method="standard", score="softmax", verbose=False
 ):
     """Load conformal prediction results using the same pattern as pareto_plots.py"""
     file_path = f"{results_folder}/{dataset}_{score}_alpha={alpha}_{method}.pkl"
     try:
         with open(file_path, "rb") as f:
             metrics = pickle.load(f)
-        print(f"✓ Loaded conformal results from: {file_path}")
+        if verbose:
+            print(f"✓ Loaded conformal results from: {file_path}")
         return metrics
     except FileNotFoundError:
-        print(f"⚠️ Could not find conformal prediction results at: {file_path}")
+        if verbose:
+            print(f"⚠️ Could not find conformal prediction results at: {file_path}")
         return None
 
 
 def compute_avg_set_sizes_per_class(
-    dataset="plantnet", alpha=0.1, method="standard", score="softmax"
+    dataset="plantnet", alpha=0.1, method="standard", score="softmax", verbose=True
 ):
     """Compute average set size per class from conformal prediction results."""
     # Load conformal results
-    metrics = load_conformal_result(dataset, alpha, method, score)
+    metrics = load_conformal_result(dataset, alpha, method, score, verbose=verbose)
     if metrics is None:
         return None
 
@@ -268,7 +270,8 @@ def compute_avg_set_sizes_per_class(
     try:
         test_labels = np.load(test_labels_path)
     except FileNotFoundError:
-        print(f"⚠️ Could not load test labels from: {test_labels_path}")
+        if verbose:
+            print(f"⚠️ Could not load test labels from: {test_labels_path}")
         return None
 
     # Compute average set size per class
@@ -281,12 +284,13 @@ def compute_avg_set_sizes_per_class(
         ]
     )
 
-    print(f"✓ Computed average set sizes for {num_classes} classes")
+    if verbose:
+        print(f"✓ Computed average set sizes for {num_classes} classes")
     return avg_size_by_class
 
 
 def compute_avg_coverage_per_class(
-    dataset="plantnet", alpha=0.1, method="standard", score="softmax"
+    dataset="plantnet", alpha=0.1, method="standard", score="softmax", verbose=True
 ):
     """Compute average coverage per class from conformal prediction results."""
     # Load conformal results
@@ -299,16 +303,18 @@ def compute_avg_coverage_per_class(
     try:
         test_labels = np.load(test_labels_path)
     except FileNotFoundError:
-        print(f"⚠️ Could not load test labels from: {test_labels_path}")
+        if verbose:
+            print(f"⚠️ Could not load test labels from: {test_labels_path}")
         return None
 
     # Get coverage per class - either from precomputed or compute from prediction sets
     if "raw_class_coverages" in metrics["coverage_metrics"]:
         # Use precomputed class coverages
         avg_coverage_by_class = metrics["coverage_metrics"]["raw_class_coverages"]
-        print(
-            f"✓ Loaded precomputed class coverages for {len(avg_coverage_by_class)} classes"
-        )
+        if verbose:
+            print(
+                f"✓ Loaded precomputed class coverages for {len(avg_coverage_by_class)} classes"
+            )
     else:
         # Compute from prediction sets if available
         if "pred_sets" in metrics:
@@ -329,13 +335,15 @@ def compute_avg_coverage_per_class(
                     for k in range(num_classes)
                 ]
             )
-            print(
-                f"✓ Computed class coverages from prediction sets for {num_classes} classes"
-            )
+            if verbose:
+                print(
+                    f"✓ Computed class coverages from prediction sets for {num_classes} classes"
+                )
         else:
-            print(
-                "⚠️ No coverage data available (neither raw_class_coverages nor pred_sets)"
-            )
+            if verbose:
+                print(
+                    "⚠️ No coverage data available (neither raw_class_coverages nor pred_sets)"
+                )
             return None
 
     return avg_coverage_by_class
@@ -603,5 +611,114 @@ plot_combined_analysis(
     methods=["standard", "classwise", "prevalence-adjusted"],
     scores=["softmax", "softmax", "softmax"],
 )
+
+# %%
+
+
+name1 = "Cirsium rivulare (Jacq.) All."
+name2 = "Cirsium tuberosum (L.) All."
+
+
+name1 = "Chaerophyllum aromaticum L."
+name2 = "Chaerophyllum temulum L."
+
+
+name1 = "Conostomium kenyense Bremek."
+name2 = "Conostomium quadrangulare (Rendle) Cufod."
+
+name1 = "Adenostyles alpina (L.) Bluff & Fingerh."
+name2 = "Adenostyles leucophylla (Willd.) Rchb."
+name3 = "Adenostyles alliariae (Gouan) A.Kern."
+
+name1 = "Zamia furfuracea L.f. ex Aiton"
+name2 = "Zamia pumila L."
+
+name1 = "Nepenthes mirabilis (Lour.) Druce"
+name2 = "Nepenthes vieillardii Hook. f."
+name3 = "Nepenthes spp."
+name4 = "Nepenthes × neglecta Macfarl."
+
+name2 = "Cereus uruguayanus R. Kiesling"  # 1486501
+name1 = "Cereus jamacaru DC."  # 1389297
+name3 = "Cereus repandus (L.) Mill."  #  1408869
+
+
+name1 = "Peperomia albovittata C. DC."  # 1643184
+# name2 = "Peperomia clusiifolia (Jacq.) Hook."  # 1643341
+# name3 = "Peperomia columella Rauh & Hutchison"  #  1643349
+name1 = "Alocasia sanderiana W.Bull"  # 1420795
+
+#################
+name1 = "Metasequoia glyptostroboides Hu & W.C.Cheng"  # 1396708
+name2 = "Metasequoia glyptostroboides Hu & W.C. Cheng"  # 1434712
+# name2 = "Zamia furfuracea L.f. ex Aiton"  # 1420896
+name2 = "Vanilla planifolia Jacks. ex Andrews"  # 1419807
+name3 = "Vanilla planifolia Jacks."  # 1404481
+
+
+def show_species_info(species_name, alpha=0.1):
+    """Display species information as markdown table."""
+
+    # Find species in dataset
+    species_mask = df_to_plot["species_name"] == species_name
+    if not species_mask.any():
+        print(f"Species '{species_name}' not found in dataset")
+        return
+
+    # Get basic info
+    species_row = df_to_plot[species_mask].iloc[0]
+    class_id = species_row["class_id"]
+    train_count = species_row["counts"]
+    iucn_status = species_row["iucn_status"]
+
+    # Get metrics for each method
+    methods = [
+        ("standard", "Standard"),
+        ("classwise", "Classwise"),
+        ("prevalence-adjusted", "Std w. PAS"),
+    ]
+
+    # Create markdown table
+    print(f"## {species_name}")
+    print(f"- **# of examples:** {train_count}")
+    print(f"- **IUCN Status:** {iucn_status}")
+    print()
+    print("| Method | Coverage | Size |")
+    print("|--------|----------|------|")
+
+    for method_key, method_display in methods:
+        # Get coverage and set size data
+        coverage_data = compute_avg_coverage_per_class(
+            "plantnet", alpha, method_key, "softmax", verbose=False
+        )
+        setsize_data = compute_avg_set_sizes_per_class(
+            "plantnet", alpha, method_key, "softmax", verbose=False
+        )
+
+        if (
+            coverage_data is not None
+            and setsize_data is not None
+            and class_id < len(coverage_data)
+        ):
+            coverage = coverage_data[class_id]
+            setsize = setsize_data[class_id]
+            print(f"| {method_display} | {coverage:.2f} | {setsize:.1f} |")
+        else:
+            print(f"| {method_display} | N/A | N/A |")
+
+    print()  # Empty line for spacing
+
+
+# Example species to analyze
+species_list = [
+    "Metasequoia glyptostroboides Hu & W.C.Cheng",
+    "Vanilla planifolia Jacks. ex Andrews",
+    "Abeliophyllum distichum Nakai",
+    "Cereus uruguayanus R. Kiesling",
+]
+
+# Display information for each species
+for species in species_list:
+    show_species_info(species)
 
 # %%
