@@ -820,8 +820,9 @@ def plot_results(
     os.makedirs(f"{fig_folder}/weighted_macro_coverage", exist_ok=True)
     fig_path = f"{fig_folder}/weighted_macro_coverage/{dataset}_conformal_comparison_NO_LEGEND_js.pdf"
 
-    # Save clean version without legend
+    # Save clean version without legend (both SVG and PDF)
     plt.savefig(fig_path, bbox_inches="tight")
+    plt.savefig(fig_path.replace(".pdf", ".svg"), bbox_inches="tight")
 
     # Get handles and labels from the first axis for legend
     handles, labels = axes[0].get_legend_handles_labels()
@@ -837,10 +838,13 @@ def plot_results(
         frameon=True,
     )
 
-    # Save version with legend (for reference)
+    # Save version with legend (for reference) - SVG, PDF, and JPG
     plt.subplots_adjust(bottom=0.22)  # adjust as needed for space
     plt.savefig(
         fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.pdf"), bbox_inches="tight"
+    )
+    plt.savefig(
+        fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.svg"), bbox_inches="tight"
     )
     plt.savefig(
         fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.jpg"), bbox_inches="tight"
@@ -858,16 +862,17 @@ def plot_results(
     # Remove axes from legend figure
     legend_fig.gca().set_axis_off()
 
-    # Save standalone legend
+    # Save standalone legend (both PDF and SVG)
     legend_path = fig_path.replace("NO_LEGEND_js.pdf", "LEGEND_ONLY_js.pdf")
     legend_fig.savefig(legend_path, bbox_inches="tight", transparent=True)
+    legend_svg_path = legend_path.replace(".pdf", ".svg")
+    legend_fig.savefig(legend_svg_path, bbox_inches="tight", transparent=True)
 
-    print(f"✅ Saved three versions:")
-    print(f"   - Main plot: {fig_path}")
-    print(
-        f'   - With legend: {fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.pdf")}'
-    )
-    print(f"   - Legend only: {legend_path}")
+    print("✅ Saved plots in both SVG and PDF formats:")
+    print(f"   - Main plot: {fig_path} (+ SVG)")
+    with_legend_path = fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.pdf")
+    print(f"   - With legend: {with_legend_path} (+ SVG)")
+    print(f"   - Legend only: {legend_path} (+ SVG)")
 
     # Close the legend figure to free memory
     plt.close(legend_fig)
