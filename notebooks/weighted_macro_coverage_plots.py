@@ -820,9 +820,8 @@ def plot_results(
     os.makedirs(f"{fig_folder}/weighted_macro_coverage", exist_ok=True)
     fig_path = f"{fig_folder}/weighted_macro_coverage/{dataset}_conformal_comparison_NO_LEGEND_js.pdf"
 
-    # Save clean version without legend (both SVG and PDF)
+    # Save clean version without legend
     plt.savefig(fig_path, bbox_inches="tight")
-    plt.savefig(fig_path.replace(".pdf", ".svg"), bbox_inches="tight")
 
     # Get handles and labels from the first axis for legend
     handles, labels = axes[0].get_legend_handles_labels()
@@ -838,13 +837,10 @@ def plot_results(
         frameon=True,
     )
 
-    # Save version with legend (for reference) - SVG, PDF, and JPG
+    # Save version with legend (for reference)
     plt.subplots_adjust(bottom=0.22)  # adjust as needed for space
     plt.savefig(
         fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.pdf"), bbox_inches="tight"
-    )
-    plt.savefig(
-        fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.svg"), bbox_inches="tight"
     )
     plt.savefig(
         fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.jpg"), bbox_inches="tight"
@@ -862,21 +858,23 @@ def plot_results(
     # Remove axes from legend figure
     legend_fig.gca().set_axis_off()
 
-    # Save standalone legend (both PDF and SVG)
+    # Save standalone legend
     legend_path = fig_path.replace("NO_LEGEND_js.pdf", "LEGEND_ONLY_js.pdf")
     legend_fig.savefig(legend_path, bbox_inches="tight", transparent=True)
-    legend_svg_path = legend_path.replace(".pdf", ".svg")
-    legend_fig.savefig(legend_svg_path, bbox_inches="tight", transparent=True)
 
-    print("✅ Saved plots in both SVG and PDF formats:")
-    print(f"   - Main plot: {fig_path} (+ SVG)")
-    with_legend_path = fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.pdf")
-    print(f"   - With legend: {with_legend_path} (+ SVG)")
-    print(f"   - Legend only: {legend_path} (+ SVG)")
+    print(f"✅ Saved three versions:")
+    print(f"   - Main plot: {fig_path}")
+    print(
+        f'   - With legend: {fig_path.replace("NO_LEGEND_js.pdf", "WITH_LEGEND_js.pdf")}'
+    )
+    print(f"   - Legend only: {legend_path}")
 
     # Close the legend figure to free memory
     plt.close(legend_fig)
     plt.show()
+
+    # Export data to CSV files
+    export_data_to_csv(all_res, at_risk_species, alphas, num_classes, dataset)
 
     # Display summary
     print("\n✅ Analysis complete! The plot shows:")
@@ -890,6 +888,115 @@ def plot_results(
     print(
         "   - WPAS successfully improves coverage for at-risk species while maintaining reasonable set sizes"
     )
+
+
+def export_data_to_csv(all_res, at_risk_species, alphas, num_classes, dataset):
+    """Export the plotted data to CSV files for reuse in future visualizations."""
+
+    # Create output directory
+    os.makedirs(f"{fig_folder}/weighted_macro_coverage", exist_ok=True)
+
+    # Methods to export (same as display_methods in plot_results)
+    export_methods = [
+        "standard",
+        "prevalence-adjusted",
+        "WPAS ($\\gamma=$ 1)",
+        "WPAS ($\\gamma=$ 10)",
+        "WPAS ($\\gamma=$ 100)",
+        "WPAS ($\\gamma=$ 1000)",
+    ]
+
+    # Prepare data for CSV export
+    csv_data = []
+
+    for alpha in alphas:
+        alpha_key = f"alpha={alpha}"
+        if alpha_key in all_res:
+            for method in export_methods:
+                if method in all_res[alpha_key]:
+                    res = all_res[alpha_key][method]
+
+                    # Calculate the same metrics as in the plot
+                    other_species = np.setdiff1d(
+                        np.arange(num_classes), at_risk_species
+                    )
+
+                    # At-risk average coverage
+                    at_risk_avg_cov = np.mean(
+                        res["coverage_metrics"]["raw_class_coverages"][at_risk_species]
+                    )
+
+                    # Not-at-risk average coverage
+                    not_at_risk_avg_cov = np.mean(
+                        res["coverage_metrics"]["raw_class_coverages"][other_species]
+                    )
+
+                    # Macro-coverage
+                    macro_cov = np.mean(res["coverage_metrics"]["raw_class_coverages"])
+
+                    # Marginal coverage
+                    marginal_cov = res["coverage_metrics"]["marginal_cov"]
+
+                    # Average set size
+                    avg_set_size = res["set_size_metrics"]["mean"]
+
+                    csv_data.append(
+                        {
+                            "dataset": dataset,
+                            "method": method,
+                            "alpha": alpha,
+                            "at_risk_avg_coverage": at_risk_avg_cov,
+                            "not_at_risk_avg_coverage": not_at_risk_avg_cov,
+                            "macro_coverage": macro_cov,
+                            "marginal_coverage": marginal_cov,
+                            "avg_set_size": avg_set_size,
+                            "num_at_risk_species": len(at_risk_species),
+                            "num_total_classes": num_classes,
+                        }
+                    )
+
+    # Create DataFrame and save to CSV
+    df_results = pd.DataFrame(csv_data)
+    csv_path = (
+        f"{fig_folder}/weighted_macro_coverage/{dataset}_conformal_comparison_data.csv"
+    )
+    df_results.to_csv(csv_path, index=False)
+
+    # Also export detailed per-class coverage data
+    detailed_data = []
+    for alpha in alphas:
+        alpha_key = f"alpha={alpha}"
+        if alpha_key in all_res:
+            for method in export_methods:
+                if method in all_res[alpha_key]:
+                    res = all_res[alpha_key][method]
+                    class_coverages = res["coverage_metrics"]["raw_class_coverages"]
+
+                    for class_id, coverage in enumerate(class_coverages):
+                        is_at_risk = class_id in at_risk_species
+                        detailed_data.append(
+                            {
+                                "dataset": dataset,
+                                "method": method,
+                                "alpha": alpha,
+                                "class_id": class_id,
+                                "coverage": coverage,
+                                "is_at_risk": is_at_risk,
+                            }
+                        )
+
+    # Save detailed per-class data
+    df_detailed = pd.DataFrame(detailed_data)
+    detailed_csv_path = (
+        f"{fig_folder}/weighted_macro_coverage/{dataset}_per_class_coverage_data.csv"
+    )
+    df_detailed.to_csv(detailed_csv_path, index=False)
+
+    print(f"\n📊 CSV data exported:")
+    print(f"   - Summary data: {csv_path}")
+    print(f"   - Per-class data: {detailed_csv_path}")
+
+    return csv_path, detailed_csv_path
 
 
 def main():

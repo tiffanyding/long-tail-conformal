@@ -705,6 +705,222 @@ def get_inset_lims(dataset, coverage_metric):
     return *xlims[dataset][coverage_metric], *ylims[dataset]
 
 
+def export_pareto_data_to_csv(all_res, dataset, scores_summary, save_suffix, 
+                             fig_folder, loss_suffix, alphas, set_size_metric):
+    """
+    Export all pareto plot data to CSV files for later use with plotly or other tools.
+    
+    Parameters:
+    -----------
+    all_res : dict
+        Results dictionary from load_all_results
+    dataset : str
+        Dataset name
+    scores_summary : str
+        Summary string of scores used
+    save_suffix : str
+        Additional suffix for filename
+    fig_folder : str
+        Folder to save CSV files
+    loss_suffix : str
+        Loss type suffix
+    alphas : list
+        List of alpha values
+    set_size_metric : str
+        Set size metric used ('mean' or 'train_mean')
+    """
+    # Prepare data for CSV export
+    csv_records = []
+    
+    # Coverage metrics to export
+    cov_metrics = ["cov_below50", "undercov_gap", "macro_cov", "train_marginal_cov"]
+    
+    for alpha in alphas:
+        res = all_res.get(f"alpha={alpha}", {})
+        
+        for method_key, method_data in res.items():
+            # Extract base method name and parameters
+            if method_key.startswith("cvx-cw_weight="):
+                method_name = "Interp-Q"
+                weight = method_key.split("=")[1]
+                method_params = f"weight={weight}"
+            elif method_key.startswith("fuzzy-"):
+                parts = method_key.split("-")
+                if len(parts) >= 3:
+                    method_name = f"Fuzzy-{parts[1]}" 
+                    bandwidth = parts[2]
+                    method_params = f"bandwidth={bandwidth}"
+                else:
+                    method_name = method_key
+                    method_params = ""
+            elif method_key == "standard_softmax":
+                method_name = "Standard"
+                method_params = "score=softmax"
+            elif method_key == "standard":
+                method_name = "Standard" 
+                score_used = method_data.get("score_used", "PAS")
+                method_params = f"score={score_used}"
+            else:
+                method_name = method_key
+                method_params = ""
+            
+            # Create base record
+            record = {
+                "dataset": dataset,
+                "alpha": alpha,
+                "method": method_name,
+                "method_key": method_key,
+                "method_params": method_params,
+                "set_size_metric_type": set_size_metric
+            }
+            
+            # Add coverage metrics
+            coverage_data = method_data.get("coverage_metrics", {})
+            for cov_metric in cov_metrics:
+                record[cov_metric] = coverage_data.get(cov_metric, None)
+            
+            # Add set size metric
+            set_size_data = method_data.get("set_size_metrics", {})
+            record["set_size"] = set_size_data.get(set_size_metric, None)
+            
+            csv_records.append(record)
+    
+    # Convert to DataFrame
+    df = pd.DataFrame(csv_records)
+    
+    # Generate CSV filename
+    csv_path = f"{fig_folder}/{dataset}/ALL_metrics_{dataset}_{scores_summary}{save_suffix}_pareto_DATA{loss_suffix}.csv"
+    
+    # Save CSV
+    os.makedirs(f"{fig_folder}/{dataset}", exist_ok=True)
+    df.to_csv(csv_path, index=False)
+    
+    print(f"   - Data CSV: {csv_path}")
+    
+    return csv_path
+
+
+def export_detailed_pareto_data_to_csv(all_res, dataset, scores_summary, save_suffix, 
+                                     fig_folder, loss_suffix, alphas, set_size_metric,
+                                     core_methods):
+    """
+    Export detailed pareto plot data to separate CSV files for each coverage metric.
+    This creates files that are optimized for plotly reconstruction.
+    
+    Parameters:
+    -----------
+    all_res : dict
+        Results dictionary from load_all_results
+    dataset : str
+        Dataset name
+    scores_summary : str
+        Summary string of scores used
+    save_suffix : str
+        Additional suffix for filename
+    fig_folder : str
+        Folder to save CSV files
+    loss_suffix : str
+        Loss type suffix
+    alphas : list
+        List of alpha values
+    set_size_metric : str
+        Set size metric used ('mean' or 'train_mean')
+    core_methods : list
+        List of core methods for styling info
+    """
+    # Coverage metrics to export
+    cov_metrics = ["cov_below50", "undercov_gap", "macro_cov", "train_marginal_cov"]
+    cov_metric_names = ["FracBelow50%", "UnderCovGap", "MacroCov", "MarginalCov"]
+    
+    # Create method styling lookup
+    method_styles = {}
+    for key, label, color, marker in core_methods:
+        method_styles[key] = {
+            "display_name": label,
+            "color": color,
+            "marker": marker
+        }
+    
+    # Additional styling for other methods
+    method_styles.update({
+        "standard_softmax": {"display_name": "Standard (Softmax)", "color": "blue", "marker": "p"},
+        "clustered": {"display_name": "Clustered", "color": "purple", "marker": "P"},
+    })
+    
+    for cov_idx, (coverage_metric, metric_name) in enumerate(zip(cov_metrics, cov_metric_names)):
+        csv_records = []
+        
+        for alpha in alphas:
+            res = all_res.get(f"alpha={alpha}", {})
+            
+            for method_key, method_data in res.items():
+                coverage_data = method_data.get("coverage_metrics", {})
+                set_size_data = method_data.get("set_size_metrics", {})
+                
+                x_val = coverage_data.get(coverage_metric, None)
+                y_val = set_size_data.get(set_size_metric, None)
+                
+                if x_val is not None and y_val is not None:
+                    # Get styling info
+                    style_info = method_styles.get(method_key, {
+                        "display_name": method_key,
+                        "color": "gray", 
+                        "marker": "o"
+                    })
+                    
+                    # Determine method category and parameters
+                    if method_key.startswith("cvx-cw_weight="):
+                        method_category = "Interp-Q"
+                        weight = float(method_key.split("=")[1])
+                        method_params = f"weight={weight}"
+                        # Use transparency based on weight for convex methods
+                        alpha_transparency = min(0.3 + 0.7 * weight, 1.0)
+                    elif method_key.startswith("fuzzy-"):
+                        parts = method_key.split("-")
+                        method_category = f"Fuzzy-{parts[1]}" if len(parts) >= 2 else "Fuzzy"
+                        bandwidth = parts[2] if len(parts) >= 3 else "unknown"
+                        method_params = f"bandwidth={bandwidth}"
+                        alpha_transparency = 0.5  # Default for fuzzy methods
+                    else:
+                        method_category = style_info["display_name"]
+                        method_params = ""
+                        alpha_transparency = 0.8  # Default transparency
+                    
+                    record = {
+                        "dataset": dataset,
+                        "coverage_metric": coverage_metric,
+                        "coverage_metric_name": metric_name,
+                        "alpha": alpha,
+                        "method_key": method_key,
+                        "method_category": method_category,
+                        "method_display_name": style_info["display_name"],
+                        "method_params": method_params,
+                        "x_value": x_val,
+                        "y_value": y_val,
+                        "color": style_info["color"],
+                        "marker": style_info["marker"],
+                        "alpha_transparency": alpha_transparency,
+                        "set_size_metric_type": set_size_metric
+                    }
+                    
+                    csv_records.append(record)
+        
+        # Convert to DataFrame and save
+        if csv_records:
+            df = pd.DataFrame(csv_records)
+            
+            # Generate CSV filename for this coverage metric
+            csv_path = f"{fig_folder}/{dataset}/DETAILED_{dataset}_{scores_summary}{save_suffix}_{coverage_metric}_pareto_DATA{loss_suffix}.csv"
+            
+            # Save CSV
+            os.makedirs(f"{fig_folder}/{dataset}", exist_ok=True)
+            df.to_csv(csv_path, index=False)
+            
+            print(f"   - Detailed CSV ({metric_name}): {csv_path}")
+    
+    return True
+
+
 def generate_all_pareto_plots(
     dataset,
     score,
@@ -791,6 +1007,15 @@ def generate_all_pareto_plots(
     set_size_metric = "train_mean" if dataset.endswith("-trunc") else "mean"
     print(f"{set_size_metric=}")
 
+    # Define core methods for styling consistency
+    core_methods = [
+        ("standard", "Standard", "blue", "X"),
+        ("classwise", "Classwise", "red", "X"),
+        ("classwise-exact", "Exact Classwise", "red", "d"),
+        ("clustered", "Clustered", "purple", "P"),
+        ("prevalence-adjusted", "Standard w. PAS", "orange", "^"),
+    ]
+
     cov_metrics = ["cov_below50", "undercov_gap", "macro_cov", "train_marginal_cov"]
     cov_metric_names = ["FracBelow50$\\%$", "UnderCovGap", "MacroCov", "MarginalCov"]
     fig, axes = plt.subplots(1, len(cov_metrics), figsize=(13, 3), sharey=True)
@@ -876,17 +1101,16 @@ def generate_all_pareto_plots(
     plt.savefig(fig_path, bbox_inches="tight")
 
     # Create legend for standalone legend generation (but don't save WITH_LEGEND version)
-    if len(alphas) > 1:
-        legend = axes[0].legend(
-            ncols=len(alphas),
-            loc="upper center",
-            bbox_to_anchor=(2.0, -0.08),
-            fontsize=8,
-        )
-    else:
-        legend = axes[0].legend(
-            ncols=3, loc="upper center", bbox_to_anchor=(2.0, -0.08), fontsize=8
-        )
+    # Sort alphas in descending float order for legend columns
+    sorted_alphas = sorted(alphas, reverse=True)
+    ncols_legend = len(sorted_alphas) if len(sorted_alphas) > 1 else 3
+
+    legend = axes[0].legend(
+        ncols=ncols_legend,
+        loc="upper center",
+        bbox_to_anchor=(2.0, -0.08),
+        fontsize=8,
+    )
 
     # Create standalone legend PDF
     legend_fig = plt.figure(figsize=(12, 2))  # Wide figure for horizontal legend
@@ -895,15 +1119,9 @@ def generate_all_pareto_plots(
     # Get legend handles and labels from the main plot
     handles, labels = axes[0].get_legend_handles_labels()
 
-    # Create standalone legend
-    if len(alphas) > 1:
-        legend_standalone = legend_fig.legend(
-            handles, labels, ncol=len(alphas), loc="center", fontsize=8, frameon=True
-        )
-    else:
-        legend_standalone = legend_fig.legend(
-            handles, labels, ncol=3, loc="center", fontsize=8, frameon=True
-        )
+    legend_standalone = legend_fig.legend(
+        handles, labels, ncol=ncols_legend, loc="center", fontsize=8, frameon=True
+    )
 
     # Remove axes from legend figure
     legend_fig.gca().set_axis_off()
@@ -915,9 +1133,36 @@ def generate_all_pareto_plots(
     )
     legend_fig.savefig(legend_path, bbox_inches="tight", transparent=True)
 
-    print(f"✅ Saved two versions:")
+    # Export data to CSV for later use with plotly
+    csv_path = export_pareto_data_to_csv(
+        all_res=all_res,
+        dataset=dataset,
+        scores_summary=scores_summary,
+        save_suffix=save_suffix,
+        fig_folder=fig_folder,
+        loss_suffix=loss_suffix,
+        alphas=alphas,
+        set_size_metric=set_size_metric
+    )
+    
+    # Export detailed data to separate CSV files for each coverage metric
+    export_detailed_pareto_data_to_csv(
+        all_res=all_res,
+        dataset=dataset,
+        scores_summary=scores_summary,
+        save_suffix=save_suffix,
+        fig_folder=fig_folder,
+        loss_suffix=loss_suffix,
+        alphas=alphas,
+        set_size_metric=set_size_metric,
+        core_methods=core_methods
+    )
+
+    print(f"✅ Saved plot files and CSV data:")
     print(f"   - Main plot: {fig_path}")
     print(f"   - Legend only: {legend_path}")
+    print(f"   - Summary CSV: {csv_path}")
+    print(f"   - Detailed CSVs: One file per coverage metric")
 
     # Close the legend figure to free memory
     plt.close(legend_fig)
