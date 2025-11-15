@@ -112,7 +112,8 @@ def compute_class_cond_decision_accuracy_for_method(res, method, labels):
 # %%
 
 
-datasets = ["plantnet-trunc", "inaturalist-trunc"]
+datasets = ["plantnet", "inaturalist", "plantnet-trunc", "inaturalist-trunc"]
+# datasets = ["plantnet-trunc", "inaturalist-trunc"]
 methods = ["classwise", "standard", "prevalence-adjusted"]
 gamma_levels = [0.0, 0.25, 0.5, 0.75, 1.0]
 method_colors = {
@@ -194,6 +195,7 @@ for method in methods:
             [0],
             color=method_colors[method],
             lw=5,
+            linestyle=method_style[method],
             label=method_to_name[method],
         )
     )

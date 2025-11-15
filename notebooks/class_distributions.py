@@ -194,3 +194,38 @@ axes[3].legend(
 plt.tight_layout(pad=1.2, w_pad=0.3, rect=[0, 0.05, 1, 1])
 plt.savefig(f"{fig_folder}/all_class_distributions.pdf", bbox_inches="tight")
 plt.show()
+
+
+# Provide proportion of classes with less than target_test_max samples in test set for non-truncated datasets.
+target_test_max = 10  # Can be changed to 3, 10, or any other value
+
+print("\n" + "=" * 80)
+print(
+    f"Classes with less than {target_test_max} samples in TEST set (non-truncated datasets)"
+)
+print("=" * 80)
+
+for train_lab, val_lab, test_lab, name in [
+    (pn_train_labels, pn_val_labels, pn_test_labels, "plantnet"),
+    (inat_train_labels, inat_val_labels, inat_test_labels, "inaturalist"),
+]:
+    # Compute test counts per class
+    test_ctr = Counter(test_lab)
+
+    # Get all classes present in train (which should include all classes)
+    train_ctr = Counter(train_lab)
+    all_classes = train_ctr.keys()
+
+    # Count classes with less than target_test_max samples in test
+    classes_lt_target = sum(
+        1 for class_id in all_classes if test_ctr.get(class_id, 0) < target_test_max
+    )
+    total_classes = len(all_classes)
+    proportion = classes_lt_target / total_classes if total_classes > 0 else 0
+
+    print(f"\n{dataset_names[name]}:")
+    print(f"  Total classes: {total_classes}")
+    print(f"  Classes with < {target_test_max} samples in test: {classes_lt_target}")
+    print(f"  Proportion: {proportion:.4f} ({proportion*100:.2f}%)")
+
+print("\n" + "=" * 80)
