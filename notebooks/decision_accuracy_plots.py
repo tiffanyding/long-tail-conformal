@@ -142,9 +142,10 @@ for dataset_name in datasets:
     test_labels = np.load(f"{inputs_folder}/best-{dataset_name}-model_test_labels.npy")
 
     num_classes = np.max(test_labels) + 1
+    alpha = 0.1  # Store alpha value for the horizontal line
     res = {}
     for method in methods:
-        res[method] = load_metrics(dataset_name, 0.1, method)
+        res[method] = load_metrics(dataset_name, alpha, method)
     for method in methods:
         dec_acc = compute_class_cond_decision_accuracy_for_method(
             res, method, test_labels
@@ -171,6 +172,27 @@ for dataset_name in datasets:
                 linestyle=method_style[method],
                 label=method_to_name[method],
                 solid_capstyle="round",
+            )
+        # Add horizontal line at y=alpha level
+        ax.axhline(
+            y=1 - alpha,
+            color="gray",
+            linewidth=1.5,
+            linestyle="--",
+            alpha=0.4,
+            zorder=1,
+        )
+        # Add text label on the left of the first subplot only
+        if col == 0:
+            ax.text(
+                0.95,
+                (1 - alpha) * 1.1,
+                f"$1-\\alpha$",
+                transform=ax.get_yaxis_transform(),
+                fontsize=20,
+                va="center",
+                ha="right",
+                color="gray",
             )
         ax.set_xlim(0, num_classes - 1)
         ax.spines[["right", "top"]].set_visible(False)
