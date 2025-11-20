@@ -204,6 +204,7 @@ def load_all_results(
                     score=method_score,
                     results_folder=results_folder,
                 )
+
         all_res[f"alpha={alpha}"] = res
 
     return all_res
@@ -264,8 +265,8 @@ def plot_set_size_vs_cov_metric(
         ("classwise", "Classwise", "red", "X"),
         ("classwise-exact", "Exact Classwise", "red", "d"),
         ("clustered", "Clustered", "purple", "P"),
+        ("rc3p", "RC3P", "green", "o"),
         ("prevalence-adjusted", "Standard w. PAS", "orange", "^"),
-        ("rc3p", "RC3P", "green", "s"),  # Added RC3P with distinctive style
         # ('standard',             'Standard (Softmax)',       'blue',      'p'),
     ]
 
@@ -348,6 +349,12 @@ def plot_set_size_vs_cov_metric(
 
         # core scatter methods (only if present), skip 'standard' since handled above
         for key, label, color, mk in core_methods:
+            fillstyle = 'none' if key == 'rc3p' else 'full'
+            # if key == 'rc3p':
+            #     # Print the coverage metric
+            #     print(f"RC3P alpha={alpha}, {coverage_metric} = {res[key]['coverage_metrics'][coverage_metric]}")
+            # if key == 'rc3p' and coverage_metric == 'train_marginal_cov':
+            #     pdb.set_trace()
             if key == "standard":
                 continue
             if key in res:
@@ -370,11 +377,12 @@ def plot_set_size_vs_cov_metric(
                     res[key]["coverage_metrics"][coverage_metric],
                     res[key]["set_size_metrics"][set_size_metric],
                     linestyle="",
+                    fillstyle=fillstyle,
                     marker=mk,
                     color=color,
                     markersize=ms,
                     alpha=0.8,
-                    markeredgewidth=0,
+                    markeredgewidth=1 if key == 'rc3p' else 0, 
                     label=formatted_label,
                     zorder=plot_zorder,
                 )
@@ -1192,20 +1200,21 @@ methods = ["standard", "classwise", "clustered", "prevalence-adjusted"] + [
     # [f'fuzzy-RErarity-{bw}' for bw in rarity_bandwidths] +\
 ]
 
-for dataset in ["plantnet", "inaturalist"]:
-    # Generate standard plots (using default softmax results)
-    generate_all_pareto_plots(
-        dataset,
-        score,
-        alphas,
-        methods,
-        save_suffix="",
-        legendfontsize=14,
-        show_grid=True,
-        use_focal_loss=True,
-        show_inset=False,
-        force_standard=True,
-    )
+# TEMP: COMMENTED OUT
+# for dataset in ["plantnet", "inaturalist"]:
+#     # Generate standard plots (using default softmax results)
+#     generate_all_pareto_plots(
+#         dataset,
+#         score,
+#         alphas,
+#         methods,
+#         save_suffix="",
+#         legendfontsize=14,
+#         show_grid=True,
+#         use_focal_loss=True,
+#         show_inset=False,
+#         force_standard=True,
+#     )
 
 
 # %%
@@ -1249,7 +1258,9 @@ for dataset in dataset_names.keys():
     )
 
     # Generate focal loss plots (uncomment to use focal loss results)
-    # generate_all_pareto_plots(dataset, score, alphas, methods, show_inset=True, use_focal_loss=True)
+    # If dataset ends in '-trunc', skip
+    if not dataset.endswith("-trunc"):
+        generate_all_pareto_plots(dataset, score, alphas, methods, show_inset=True, use_focal_loss=True)
 
 # %%
 ## Generate csv's of metrics
@@ -1416,29 +1427,29 @@ for dataset in dataset_names.keys():
 # blog version
 
 
-alphas = [0.1, 0.2, 0.05, 0.01]
-scores = ["softmax", "softmax", "softmax"]
-dataset_names = {
-    "plantnet": "Pl@ntNet-300K",
-}
+# alphas = [0.1, 0.2, 0.05, 0.01]
+# scores = ["softmax", "softmax", "softmax"]
+# dataset_names = {
+#     "plantnet": "Pl@ntNet-300K",
+# }
 
-methods = ["standard", "classwise", "prevalence-adjusted"]
-# methods = ['standard']
-# Assign scores: 'PAS' for all except the last, which is 'softmax'
-# scores = ["PAS"] * (len(methods) - 1) + ["softmax"]
-for dataset in dataset_names.keys():
-    # Generate standard PAS plots
-    generate_all_pareto_plots(
-        dataset,
-        scores,
-        alphas,
-        methods,
-        use_focal_loss=False,
-        legendfontsize=15,
-        show_inset=False,
-        extension=".svg",
-        force_standard=True,
-    )
+# methods = ["standard", "classwise", "prevalence-adjusted"]
+# # methods = ['standard']
+# # Assign scores: 'PAS' for all except the last, which is 'softmax'
+# # scores = ["PAS"] * (len(methods) - 1) + ["softmax"]
+# for dataset in dataset_names.keys():
+#     # Generate standard PAS plots
+#     generate_all_pareto_plots(
+#         dataset,
+#         scores,
+#         alphas,
+#         methods,
+#         use_focal_loss=False,
+#         legendfontsize=15,
+#         show_inset=False,
+#         extension=".svg",
+#         force_standard=True,
+#     )
 
 
 

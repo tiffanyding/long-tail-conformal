@@ -1065,12 +1065,11 @@ def compute_rc3p_params(cal_softmax_scores,
         # Use Option II from Shi et al., 2024 to select k_hat: smallest t in 1..num_classes
         # such that top-t error <= alpha. ranks_k is 0-indexed (0 = top-1), so
         # top-t error = P(rank >= t) when using 0-indexed ranks.
-        k_hat = num_classes
-        for t in range(1, num_classes + 1):
+        k_hat = 0
+        for t in range(num_classes):
             top_t_error = np.mean(ranks_k > t)
-            if top_t_error <= alpha:
+            if top_t_error < alpha:
                 k_hat = t
-            else:
                 break
 
         # Sanity check: ensure the chosen k_hat meets the required bound
@@ -1197,8 +1196,7 @@ def rc3p(cal_softmax_scores,
         k_hats
     )
     cal_coverage_metrics, _ = compute_all_metrics(cal_labels, cal_preds, alpha)
-    print(f'******** rc3p calibration set marginal coverage: {cal_coverage_metrics["marginal_coverage"]:.3f}')
-    
+    print(f'******** rc3p calibration set marginal coverage: {cal_coverage_metrics["marginal_cov"]:.3f}')
 
     rc3p_preds = create_rc3p_prediction_sets(
         test_softmax_scores,
@@ -1208,6 +1206,9 @@ def rc3p(cal_softmax_scores,
     )
 
     coverage_metrics, set_size_metrics = compute_all_metrics(test_labels, rc3p_preds, alpha)
+
+    print(f'******** rc3p test set marginal coverage: {coverage_metrics["marginal_cov"]:.3f}')
+
 
     return (q_hats_rc3p, k_hats, alpha_hats), rc3p_preds, coverage_metrics, set_size_metrics
 
