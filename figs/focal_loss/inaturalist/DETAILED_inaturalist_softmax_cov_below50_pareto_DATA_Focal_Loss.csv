@@ -1,0 +1,57 @@
+dataset,coverage_metric,coverage_metric_name,alpha,method_key,method_category,method_display_name,method_params,x_value,y_value,color,marker,alpha_transparency,set_size_metric_type
+inaturalist,cov_below50,FracBelow50%,0.2,standard,Standard,Standard,,0.16040284942274624,2.8069310143422674,blue,X,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.2,classwise,Classwise,Classwise,,0.005281257676246622,6653.489043199862,red,X,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.2,clustered,Clustered,Clustered,,0.16113976909850158,2.7778138317433534,purple,P,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.2,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.09702775730778679,3.3442576849027623,orange,^,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.16040284942274624,2.8069310143422674,gray,o,0.3,mean
+inaturalist,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.1461557356914763,2.6903757544292297,gray,o,0.475,mean
+inaturalist,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.13031196266273642,2.907261989746252,gray,o,0.6499999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.10673053303856546,3.5448980033313866,gray,o,0.825,mean
+inaturalist,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.08155244411692458,4.7567438942609295,gray,o,0.9299999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.06669123065585851,6.000367750448872,gray,o,0.9649999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.054777695897813804,7.605100915049646,gray,o,0.9824999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.043723900761483664,10.418305319402082,gray,o,0.9929999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.025423728813559324,22.6062690635343,gray,o,0.9992999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.2,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.005281257676246622,6653.489043199862,gray,o,1.0,mean
+inaturalist,cov_below50,FracBelow50%,0.1,standard,Standard,Standard,,0.06435765168263326,10.035001189780864,blue,X,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.1,classwise,Classwise,Classwise,,0.00012281994595922377,7427.5672875159535,red,X,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.1,clustered,Clustered,Clustered,,0.05981331368214198,8.046379821316547,purple,P,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.1,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.04114468189633996,10.976226015099401,orange,^,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.06435765168263326,10.035001189780864,gray,o,0.3,mean
+inaturalist,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.057971014492753624,9.554805633071581,gray,o,0.475,mean
+inaturalist,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.050724637681159424,10.600449953490385,gray,o,0.6499999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.042495701301891425,13.195491812144418,gray,o,0.825,mean
+inaturalist,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.03328420535494964,17.898782097042854,gray,o,0.9299999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.027388847948906902,22.559543124148224,gray,o,0.9649999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.022967329894374847,28.339996106171718,gray,o,0.9824999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.016826332596413657,38.09771345750319,gray,o,0.9929999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.008843036109064112,77.17208557769268,gray,o,0.9992999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.1,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.00012281994595922377,7427.5672875159535,gray,o,1.0,mean
+inaturalist,cov_below50,FracBelow50%,0.05,standard,Standard,Standard,,0.028494227462539917,30.966556341532005,blue,X,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.05,classwise,Classwise,Classwise,,0.0,7830.816232937461,red,X,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.05,clustered,Clustered,Clustered,,0.02702038811102923,28.64334696173232,purple,P,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.05,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.018300171947924344,32.03590974971337,orange,^,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.028494227462539917,30.966556341532005,gray,o,0.3,mean
+inaturalist,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.02702038811102923,30.794838514288188,gray,o,0.475,mean
+inaturalist,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.023949889462048637,34.4756311246674,gray,o,0.6499999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.01915991156963891,42.74400242282648,gray,o,0.825,mean
+inaturalist,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.014861213461066078,56.905358340363854,gray,o,0.9299999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.012159174649963155,70.38153027451489,gray,o,0.9649999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.01043969540653402,86.53105328055032,gray,o,0.9824999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.007860476541390321,112.79105284790275,gray,o,0.9929999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.004421518054532056,209.53767278863003,gray,o,0.9992999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.05,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.0,7830.816232937461,gray,o,1.0,mean
+inaturalist,cov_below50,FracBelow50%,0.01,standard,Standard,Standard,,0.004175878162613608,286.9145953663444,blue,X,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.01,classwise,Classwise,Classwise,,0.0,8142.0,red,X,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.01,clustered,Clustered,Clustered,,0.004175878162613608,286.9145953663444,purple,P,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.01,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.0034389584868582657,271.3955480563307,orange,^,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.004175878162613608,286.9145953663444,gray,o,0.3,mean
+inaturalist,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.0040530582166543845,307.6046682674627,gray,o,0.475,mean
+inaturalist,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.0036845983787767134,338.55002487723624,gray,o,0.6499999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.0031933185949398184,396.671382525364,gray,o,0.825,mean
+inaturalist,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.0029476787030213707,484.089622947628,gray,o,0.9299999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.002702038811102923,558.5215999307763,gray,o,0.9649999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.002087939081306804,640.5564064291432,gray,o,0.9824999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.0017194792434291329,760.7474419711424,gray,o,0.9929999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.001105379513633014,1123.1202976615398,gray,o,0.9992999999999999,mean
+inaturalist,cov_below50,FracBelow50%,0.01,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.0,8142.0,gray,o,1.0,mean

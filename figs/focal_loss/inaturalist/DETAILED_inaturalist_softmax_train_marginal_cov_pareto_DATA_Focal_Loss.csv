@@ -1,0 +1,57 @@
+dataset,coverage_metric,coverage_metric_name,alpha,method_key,method_category,method_display_name,method_params,x_value,y_value,color,marker,alpha_transparency,set_size_metric_type
+inaturalist,train_marginal_cov,MarginalCov,0.2,standard,Standard,Standard,,0.8009422332301019,2.8069310143422674,blue,X,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,classwise,Classwise,Classwise,,0.8819637271376444,6653.489043199862,red,X,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,clustered,Clustered,Clustered,,0.7999149124109125,2.7778138317433534,purple,P,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.801457096514037,3.3442576849027623,orange,^,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.8009422332301019,2.8069310143422674,gray,o,0.3,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.794224298387623,2.6903757544292297,gray,o,0.475,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.794542014809589,2.907261989746252,gray,o,0.6499999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.8017705985404835,3.5448980033313866,gray,o,0.825,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.8143366918953544,4.7567438942609295,gray,o,0.9299999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.82303873722028,6.000367750448872,gray,o,0.9649999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.8311248895891257,7.605100915049646,gray,o,0.9824999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.8400535242047024,10.418305319402082,gray,o,0.9929999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.8567038433780905,22.6062690635343,gray,o,0.9992999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.2,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.8819637271376444,6653.489043199862,gray,o,1.0,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,standard,Standard,Standard,,0.8992699049553767,10.035001189780864,blue,X,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,classwise,Classwise,Classwise,,0.9534538808692379,7427.5672875159535,red,X,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,clustered,Clustered,Clustered,,0.880542878390243,8.046379821316547,purple,P,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.8996543432518902,10.976226015099401,orange,^,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.8992699049553767,10.035001189780864,gray,o,0.3,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.8939992854885062,9.554805633071581,gray,o,0.475,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.8960205344221781,10.600449953490385,gray,o,0.6499999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.9024189284510815,13.195491812144418,gray,o,0.825,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.9097146284706266,17.898782097042854,gray,o,0.9299999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.9154154780646,22.559543124148224,gray,o,0.9649999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.9212877207382331,28.339996106171718,gray,o,0.9824999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.9273893127217088,38.09771345750319,gray,o,0.9929999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.9379739949425316,77.17208557769268,gray,o,0.9992999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.1,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.9534538808692379,7427.5672875159535,gray,o,1.0,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,standard,Standard,Standard,,0.9484803305628579,30.966556341532005,blue,X,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,classwise,Classwise,Classwise,,0.9857450073179856,7830.816232937461,red,X,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,clustered,Clustered,Clustered,,0.9413992817113258,28.64334696173232,purple,P,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.9483902828173357,32.03590974971337,orange,^,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.9484803305628579,30.966556341532005,gray,o,0.3,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.946966205925977,30.794838514288188,gray,o,0.475,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.9498303591811179,34.4756311246674,gray,o,0.6499999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.954393848925821,42.74400242282648,gray,o,0.825,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.9595310086098654,56.905358340363854,gray,o,0.9299999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.9634540812402065,70.38153027451489,gray,o,0.9649999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.966168481815193,86.53105328055032,gray,o,0.9824999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.9700048746817584,112.79105284790275,gray,o,0.9929999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.9762334245112112,209.53767278863003,gray,o,0.9992999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.05,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.9857450073179856,7830.816232937461,gray,o,1.0,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,standard,Standard,Standard,,0.9906513632055374,286.9145953663444,blue,X,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,classwise,Classwise,Classwise,,0.9999999999999999,8142.0,red,X,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,clustered,Clustered,Clustered,,0.9906513632055374,286.9145953663444,purple,P,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.9902082606090321,271.3955480563307,orange,^,0.8,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.9906513632055374,286.9145953663444,gray,o,0.3,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.9911046235285352,307.6046682674627,gray,o,0.475,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.991818507647469,338.55002487723624,gray,o,0.6499999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.9929891025631269,396.671382525364,gray,o,0.825,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.9942890152902154,484.089622947628,gray,o,0.9299999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.9950731006992249,558.5215999307763,gray,o,0.9649999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.9957651772585898,640.5564064291432,gray,o,0.9824999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.9965562599279912,760.7474419711424,gray,o,0.9929999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.9979587247620543,1123.1202976615398,gray,o,0.9992999999999999,mean
+inaturalist,train_marginal_cov,MarginalCov,0.01,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.9999999999999999,8142.0,gray,o,1.0,mean

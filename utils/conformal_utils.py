@@ -980,6 +980,180 @@ def fuzzy_classwise_CP(cal_scores_all, cal_labels, alpha, val_scores_all=None,
 
 
 #========================================
+#   rc3p (from Shi et al., 2024)
+#========================================
+
+# Compute rc3p parameters
+def compute_rc3p_params(cal_softmax_scores,
+                        cal_scores_all,
+                        cal_labels,
+                        alpha,
+                        default_qhat=np.inf):
+    """
+    Compute rc3p per-class parameters (k_hat and q_hats) using the base conformal
+    scores cal_scores_all and softmax probabilities cal_softmax_scores.
+
+    rc3p uses:
+        - a per-class rank budget k_hat[k]
+        - a per-class effective miscoverage alpha_hat[k]
+        - a per-class quantile q_hat_rc3p[k] computed at level 1 - alpha_hat[k]
+          over the *true-class* scores of class k.
+
+    Args:
+        cal_softmax_scores: (n_cal, K) array of softmax probabilities on calibration data
+        cal_scores_all:     (n_cal, K) array of base scores (APS/RAPS/etc.)
+        cal_labels:         (n_cal,) array of integer class labels
+        alpha:              global miscoverage level (e.g., 0.1)
+        default_qhat:       default threshold when a class has no data
+
+    Returns:
+        q_hats_rc3p: (K,) array of per-class thresholds for rc3p
+        k_hats:      (K,) array of per-class integer rank caps (1-based)
+        alpha_hats:  (K,) array of per-class effective miscoverage (for debugging)
+    """
+    cal_softmax_scores = np.array(cal_softmax_scores)
+    cal_scores_all = np.array(cal_scores_all)
+    cal_labels = np.array(cal_labels)
+
+    n_cal, num_classes = cal_softmax_scores.shape
+
+    # Compute ranks for all (i, j): rank 1 = highest softmax probability
+    sorted_idx = np.argsort(-cal_softmax_scores, axis=1)        # (n_cal, K)
+    ranks = np.empty_like(sorted_idx)
+    ranks[np.arange(n_cal)[:, None], sorted_idx] = np.arange(1, num_classes + 1)[None, :]
+
+    q_hats_rc3p = np.zeros((num_classes,))
+    k_hats = np.zeros((num_classes,), dtype=int)
+    alpha_hats = np.zeros((num_classes,))
+
+    for k in range(num_classes):
+        # Select calibration examples where class k is the true label
+        idx_k = (cal_labels == k)
+        if not np.any(idx_k):
+            # Default behavior for classes with no calibration examples
+            q_hats_rc3p[k] = default_qhat
+            k_hats[k] = num_classes  # no rank restriction
+            alpha_hats[k] = alpha
+            print(f'rc3p WARNING: class {k} has no calibration examples; using default qhat={default_qhat} and k_hat={num_classes}')
+            continue
+
+        ranks_k = ranks[idx_k, k]               # ranks of true class k
+        scores_k = cal_scores_all[idx_k, k]     # scores of true class k
+
+        # Estimate epsilon_{k,k} = P(rank > k | Y = k) for k=1..K
+        # eps_vec[t-1] = epsilon_t for t in 1..K
+        eps_vec = np.zeros((num_classes,))
+        for t in range(1, num_classes + 1):
+            eps_vec[t - 1] = np.mean(ranks_k > t)
+
+        # Option II from the paper:
+        # k_hat[k] = min { t : epsilon_t < alpha }
+        # alpha_hat[k] = alpha - epsilon_{k_hat[k]}
+        candidates = np.where(eps_vec < alpha)[0]
+        if len(candidates) == 0:
+            # If we never get epsilon_t < alpha, fall back to K
+            t_idx = num_classes - 1
+        else:
+            t_idx = candidates[0]
+        k_hat_k = t_idx + 1  # back to 1-based
+        eps_k_hat = eps_vec[t_idx]
+        alpha_hat_k = max(0.0, alpha - eps_k_hat)
+
+        k_hats[k] = k_hat_k
+        alpha_hats[k] = alpha_hat_k
+
+        # Compute class-wise quantile at level 1 - alpha_hat_k on scores_k
+        # using your existing conformal quantile helper
+        if alpha_hat_k == 0.0:
+            # effectively require "score <= max(score)" → include everything by score;
+            # rank truncation will still cut the set down
+            q_hats_rc3p[k] = np.inf
+        else:
+            q_hats_rc3p[k] = get_conformal_quantile(
+                scores_k,
+                alpha_hat_k,
+                default_qhat=default_qhat,
+                exact_coverage=False
+            )
+
+    return q_hats_rc3p, k_hats, alpha_hats
+
+def create_rc3p_prediction_sets(softmax_scores,
+                                scores_all,
+                                q_hats_rc3p,
+                                k_hats):
+    """
+    Construct rc3p prediction sets given:
+        - softmax_scores: (n, K)
+        - scores_all:     (n, K) base conformal scores for all classes
+        - q_hats_rc3p:    (K,) per-class thresholds from compute_rc3p_params
+        - k_hats:         (K,) per-class rank caps (1-based)
+
+    Returns:
+        set_preds: list of length-n arrays, where set_preds[i] is the prediction set for example i.
+    """
+    softmax_scores = np.array(softmax_scores)
+    scores_all = np.array(scores_all)
+    q_hats_rc3p = np.array(q_hats_rc3p)
+    k_hats = np.array(k_hats)
+
+    n, num_classes = softmax_scores.shape
+
+    # Precompute ranks for all (i, j)
+    sorted_idx = np.argsort(-softmax_scores, axis=1)
+    ranks = np.empty_like(sorted_idx)
+    ranks[np.arange(n)[:, None], sorted_idx] = np.arange(1, num_classes + 1)[None, :]
+
+    set_preds = []
+    for i in range(n):
+        row_scores = scores_all[i]   # shape (K,)
+        row_ranks = ranks[i]         # shape (K,)
+
+        # Include class j iff:
+        #   score_ij <= q_hat_rc3p[j] and rank_ij <= k_hat[j]
+        mask = (row_scores <= q_hats_rc3p) & (row_ranks <= k_hats)
+        set_preds.append(np.where(mask)[0])
+
+    return set_preds
+
+
+# Full rc3p pipeline
+def rc3p(cal_softmax_scores,
+        cal_scores_all,
+        cal_labels,
+        test_softmax_scores,
+        test_scores_all,
+        test_labels,
+        alpha,
+        default_qhat=np.inf):
+    """
+    rc3p pipeline:
+        1) Fit rc3p params (q_hats_rc3p, k_hats) on calibration data.
+        2) Build prediction sets on validation data.
+        3) Evaluate metrics using existing compute_all_metrics().
+    """
+    num_classes = cal_softmax_scores.shape[1]
+
+    q_hats_rc3p, k_hats, alpha_hats = compute_rc3p_params(
+        cal_softmax_scores=cal_softmax_scores,
+        cal_scores_all=cal_scores_all,
+        cal_labels=cal_labels,
+        alpha=alpha,
+        default_qhat=default_qhat
+    )
+
+    rc3p_preds = create_rc3p_prediction_sets(
+        softmax_scores=test_softmax_scores,
+        scores_all=test_scores_all,
+        q_hats_rc3p=q_hats_rc3p,
+        k_hats=k_hats
+    )
+
+    coverage_metrics, set_size_metrics = compute_all_metrics(test_labels, rc3p_preds, alpha)
+
+    return (q_hats_rc3p, k_hats, alpha_hats), rc3p_preds, coverage_metrics, set_size_metrics
+
+#========================================
 #   Conformal variant: exact coverage via randomization 
 #========================================
 

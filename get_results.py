@@ -159,6 +159,65 @@ def get_results(dataset, alphas, methods, score='softmax', results_folder='resul
                 res = {'pred_sets': pred_sets, 'qhat': qhat}
                 prep_for_save(res, test_labels, alpha, train_labels_path)
                 save(res, save_path)
+
+        # # ------- Run Convex Combination Methods --------
+        if ('cvx' in methods) or ('monotonic-cvx' in methods):
+            # weights = 1 - np.array([0, .001, .01, .025, .05, .1, .15, .2, .4, .6, .8, 1])
+            weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1]
+            with open(f'{results_prefix}_standard.pkl', 'rb') as f:
+                standard_res = pickle.load(f)
+                standard_qhat = standard_res['qhat']
+            with open(f'{results_prefix}_classwise.pkl', 'rb') as f:
+                classwise_res = pickle.load(f)
+                cw_qhats = classwise_res['qhats']    
+            cw_qhats[np.isinf(cw_qhats)] = 1
+        
+        # Original convex combination
+        if 'cvx' in methods:
+            for w_cw in weights:
+                save_path = f'{results_prefix}_cvx-cw_weight={w_cw}.pkl'
+                if not os.path.exists(save_path) or override_saved: 
+                    cvx_classwise_qhats = w_cw * cw_qhats + (1 - w_cw) * standard_qhat
+                    cvx_classwise_pred_sets = create_classwise_prediction_sets(test_scores, cvx_classwise_qhats)
+                    res = {'pred_sets': cvx_classwise_pred_sets, 'qhats': cvx_classwise_qhats}
+                    prep_for_save(res, test_labels, alpha, train_labels_path)
+                    save(res, save_path)
+
+        # # "Monotonic" convex combination (only downwards)
+        if 'monotonic-cvx' in methods:
+            keep_as_cw = cw_qhats <= standard_qhat
+            print(f"# of classes with classwise qhat larger than standard qhat: {np.sum(keep_as_cw)}")
+            for w_cw in weights:
+                save_path = f'{results_prefix}_monotonic-cvx-cw_weight={w_cw}.pkl'
+                if not os.path.exists(save_path) or override_saved: 
+                    cvx_classwise_qhats = w_cw * cw_qhats + (1 - w_cw) * standard_qhat
+                    cvx_classwise_qhats[keep_as_cw] = cw_qhats[keep_as_cw]
+                    cvx_classwise_pred_sets = create_classwise_prediction_sets(test_scores, cvx_classwise_qhats)
+                    res = {'pred_sets': cvx_classwise_pred_sets, 'qhats': cvx_classwise_qhats}
+                    prep_for_save(res, test_labels, alpha, train_labels_path)
+                    save(res, save_path)
+
+        ## RC3P
+        if 'rc3p' in methods:
+            save_path = f'{results_prefix}_rc3p.pkl'
+            if not os.path.exists(save_path) or override_saved:
+                (q_hats_rc3p, k_hats, alpha_hats), rc3p_preds, _, _ = rc3p(
+                    cal_softmax_scores=val_softmax,
+                    cal_scores_all=val_scores,
+                    cal_labels=val_labels,
+                    test_softmax_scores=test_softmax,
+                    test_scores_all=test_scores,
+                    test_labels=test_labels,
+                    alpha=alpha
+                )
+                res = {
+                    'pred_sets': rc3p_preds,
+                    'qhats': q_hats_rc3p,
+                    'k_hats': k_hats,
+                    'alpha_hats': alpha_hats
+                }
+                prep_for_save(res, test_labels, alpha, train_labels_path)
+                save(res, save_path)
     
         # ------- Run Fuzzy CP methods --------
         ## Random projection ("Baseline") 
@@ -210,14 +269,16 @@ def get_results(dataset, alphas, methods, score='softmax', results_folder='resul
         reconformalize = 'alpha' # 'additive' or 'multiplicative' or 'alpha'
         
         # Create holdout dataset for reconformalization
-        num_holdout = 5000 
-        print(f'Holding out {num_holdout} of {len(val_labels)} examples for reconformalization step')
-        shuffle_idx = np.random.permutation(np.arange(len(val_labels)))
-        holdout_idx = shuffle_idx[:num_holdout]
-        cal_idx = shuffle_idx[num_holdout:]
-        
-        cal_scores_all, cal_labels = val_scores[cal_idx], val_labels[cal_idx]
-        holdout_scores_all, holdout_labels = val_scores[holdout_idx], val_labels[holdout_idx]
+        # Only do this if there is a method containing 'RE' in its name
+        if any('RE' in method for method in methods):
+            num_holdout = 5000 
+            print(f'Holding out {num_holdout} of {len(val_labels)} examples for reconformalization step')
+            shuffle_idx = np.random.permutation(np.arange(len(val_labels)))
+            holdout_idx = shuffle_idx[:num_holdout]
+            cal_idx = shuffle_idx[num_holdout:]
+            
+            cal_scores_all, cal_labels = val_scores[cal_idx], val_labels[cal_idx]
+            holdout_scores_all, holdout_labels = val_scores[holdout_idx], val_labels[holdout_idx]
         
         
         # RandProj 
@@ -290,42 +351,7 @@ def get_results(dataset, alphas, methods, score='softmax', results_folder='resul
                     prep_for_save(res, test_labels, alpha, train_labels_path)
                     save(res, save_path)
                     
-        # # ------- Run Convex Combination Methods --------
-        if ('cvx' in methods) or ('monotonic-cvx' in methods):
-            # weights = 1 - np.array([0, .001, .01, .025, .05, .1, .15, .2, .4, .6, .8, 1])
-            weights = [0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975, 0.99 , 0.999, 1]
-            with open(f'{results_prefix}_standard.pkl', 'rb') as f:
-                standard_res = pickle.load(f)
-                standard_qhat = standard_res['qhat']
-            with open(f'{results_prefix}_classwise.pkl', 'rb') as f:
-                classwise_res = pickle.load(f)
-                cw_qhats = classwise_res['qhats']    
-            cw_qhats[np.isinf(cw_qhats)] = 1
         
-        # Original convex combination
-        if 'cvx' in methods:
-            for w_cw in weights:
-                save_path = f'{results_prefix}_cvx-cw_weight={w_cw}.pkl'
-                if not os.path.exists(save_path) or override_saved: 
-                    cvx_classwise_qhats = w_cw * cw_qhats + (1 - w_cw) * standard_qhat
-                    cvx_classwise_pred_sets = create_classwise_prediction_sets(test_scores, cvx_classwise_qhats)
-                    res = {'pred_sets': cvx_classwise_pred_sets, 'qhats': cvx_classwise_qhats}
-                    prep_for_save(res, test_labels, alpha, train_labels_path)
-                    save(res, save_path)
-
-        # # "Monotonic" convex combination (only downwards)
-        if 'monotonic-cvx' in methods:
-            keep_as_cw = cw_qhats <= standard_qhat
-            print(f"# of classes with classwise qhat larger than standard qhat: {np.sum(keep_as_cw)}")
-            for w_cw in weights:
-                save_path = f'{results_prefix}_monotonic-cvx-cw_weight={w_cw}.pkl'
-                if not os.path.exists(save_path) or override_saved: 
-                    cvx_classwise_qhats = w_cw * cw_qhats + (1 - w_cw) * standard_qhat
-                    cvx_classwise_qhats[keep_as_cw] = cw_qhats[keep_as_cw]
-                    cvx_classwise_pred_sets = create_classwise_prediction_sets(test_scores, cvx_classwise_qhats)
-                    res = {'pred_sets': cvx_classwise_pred_sets, 'qhats': cvx_classwise_qhats}
-                    prep_for_save(res, test_labels, alpha, train_labels_path)
-                    save(res, save_path)
 
 if __name__ == "__main__":
     st = time.time()
@@ -342,7 +368,7 @@ if __name__ == "__main__":
     parser.add_argument('--methods', type=str, nargs='+',
                         default=[
                           'standard', 'classwise', 'classwise-exact', 'clustered',
-                          'fuzzy-rarity', 'fuzzy-RErarity', 'cvx', 'prevalence-adjusted'
+                          'fuzzy-rarity', 'fuzzy-RErarity', 'cvx', 'prevalence-adjusted', 'rc3p'
                         ],
                         help='Which methods to run')
     parser.add_argument('--model_type', type=str, choices=['best', 'last_epoch', 'proper_cal'], default='best',
@@ -391,5 +417,4 @@ if __name__ == "__main__":
                 model_type=model_type, loss=loss, override_saved=override_saved)
 
     print(f'Time taken: {(time.time() - st) / 60:.2f} minutes')
-    
-    
+

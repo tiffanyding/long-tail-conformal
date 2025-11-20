@@ -265,6 +265,7 @@ def plot_set_size_vs_cov_metric(
         ("classwise-exact", "Exact Classwise", "red", "d"),
         ("clustered", "Clustered", "purple", "P"),
         ("prevalence-adjusted", "Standard w. PAS", "orange", "^"),
+        ("rc3p", "RC3P", "green", "s"),  # Added RC3P with distinctive style
         # ('standard',             'Standard (Softmax)',       'blue',      'p'),
     ]
 
@@ -845,6 +846,7 @@ def export_detailed_pareto_data_to_csv(all_res, dataset, scores_summary, save_su
     method_styles.update({
         "standard_softmax": {"display_name": "Standard (Softmax)", "color": "blue", "marker": "p"},
         "clustered": {"display_name": "Clustered", "color": "purple", "marker": "P"},
+        "rc3p": {"display_name": "RC3P", "color": "#FF5733", "marker": "D"},  # Added RC3P styling
     })
     
     for cov_idx, (coverage_metric, metric_name) in enumerate(zip(cov_metrics, cov_metric_names)):
@@ -1014,6 +1016,7 @@ def generate_all_pareto_plots(
         ("classwise-exact", "Exact Classwise", "red", "d"),
         ("clustered", "Clustered", "purple", "P"),
         ("prevalence-adjusted", "Standard w. PAS", "orange", "^"),
+        ("rc3p", "RC3P", "#FF5733", "D"),  # Added RC3P to core methods
     ]
 
     cov_metrics = ["cov_below50", "undercov_gap", "macro_cov", "train_marginal_cov"]
@@ -1228,6 +1231,7 @@ methods = (
         "classwise-exact",
         "clustered",
         "prevalence-adjusted",
+        "rc3p",
     ]
     + [f"cvx-cw_weight={w}" for w in cw_weights]
     + [f"fuzzy-rarity-{bw}" for bw in rarity_bandwidths]
@@ -1300,6 +1304,7 @@ for dataset in dataset_names.keys():
         "standard": "Standard",
         "classwise": "Classwise",
         "clustered": "Clustered",
+        "rc3p": "RC3P",
         "prevalence-adjusted": "Standard w. PAS",
         "cvx-cw_weight=0.999": "Interp-Q ($\\tau=0.999$)",
         "cvx-cw_weight=0.99": "Interp-Q ($\\tau=0.99$)",
@@ -1358,7 +1363,7 @@ dataset_names = {
 }
 
 methods = (
-    ["standard", "classwise", "clustered"]
+    ["standard", "classwise", "clustered", "rc3p"]
     + [f"fuzzy-rarity-{bw}" for bw in rarity_bandwidths]
     + [f"fuzzy-RErarity-{bw}" for bw in rarity_bandwidths]
     + [f"cvx-cw_weight={w}" for w in cw_weights]
@@ -1435,4 +1440,5 @@ for dataset in dataset_names.keys():
         force_standard=True,
     )
 
-# %%
+
+

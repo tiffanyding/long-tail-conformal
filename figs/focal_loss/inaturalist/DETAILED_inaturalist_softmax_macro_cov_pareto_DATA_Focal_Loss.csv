@@ -1,0 +1,57 @@
+dataset,coverage_metric,coverage_metric_name,alpha,method_key,method_category,method_display_name,method_params,x_value,y_value,color,marker,alpha_transparency,set_size_metric_type
+inaturalist,macro_cov,MacroCov,0.2,standard,Standard,Standard,,0.7127112200921467,2.8069310143422674,blue,X,0.8,mean
+inaturalist,macro_cov,MacroCov,0.2,classwise,Classwise,Classwise,,0.9694470409892963,6653.489043199862,red,X,0.8,mean
+inaturalist,macro_cov,MacroCov,0.2,clustered,Clustered,Clustered,,0.7115932325044159,2.7778138317433534,purple,P,0.8,mean
+inaturalist,macro_cov,MacroCov,0.2,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.7845196466470746,3.3442576849027623,orange,^,0.8,mean
+inaturalist,macro_cov,MacroCov,0.2,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.7127112200921467,2.8069310143422674,gray,o,0.3,mean
+inaturalist,macro_cov,MacroCov,0.2,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.7251704364792938,2.6903757544292297,gray,o,0.475,mean
+inaturalist,macro_cov,MacroCov,0.2,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.7415264753658544,2.907261989746252,gray,o,0.6499999999999999,mean
+inaturalist,macro_cov,MacroCov,0.2,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.7705844803946441,3.5448980033313866,gray,o,0.825,mean
+inaturalist,macro_cov,MacroCov,0.2,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.8047634310410896,4.7567438942609295,gray,o,0.9299999999999999,mean
+inaturalist,macro_cov,MacroCov,0.2,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.8274053511712113,6.000367750448872,gray,o,0.9649999999999999,mean
+inaturalist,macro_cov,MacroCov,0.2,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.8478608240327946,7.605100915049646,gray,o,0.9824999999999999,mean
+inaturalist,macro_cov,MacroCov,0.2,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.868535054882465,10.418305319402082,gray,o,0.9929999999999999,mean
+inaturalist,macro_cov,MacroCov,0.2,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.9064996123680226,22.6062690635343,gray,o,0.9992999999999999,mean
+inaturalist,macro_cov,MacroCov,0.2,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.9694470409892963,6653.489043199862,gray,o,1.0,mean
+inaturalist,macro_cov,MacroCov,0.1,standard,Standard,Standard,,0.8421568646180159,10.035001189780864,blue,X,0.8,mean
+inaturalist,macro_cov,MacroCov,0.1,classwise,Classwise,Classwise,,0.9924874742470691,7427.5672875159535,red,X,0.8,mean
+inaturalist,macro_cov,MacroCov,0.1,clustered,Clustered,Clustered,,0.8448055147189858,8.046379821316547,purple,P,0.8,mean
+inaturalist,macro_cov,MacroCov,0.1,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.8802877828166166,10.976226015099401,orange,^,0.8,mean
+inaturalist,macro_cov,MacroCov,0.1,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.8421568646180159,10.035001189780864,gray,o,0.3,mean
+inaturalist,macro_cov,MacroCov,0.1,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.8503159983518922,9.554805633071581,gray,o,0.475,mean
+inaturalist,macro_cov,MacroCov,0.1,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.8627357279782683,10.600449953490385,gray,o,0.6499999999999999,mean
+inaturalist,macro_cov,MacroCov,0.1,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.8796476320461991,13.195491812144418,gray,o,0.825,mean
+inaturalist,macro_cov,MacroCov,0.1,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.8972151021498082,17.898782097042854,gray,o,0.9299999999999999,mean
+inaturalist,macro_cov,MacroCov,0.1,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.9097799742553044,22.559543124148224,gray,o,0.9649999999999999,mean
+inaturalist,macro_cov,MacroCov,0.1,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.921336170527651,28.339996106171718,gray,o,0.9824999999999999,mean
+inaturalist,macro_cov,MacroCov,0.1,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.9343082591563628,38.09771345750319,gray,o,0.9929999999999999,mean
+inaturalist,macro_cov,MacroCov,0.1,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.9568950605976507,77.17208557769268,gray,o,0.9992999999999999,mean
+inaturalist,macro_cov,MacroCov,0.1,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.9924874742470691,7427.5672875159535,gray,o,1.0,mean
+inaturalist,macro_cov,MacroCov,0.05,standard,Standard,Standard,,0.9116964613177188,30.966556341532005,blue,X,0.8,mean
+inaturalist,macro_cov,MacroCov,0.05,classwise,Classwise,Classwise,,0.9984912063889163,7830.816232937461,red,X,0.8,mean
+inaturalist,macro_cov,MacroCov,0.05,clustered,Clustered,Clustered,,0.9156618548692947,28.64334696173232,purple,P,0.8,mean
+inaturalist,macro_cov,MacroCov,0.05,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.9312009696025297,32.03590974971337,orange,^,0.8,mean
+inaturalist,macro_cov,MacroCov,0.05,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.9116964613177188,30.966556341532005,gray,o,0.3,mean
+inaturalist,macro_cov,MacroCov,0.05,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.9158986577739441,30.794838514288188,gray,o,0.475,mean
+inaturalist,macro_cov,MacroCov,0.05,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.9233219569523317,34.4756311246674,gray,o,0.6499999999999999,mean
+inaturalist,macro_cov,MacroCov,0.05,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.9338321266282599,42.74400242282648,gray,o,0.825,mean
+inaturalist,macro_cov,MacroCov,0.05,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.9448079870993275,56.905358340363854,gray,o,0.9299999999999999,mean
+inaturalist,macro_cov,MacroCov,0.05,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.9526084699099095,70.38153027451489,gray,o,0.9649999999999999,mean
+inaturalist,macro_cov,MacroCov,0.05,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.957951457088818,86.53105328055032,gray,o,0.9824999999999999,mean
+inaturalist,macro_cov,MacroCov,0.05,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.9656743382084333,112.79105284790275,gray,o,0.9929999999999999,mean
+inaturalist,macro_cov,MacroCov,0.05,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.978410500189411,209.53767278863003,gray,o,0.9992999999999999,mean
+inaturalist,macro_cov,MacroCov,0.05,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,0.9984912063889163,7830.816232937461,gray,o,1.0,mean
+inaturalist,macro_cov,MacroCov,0.01,standard,Standard,Standard,,0.9812977289336002,286.9145953663444,blue,X,0.8,mean
+inaturalist,macro_cov,MacroCov,0.01,classwise,Classwise,Classwise,,1.0,8142.0,red,X,0.8,mean
+inaturalist,macro_cov,MacroCov,0.01,clustered,Clustered,Clustered,,0.9812977289336002,286.9145953663444,purple,P,0.8,mean
+inaturalist,macro_cov,MacroCov,0.01,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.9835067959653183,271.3955480563307,orange,^,0.8,mean
+inaturalist,macro_cov,MacroCov,0.01,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.9812977289336002,286.9145953663444,gray,o,0.3,mean
+inaturalist,macro_cov,MacroCov,0.01,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.9820974764512916,307.6046682674627,gray,o,0.475,mean
+inaturalist,macro_cov,MacroCov,0.01,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.9835858548240513,338.55002487723624,gray,o,0.6499999999999999,mean
+inaturalist,macro_cov,MacroCov,0.01,cvx-cw_weight=0.75,Interp-Q,cvx-cw_weight=0.75,weight=0.75,0.9854899981995247,396.671382525364,gray,o,0.825,mean
+inaturalist,macro_cov,MacroCov,0.01,cvx-cw_weight=0.9,Interp-Q,cvx-cw_weight=0.9,weight=0.9,0.9878782872851853,484.089622947628,gray,o,0.9299999999999999,mean
+inaturalist,macro_cov,MacroCov,0.01,cvx-cw_weight=0.95,Interp-Q,cvx-cw_weight=0.95,weight=0.95,0.9893949402222294,558.5215999307763,gray,o,0.9649999999999999,mean
+inaturalist,macro_cov,MacroCov,0.01,cvx-cw_weight=0.975,Interp-Q,cvx-cw_weight=0.975,weight=0.975,0.99108269881861,640.5564064291432,gray,o,0.9824999999999999,mean
+inaturalist,macro_cov,MacroCov,0.01,cvx-cw_weight=0.99,Interp-Q,cvx-cw_weight=0.99,weight=0.99,0.9926016095382005,760.7474419711424,gray,o,0.9929999999999999,mean
+inaturalist,macro_cov,MacroCov,0.01,cvx-cw_weight=0.999,Interp-Q,cvx-cw_weight=0.999,weight=0.999,0.995114991890896,1123.1202976615398,gray,o,0.9992999999999999,mean
+inaturalist,macro_cov,MacroCov,0.01,cvx-cw_weight=1,Interp-Q,cvx-cw_weight=1,weight=1.0,1.0,8142.0,gray,o,1.0,mean
