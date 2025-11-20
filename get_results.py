@@ -197,7 +197,7 @@ def get_results(dataset, alphas, methods, score='softmax', results_folder='resul
                     prep_for_save(res, test_labels, alpha, train_labels_path)
                     save(res, save_path)
 
-        ## RC3P
+        # # ------- Run RC3P --------
         if 'rc3p' in methods:
             save_path = f'{results_prefix}_rc3p.pkl'
             if not os.path.exists(save_path) or override_saved:

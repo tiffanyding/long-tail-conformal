@@ -1069,10 +1069,13 @@ def compute_rc3p_params(cal_softmax_scores,
         for t in range(1, num_classes + 1):
             top_t_error = np.mean(ranks_k > t)
             if top_t_error <= alpha:
-                k_hat = t-1
+                k_hat = t
+            else:
                 break
 
         # Sanity check: ensure the chosen k_hat meets the required bound
+        if not np.mean(ranks_k > k_hat) <= alpha:
+            pdb.set_trace()
         assert np.mean(ranks_k > k_hat) <= alpha, "k_hat should satisfy top-k_hat error <= alpha"
        
         alpha_hat = alpha - np.mean(ranks_k > k_hat)
