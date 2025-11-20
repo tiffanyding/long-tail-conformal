@@ -8,4 +8,5 @@ notebooks/figs/
 *__pycache__/
 
 *.out
+*.DS_Store
 

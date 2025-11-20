@@ -34,8 +34,8 @@ def test_rc3p_debug():
         alpha=alpha
     )
 
+
     # Debugging point: Inspect ranks computation
-    import pdb; pdb.set_trace()
 
     # Create RC3P prediction sets
     rc3p_preds = create_rc3p_prediction_sets(
