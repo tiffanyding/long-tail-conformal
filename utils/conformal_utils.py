@@ -1189,6 +1189,17 @@ def rc3p(cal_softmax_scores,
         default_qhat
     )
 
+    # TEMP: Sanity check: compute marginal coverage on calibration set
+    cal_preds = create_rc3p_prediction_sets(
+        cal_softmax_scores,
+        cal_scores_all,
+        q_hats_rc3p,
+        k_hats
+    )
+    cal_coverage_metrics, _ = compute_all_metrics(cal_labels, cal_preds, alpha)
+    print(f'******** rc3p calibration set marginal coverage: {cal_coverage_metrics["marginal_coverage"]:.3f}')
+    
+
     rc3p_preds = create_rc3p_prediction_sets(
         test_softmax_scores,
         test_scores_all,

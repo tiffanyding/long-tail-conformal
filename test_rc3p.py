@@ -60,8 +60,20 @@ def test_rc3p_big():
     test_softmax_scores = np.random.dirichlet(np.ones(num_classes), size=num_test)
     cal_scores_all = 1 - cal_softmax_scores
     test_scores_all = 1 - test_softmax_scores
-    cal_labels = np.random.randint(0, num_classes, size=num_calibration)
-    test_labels = np.random.randint(0, num_classes, size=num_test)  
+
+    # Generate labels so that 50% of classes only have 3 examples in each dataset
+    num_rare_ex = 3
+    rare_classes = np.arange(num_classes // 2)
+    common_classes = np.arange(num_classes // 2, num_classes)
+    cal_labels_rare = np.random.choice(rare_classes, size=num_rare_ex * len(rare_classes), replace=True)
+    cal_labels_common = np.random.choice(common_classes, size=num_calibration - len(cal_labels_rare), replace=True)
+    cal_labels = np.concatenate([cal_labels_rare, cal_labels_common])
+    np.random.shuffle(cal_labels)
+    test_labels_rare = np.random.choice(rare_classes, size=num_rare_ex * len(rare_classes), replace=True)
+    test_labels_common = np.random.choice(common_classes, size=num_test - len(test_labels_rare), replace=True)
+    test_labels = np.concatenate([test_labels_rare, test_labels_common])
+    np.random.shuffle(test_labels)
+
     alpha = 0.1
 
     # Compute RC3P parameters
