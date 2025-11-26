@@ -1,4 +1,5 @@
 import numpy as np
+import pdb 
 from utils.conformal_utils import compute_rc3p_params, create_rc3p_prediction_sets
 
 def test_rc3p_small():
@@ -91,12 +92,19 @@ def test_rc3p_big():
         k_hats=k_hats
     )
 
+    # print parameters
+    print("RC3P q_hats:", q_hats_rc3p)
+    print("RC3P k_hats:", k_hats)
+    print("RC3P alpha_hats:", alpha_hats)
+
     # Compute class-conditional and marginal coverage
     from utils.conformal_utils import compute_all_metrics
     coverage_metrics, set_size_metrics = compute_all_metrics(test_labels, rc3p_preds,
                                                             alpha)
     print("RC3P Coverage Metrics:", coverage_metrics)
     print("RC3P Set Size Metrics:", set_size_metrics)
+
+    pdb.set_trace()
 
 
 if __name__ == "__main__":

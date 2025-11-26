@@ -2,7 +2,7 @@ dataset,coverage_metric,coverage_metric_name,alpha,method_key,method_category,me
 inaturalist,undercov_gap,UnderCovGap,0.1,standard,Standard,Standard,,0.11584901542054837,10.885218595193285,blue,X,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.1,classwise,Classwise,Classwise,,0.0023009764336642965,7427.950267159885,red,X,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.1,clustered,Clustered,Clustered,,0.11800210665362956,8.427737036796676,purple,P,0.8,mean
-inaturalist,undercov_gap,UnderCovGap,0.1,rc3p,RC3P,RC3P,,0.17668611178159443,680.7642286975145,#FF5733,D,0.8,mean
+inaturalist,undercov_gap,UnderCovGap,0.1,rc3p,RC3P,RC3P,,0.0023009764336642965,7427.950267159885,#FF5733,D,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.1,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.002287464580083655,7427.972613407749,gray,o,0.5,mean
 inaturalist,undercov_gap,UnderCovGap,0.1,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.002262322426263794,7428.6523243991605,gray,o,0.5,mean
 inaturalist,undercov_gap,UnderCovGap,0.1,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.013161470618333062,5782.4873126095135,gray,o,0.5,mean
@@ -37,7 +37,7 @@ inaturalist,undercov_gap,UnderCovGap,0.1,standard_softmax,Standard (Softmax),Sta
 inaturalist,undercov_gap,UnderCovGap,0.2,standard,Standard,Standard,,0.16842754181292402,2.8491141540658056,blue,X,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.2,classwise,Classwise,Classwise,,0.00891427703783368,6658.040041534168,red,X,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.2,clustered,Clustered,Clustered,,0.1673186141265005,2.902957146256517,purple,P,0.8,mean
-inaturalist,undercov_gap,UnderCovGap,0.2,rc3p,RC3P,RC3P,,0.14182682609865765,657.4933480433513,#FF5733,D,0.8,mean
+inaturalist,undercov_gap,UnderCovGap,0.2,rc3p,RC3P,RC3P,,0.00891427703783368,6658.040041534168,#FF5733,D,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.2,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.008733886620590695,6658.093365349255,gray,o,0.5,mean
 inaturalist,undercov_gap,UnderCovGap,0.2,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.008815459010244194,6651.107015380621,gray,o,0.5,mean
 inaturalist,undercov_gap,UnderCovGap,0.2,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.05755999770381166,1617.8454150171976,gray,o,0.5,mean
@@ -72,7 +72,7 @@ inaturalist,undercov_gap,UnderCovGap,0.2,standard_softmax,Standard (Softmax),Sta
 inaturalist,undercov_gap,UnderCovGap,0.05,standard,Standard,Standard,,0.07228831989694776,33.9724619810933,blue,X,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.05,classwise,Classwise,Classwise,,0.0004964318761831801,7830.570532372855,red,X,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.05,clustered,Clustered,Clustered,,0.07150206704771753,29.07564843057088,purple,P,0.8,mean
-inaturalist,undercov_gap,UnderCovGap,0.05,rc3p,RC3P,RC3P,,0.19581007310187085,697.8782746014234,#FF5733,D,0.8,mean
+inaturalist,undercov_gap,UnderCovGap,0.05,rc3p,RC3P,RC3P,,0.0004964318761831801,7830.570532372855,#FF5733,D,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.05,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.0004964318761831801,7830.570532372855,gray,o,0.5,mean
 inaturalist,undercov_gap,UnderCovGap,0.05,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.0004964318761831801,7830.570532372855,gray,o,0.5,mean
 inaturalist,undercov_gap,UnderCovGap,0.05,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.0005172483109924646,7814.99206091678,gray,o,0.5,mean
@@ -107,7 +107,7 @@ inaturalist,undercov_gap,UnderCovGap,0.05,standard_softmax,Standard (Softmax),St
 inaturalist,undercov_gap,UnderCovGap,0.01,standard,Standard,Standard,,0.01886166208347582,266.2118026261709,blue,X,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.01,classwise,Classwise,Classwise,,0.0,8142.0,red,X,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.01,clustered,Clustered,Clustered,,0.01886166208347582,266.2118026261709,purple,P,0.8,mean
-inaturalist,undercov_gap,UnderCovGap,0.01,rc3p,RC3P,RC3P,,0.21248389293706532,726.1556666017696,#FF5733,D,0.8,mean
+inaturalist,undercov_gap,UnderCovGap,0.01,rc3p,RC3P,RC3P,,0.0,8142.0,#FF5733,D,0.8,mean
 inaturalist,undercov_gap,UnderCovGap,0.01,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.0,8142.0,gray,o,0.5,mean
 inaturalist,undercov_gap,UnderCovGap,0.01,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.0,8142.0,gray,o,0.5,mean
 inaturalist,undercov_gap,UnderCovGap,0.01,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.0,8142.0,gray,o,0.5,mean

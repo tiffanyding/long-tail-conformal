@@ -2,7 +2,7 @@ dataset,coverage_metric,coverage_metric_name,alpha,method_key,method_category,me
 inaturalist,cov_below50,FracBelow50%,0.1,standard,Standard,Standard,,0.05821665438467207,10.885218595193285,blue,X,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.1,classwise,Classwise,Classwise,,0.0,7427.950267159885,red,X,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.1,clustered,Clustered,Clustered,,0.05883075411446819,8.427737036796676,purple,P,0.8,mean
-inaturalist,cov_below50,FracBelow50%,0.1,rc3p,RC3P,RC3P,,0.11913534758044707,680.7642286975145,#FF5733,D,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.1,rc3p,RC3P,RC3P,,0.0,7427.950267159885,#FF5733,D,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.1,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.0,7427.972613407749,gray,o,0.5,mean
 inaturalist,cov_below50,FracBelow50%,0.1,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.0,7428.6523243991605,gray,o,0.5,mean
 inaturalist,cov_below50,FracBelow50%,0.1,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.00454433800049128,5782.4873126095135,gray,o,0.5,mean
@@ -37,7 +37,7 @@ inaturalist,cov_below50,FracBelow50%,0.1,standard_softmax,Standard (Softmax),Sta
 inaturalist,cov_below50,FracBelow50%,0.2,standard,Standard,Standard,,0.14812085482682388,2.8491141540658056,blue,X,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.2,classwise,Classwise,Classwise,,0.005772537460083518,6658.040041534168,red,X,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.2,clustered,Clustered,Clustered,,0.14689265536723164,2.902957146256517,purple,P,0.8,mean
-inaturalist,cov_below50,FracBelow50%,0.2,rc3p,RC3P,RC3P,,0.12417096536477525,657.4933480433513,#FF5733,D,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.2,rc3p,RC3P,RC3P,,0.005772537460083518,6658.040041534168,#FF5733,D,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.2,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.005772537460083518,6658.093365349255,gray,o,0.5,mean
 inaturalist,cov_below50,FracBelow50%,0.2,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.005772537460083518,6651.107015380621,gray,o,0.5,mean
 inaturalist,cov_below50,FracBelow50%,0.2,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.03758290346352248,1617.8454150171976,gray,o,0.5,mean
@@ -72,7 +72,7 @@ inaturalist,cov_below50,FracBelow50%,0.2,standard_softmax,Standard (Softmax),Sta
 inaturalist,cov_below50,FracBelow50%,0.05,standard,Standard,Standard,,0.02431834929992631,33.9724619810933,blue,X,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.05,classwise,Classwise,Classwise,,0.0,7830.570532372855,red,X,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.05,clustered,Clustered,Clustered,,0.02407270940800786,29.07564843057088,purple,P,0.8,mean
-inaturalist,cov_below50,FracBelow50%,0.05,rc3p,RC3P,RC3P,,0.11901252763448784,697.8782746014234,#FF5733,D,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.05,rc3p,RC3P,RC3P,,0.0,7830.570532372855,#FF5733,D,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.05,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.0,7830.570532372855,gray,o,0.5,mean
 inaturalist,cov_below50,FracBelow50%,0.05,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.0,7830.570532372855,gray,o,0.5,mean
 inaturalist,cov_below50,FracBelow50%,0.05,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.0,7814.99206091678,gray,o,0.5,mean
@@ -107,7 +107,7 @@ inaturalist,cov_below50,FracBelow50%,0.05,standard_softmax,Standard (Softmax),St
 inaturalist,cov_below50,FracBelow50%,0.01,standard,Standard,Standard,,0.003930238270695161,266.2118026261709,blue,X,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.01,classwise,Classwise,Classwise,,0.0,8142.0,red,X,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.01,clustered,Clustered,Clustered,,0.003930238270695161,266.2118026261709,purple,P,0.8,mean
-inaturalist,cov_below50,FracBelow50%,0.01,rc3p,RC3P,RC3P,,0.11901252763448784,726.1556666017696,#FF5733,D,0.8,mean
+inaturalist,cov_below50,FracBelow50%,0.01,rc3p,RC3P,RC3P,,0.0,8142.0,#FF5733,D,0.8,mean
 inaturalist,cov_below50,FracBelow50%,0.01,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.0,8142.0,gray,o,0.5,mean
 inaturalist,cov_below50,FracBelow50%,0.01,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.0,8142.0,gray,o,0.5,mean
 inaturalist,cov_below50,FracBelow50%,0.01,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.0,8142.0,gray,o,0.5,mean

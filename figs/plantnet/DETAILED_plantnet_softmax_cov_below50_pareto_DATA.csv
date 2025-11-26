@@ -4,7 +4,7 @@ plantnet,cov_below50,FracBelow50%,0.2,classwise,Classwise,Classwise,,0.007400555
 plantnet,cov_below50,FracBelow50%,0.2,classwise-exact,Exact Classwise,Exact Classwise,,0.16558741905642924,276.669741578812,red,d,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.2,clustered,Clustered,Clustered,,0.5716928769657724,0.9948572897917203,purple,P,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.2,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.18316373728029603,2.149942144510157,orange,^,0.8,mean
-plantnet,cov_below50,FracBelow50%,0.2,rc3p,RC3P,RC3P,,0.16188714153561518,118.21438673180766,#FF5733,D,0.8,mean
+plantnet,cov_below50,FracBelow50%,0.2,rc3p,RC3P,RC3P,,0.16188714153561518,118.21435458986886,#FF5733,D,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.5587419056429233,0.9964965286706094,gray,o,0.3,mean
 plantnet,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.5263644773358002,1.0064283877603497,gray,o,0.475,mean
 plantnet,cov_below50,FracBelow50%,0.2,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.48103607770582796,1.0370917973772178,gray,o,0.6499999999999999,mean
@@ -40,7 +40,7 @@ plantnet,cov_below50,FracBelow50%,0.1,classwise,Classwise,Classwise,,0.0,780.171
 plantnet,cov_below50,FracBelow50%,0.1,classwise-exact,Exact Classwise,Exact Classwise,,0.04070305272895467,476.88927102082795,red,d,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.1,clustered,Clustered,Clustered,,0.39777983348751156,1.5693623039341733,purple,P,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.1,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.16281221091581868,2.6043648752892774,orange,^,0.8,mean
-plantnet,cov_below50,FracBelow50%,0.1,rc3p,RC3P,RC3P,,0.15541165587419056,120.6619953715608,#FF5733,D,0.8,mean
+plantnet,cov_below50,FracBelow50%,0.1,rc3p,RC3P,RC3P,,0.15541165587419056,120.66196322962202,#FF5733,D,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.3894542090656799,1.571708665466701,gray,o,0.3,mean
 plantnet,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.37280296022201664,1.557887631781949,gray,o,0.475,mean
 plantnet,cov_below50,FracBelow50%,0.1,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.3506012950971323,1.63216765235279,gray,o,0.6499999999999999,mean
@@ -76,7 +76,7 @@ plantnet,cov_below50,FracBelow50%,0.05,classwise,Classwise,Classwise,,0.0,896.94
 plantnet,cov_below50,FracBelow50%,0.05,classwise-exact,Exact Classwise,Exact Classwise,,0.014801110083256245,641.3643610182567,red,d,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.05,clustered,Clustered,Clustered,,0.28677150786308975,2.3945101568526614,purple,P,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.05,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.11748381128584644,4.3501864232450504,orange,^,0.8,mean
-plantnet,cov_below50,FracBelow50%,0.05,rc3p,RC3P,RC3P,,0.15541165587419056,123.89605296991515,#FF5733,D,0.8,mean
+plantnet,cov_below50,FracBelow50%,0.05,rc3p,RC3P,RC3P,,0.15541165587419056,123.89602082797634,#FF5733,D,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.27752081406105455,2.7546284391874516,gray,o,0.3,mean
 plantnet,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.25716928769657726,2.703940601697094,gray,o,0.475,mean
 plantnet,cov_below50,FracBelow50%,0.05,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.2414431082331175,2.918841604525585,gray,o,0.6499999999999999,mean
@@ -112,7 +112,7 @@ plantnet,cov_below50,FracBelow50%,0.01,classwise,Classwise,Classwise,,0.0,1027.4
 plantnet,cov_below50,FracBelow50%,0.01,classwise-exact,Exact Classwise,Exact Classwise,,0.0,899.6052327076369,red,d,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.01,clustered,Clustered,Clustered,,0.11655874190564293,13.10921830804834,purple,P,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.01,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.056429232192414434,18.396406531241965,orange,^,0.8,mean
-plantnet,cov_below50,FracBelow50%,0.01,rc3p,RC3P,RC3P,,0.15541165587419056,135.64248521470816,#FF5733,D,0.8,mean
+plantnet,cov_below50,FracBelow50%,0.01,rc3p,RC3P,RC3P,,0.15541165587419056,135.64245307276934,#FF5733,D,0.8,mean
 plantnet,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.10823311748381129,13.96197608639753,gray,o,0.3,mean
 plantnet,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.1026827012025902,14.263146052969915,gray,o,0.475,mean
 plantnet,cov_below50,FracBelow50%,0.01,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.09435707678075855,16.005624839290306,gray,o,0.6499999999999999,mean

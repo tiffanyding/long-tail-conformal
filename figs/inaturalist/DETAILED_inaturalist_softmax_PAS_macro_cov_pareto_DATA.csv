@@ -2,7 +2,7 @@ dataset,coverage_metric,coverage_metric_name,alpha,method_key,method_category,me
 inaturalist,macro_cov,MacroCov,0.1,standard,Standard,Standard,,0.8489876697496477,10.885218595193285,blue,X,0.8,mean
 inaturalist,macro_cov,MacroCov,0.1,classwise,Classwise,Classwise,,0.9924525857738953,7427.950267159885,red,X,0.8,mean
 inaturalist,macro_cov,MacroCov,0.1,clustered,Clustered,Clustered,,0.8448895096582595,8.427737036796676,purple,P,0.8,mean
-inaturalist,macro_cov,MacroCov,0.1,rc3p,RC3P,RC3P,,0.7775764521048005,680.7642286975145,#FF5733,D,0.8,mean
+inaturalist,macro_cov,MacroCov,0.1,rc3p,RC3P,RC3P,,0.9924525857738953,7427.950267159885,#FF5733,D,0.8,mean
 inaturalist,macro_cov,MacroCov,0.1,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.9924697805663297,7427.972613407749,gray,o,0.5,mean
 inaturalist,macro_cov,MacroCov,0.1,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.9925476479252304,7428.6523243991605,gray,o,0.5,mean
 inaturalist,macro_cov,MacroCov,0.1,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.9786570231652905,5782.4873126095135,gray,o,0.5,mean
@@ -37,7 +37,7 @@ inaturalist,macro_cov,MacroCov,0.1,standard_softmax,Standard (Softmax),Standard 
 inaturalist,macro_cov,MacroCov,0.2,standard,Standard,Standard,,0.7269282835556736,2.8491141540658056,blue,X,0.8,mean
 inaturalist,macro_cov,MacroCov,0.2,classwise,Classwise,Classwise,,0.9693906093445714,6658.040041534168,red,X,0.8,mean
 inaturalist,macro_cov,MacroCov,0.2,clustered,Clustered,Clustered,,0.7285058049357307,2.902957146256517,purple,P,0.8,mean
-inaturalist,macro_cov,MacroCov,0.2,rc3p,RC3P,RC3P,,0.7648659127171331,657.4933480433513,#FF5733,D,0.8,mean
+inaturalist,macro_cov,MacroCov,0.2,rc3p,RC3P,RC3P,,0.9693906093445714,6658.040041534168,#FF5733,D,0.8,mean
 inaturalist,macro_cov,MacroCov,0.2,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.9696795328329578,6658.093365349255,gray,o,0.5,mean
 inaturalist,macro_cov,MacroCov,0.2,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.9694862288191162,6651.107015380621,gray,o,0.5,mean
 inaturalist,macro_cov,MacroCov,0.2,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.8910738485119452,1617.8454150171976,gray,o,0.5,mean
@@ -72,7 +72,7 @@ inaturalist,macro_cov,MacroCov,0.2,standard_softmax,Standard (Softmax),Standard 
 inaturalist,macro_cov,MacroCov,0.05,standard,Standard,Standard,,0.9168856395900095,33.9724619810933,blue,X,0.8,mean
 inaturalist,macro_cov,MacroCov,0.05,classwise,Classwise,Classwise,,0.9984290452497925,7830.570532372855,red,X,0.8,mean
 inaturalist,macro_cov,MacroCov,0.05,clustered,Clustered,Clustered,,0.9173141132893947,29.07564843057088,purple,P,0.8,mean
-inaturalist,macro_cov,MacroCov,0.05,rc3p,RC3P,RC3P,,0.7816426042050852,697.8782746014234,#FF5733,D,0.8,mean
+inaturalist,macro_cov,MacroCov,0.05,rc3p,RC3P,RC3P,,0.9984290452497925,7830.570532372855,#FF5733,D,0.8,mean
 inaturalist,macro_cov,MacroCov,0.05,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,0.9984290452497925,7830.570532372855,gray,o,0.5,mean
 inaturalist,macro_cov,MacroCov,0.05,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,0.9984290452497925,7830.570532372855,gray,o,0.5,mean
 inaturalist,macro_cov,MacroCov,0.05,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,0.9983993634363771,7814.99206091678,gray,o,0.5,mean
@@ -107,7 +107,7 @@ inaturalist,macro_cov,MacroCov,0.05,standard_softmax,Standard (Softmax),Standard
 inaturalist,macro_cov,MacroCov,0.01,standard,Standard,Standard,,0.9806027031415405,266.2118026261709,blue,X,0.8,mean
 inaturalist,macro_cov,MacroCov,0.01,classwise,Classwise,Classwise,,1.0,8142.0,red,X,0.8,mean
 inaturalist,macro_cov,MacroCov,0.01,clustered,Clustered,Clustered,,0.9806027031415405,266.2118026261709,purple,P,0.8,mean
-inaturalist,macro_cov,MacroCov,0.01,rc3p,RC3P,RC3P,,0.7830801556864838,726.1556666017696,#FF5733,D,0.8,mean
+inaturalist,macro_cov,MacroCov,0.01,rc3p,RC3P,RC3P,,1.0,8142.0,#FF5733,D,0.8,mean
 inaturalist,macro_cov,MacroCov,0.01,fuzzy-rarity-1e-30,Fuzzy-rarity,fuzzy-rarity-1e-30,bandwidth=1e,1.0,8142.0,gray,o,0.5,mean
 inaturalist,macro_cov,MacroCov,0.01,fuzzy-rarity-1e-15,Fuzzy-rarity,fuzzy-rarity-1e-15,bandwidth=1e,1.0,8142.0,gray,o,0.5,mean
 inaturalist,macro_cov,MacroCov,0.01,fuzzy-rarity-1e-10,Fuzzy-rarity,fuzzy-rarity-1e-10,bandwidth=1e,1.0,8142.0,gray,o,0.5,mean

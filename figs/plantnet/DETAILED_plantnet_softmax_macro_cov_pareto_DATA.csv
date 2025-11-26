@@ -4,7 +4,7 @@ plantnet,macro_cov,MacroCov,0.2,classwise,Classwise,Classwise,,0.926721958550763
 plantnet,macro_cov,MacroCov,0.2,classwise-exact,Exact Classwise,Exact Classwise,,0.7264104581032788,276.669741578812,red,d,0.8,mean
 plantnet,macro_cov,MacroCov,0.2,clustered,Clustered,Clustered,,0.37317164499804684,0.9948572897917203,purple,P,0.8,mean
 plantnet,macro_cov,MacroCov,0.2,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.7380835600928485,2.149942144510157,orange,^,0.8,mean
-plantnet,macro_cov,MacroCov,0.2,rc3p,RC3P,RC3P,,0.7423865232187733,118.21438673180766,#FF5733,D,0.8,mean
+plantnet,macro_cov,MacroCov,0.2,rc3p,RC3P,RC3P,,0.7423865232187733,118.21435458986886,#FF5733,D,0.8,mean
 plantnet,macro_cov,MacroCov,0.2,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.3877602179629557,0.9964965286706094,gray,o,0.3,mean
 plantnet,macro_cov,MacroCov,0.2,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.40918865357380746,1.0064283877603497,gray,o,0.475,mean
 plantnet,macro_cov,MacroCov,0.2,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.4380959127487328,1.0370917973772178,gray,o,0.6499999999999999,mean
@@ -40,7 +40,7 @@ plantnet,macro_cov,MacroCov,0.1,classwise,Classwise,Classwise,,0.975832918488155
 plantnet,macro_cov,MacroCov,0.1,classwise-exact,Exact Classwise,Exact Classwise,,0.8970386002143242,476.88927102082795,red,d,0.8,mean
 plantnet,macro_cov,MacroCov,0.1,clustered,Clustered,Clustered,,0.5133251322910791,1.5693623039341733,purple,P,0.8,mean
 plantnet,macro_cov,MacroCov,0.1,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.7630140163634639,2.6043648752892774,orange,^,0.8,mean
-plantnet,macro_cov,MacroCov,0.1,rc3p,RC3P,RC3P,,0.7707622841194653,120.6619953715608,#FF5733,D,0.8,mean
+plantnet,macro_cov,MacroCov,0.1,rc3p,RC3P,RC3P,,0.7707622841194653,120.66196322962202,#FF5733,D,0.8,mean
 plantnet,macro_cov,MacroCov,0.1,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.5254309138992365,1.571708665466701,gray,o,0.3,mean
 plantnet,macro_cov,MacroCov,0.1,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.5422314084372803,1.557887631781949,gray,o,0.475,mean
 plantnet,macro_cov,MacroCov,0.1,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.564751579177044,1.63216765235279,gray,o,0.6499999999999999,mean
@@ -76,7 +76,7 @@ plantnet,macro_cov,MacroCov,0.05,classwise,Classwise,Classwise,,0.99264821026207
 plantnet,macro_cov,MacroCov,0.05,classwise-exact,Exact Classwise,Exact Classwise,,0.9497626837909217,641.3643610182567,red,d,0.8,mean
 plantnet,macro_cov,MacroCov,0.05,clustered,Clustered,Clustered,,0.638161079928126,2.3945101568526614,purple,P,0.8,mean
 plantnet,macro_cov,MacroCov,0.05,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.83529842415755,4.3501864232450504,orange,^,0.8,mean
-plantnet,macro_cov,MacroCov,0.05,rc3p,RC3P,RC3P,,0.7820200960780215,123.89605296991515,#FF5733,D,0.8,mean
+plantnet,macro_cov,MacroCov,0.05,rc3p,RC3P,RC3P,,0.7820200960780215,123.89602082797634,#FF5733,D,0.8,mean
 plantnet,macro_cov,MacroCov,0.05,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.6540792547275104,2.7546284391874516,gray,o,0.3,mean
 plantnet,macro_cov,MacroCov,0.05,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.6738286028130769,2.703940601697094,gray,o,0.475,mean
 plantnet,macro_cov,MacroCov,0.05,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.6940139665523021,2.918841604525585,gray,o,0.6499999999999999,mean
@@ -112,7 +112,7 @@ plantnet,macro_cov,MacroCov,0.01,classwise,Classwise,Classwise,,0.99971333502197
 plantnet,macro_cov,MacroCov,0.01,classwise-exact,Exact Classwise,Exact Classwise,,0.9925386143231968,899.6052327076369,red,d,0.8,mean
 plantnet,macro_cov,MacroCov,0.01,clustered,Clustered,Clustered,,0.854843921695225,13.10921830804834,purple,P,0.8,mean
 plantnet,macro_cov,MacroCov,0.01,prevalence-adjusted,Standard w. PAS,Standard w. PAS,,0.9294707572734655,18.396406531241965,orange,^,0.8,mean
-plantnet,macro_cov,MacroCov,0.01,rc3p,RC3P,RC3P,,0.7869321063371634,135.64248521470816,#FF5733,D,0.8,mean
+plantnet,macro_cov,MacroCov,0.01,rc3p,RC3P,RC3P,,0.7869321063371634,135.64245307276934,#FF5733,D,0.8,mean
 plantnet,macro_cov,MacroCov,0.01,cvx-cw_weight=0,Interp-Q,cvx-cw_weight=0,weight=0.0,0.8651919107870107,13.96197608639753,gray,o,0.3,mean
 plantnet,macro_cov,MacroCov,0.01,cvx-cw_weight=0.25,Interp-Q,cvx-cw_weight=0.25,weight=0.25,0.872558156748382,14.263146052969915,gray,o,0.475,mean
 plantnet,macro_cov,MacroCov,0.01,cvx-cw_weight=0.5,Interp-Q,cvx-cw_weight=0.5,weight=0.5,0.8851368316010255,16.005624839290306,gray,o,0.6499999999999999,mean
